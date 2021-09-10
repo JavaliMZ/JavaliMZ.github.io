@@ -1,3 +1,3 @@
 # Máquinas Linux
 
-![Linux](Assets/Linux/linux.png)
+![Linux](Assets/Linux/linux.jfif)

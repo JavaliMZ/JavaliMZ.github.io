@@ -2,9 +2,9 @@
 /* Globals */
 
 :root {
-    --sidebar-width: 300px;
-    --page-padding: 15px;
-    --content-max-width: 750px;
+    --sidebar-width: 13%;
+    --page-padding: 0px;
+    --content-max-width: 80%;
     --menu-bar-height: 50px;
 }
 

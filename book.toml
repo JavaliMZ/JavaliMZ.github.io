@@ -1,9 +1,9 @@
 [book]
 authors = ["JavaliMZ"]
-language = "en"
+language = "pt"
 multilingual = false
 src = "src"
-title = "WriteUp HackTheBox - by JavaliMZ"
+title = "WriteUps HackTheBox - by JavaliMZ"
 
 
 [output.html]
@@ -11,7 +11,6 @@ additional-css = ["theme/css/additional.css",]
 additional-js = []
 default-theme = "dark"
 preferred-dark-theme = "ayu"
-no-section-label = true
 site-url = "/"
 
 [output.html.print]

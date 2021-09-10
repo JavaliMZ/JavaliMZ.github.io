@@ -383,6 +383,7 @@ ul#searchresults span.teaser em {
 }
 
 .chapter ol {
+	padding-bottom: 15px;
     width: 100%;
 }
 
@@ -406,6 +407,7 @@ ul#searchresults span.teaser em {
 }
 
 .chapter li > a.toggle {
+	display: none;
     cursor: pointer;
     display: block;
     margin-left: auto;
@@ -415,12 +417,13 @@ ul#searchresults span.teaser em {
 }
 
 .chapter li > a.toggle div {
+	display: none;
     transition: transform 0.5s;
 }
 
 /* collapse the section */
 .chapter li:not(.expanded) + li > ol {
-    display: none;
+    
 }
 
 .chapter li.chapter-item {
