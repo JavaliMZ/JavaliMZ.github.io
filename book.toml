@@ -1,0 +1,6 @@
+[book]
+authors = ["JavaliMZ"]
+language = "en"
+multilingual = false
+src = "src"
+title = "WriteUp HackTheBox - by JavaliMZ"
