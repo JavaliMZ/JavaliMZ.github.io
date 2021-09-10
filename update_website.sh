@@ -3,6 +3,8 @@
 # Make sure we are in our repository directory
 cd /home/javali/Documents/JavaliMZ.github.io
 # Check status of the git repo, add new files and commit
+mdbook build
+
 git status
 git add -A
 
