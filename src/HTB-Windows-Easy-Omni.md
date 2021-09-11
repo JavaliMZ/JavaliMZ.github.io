@@ -1,5 +1,7 @@
 ![](Assets/HTB-Windows-Easy-omni/icon.webp)
 
+<img src="https://img.shields.io/badge/OMNI-HackTheBox-green?style=plastic" width="200">
+
 # Resolução da máquina _OMNI_
 
 #### Máquina Fácil (hackthebox.com)

@@ -138,7 +138,7 @@ a > .hljs {
     max-width: 150px;
     min-width: 90px;
 
-    display: flex;
+    display: none;
     justify-content: center;
     align-content: center;
     flex-direction: column;

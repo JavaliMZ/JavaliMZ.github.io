@@ -1,5 +1,7 @@
 ![](Assets/HTB-Linux-Hard-Falafel/icon.webp)
 
+<img src="https://img.shields.io/badge/Falafel-HackTheBox-red?style=plastic" width="200">
+
 # Resolução da máquina **Falafel**
 
 #### Máquina HARD (hackthebox.com)
@@ -9,7 +11,6 @@
 ---
 
 ---
-
 
 # Enumeração
 
