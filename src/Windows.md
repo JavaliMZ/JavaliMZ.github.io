@@ -6,6 +6,6 @@ Acho que nunca vi pela internet a resolução das máquinas em português (certa
 
 ![No Metasploit](Assets/Windows/no_metasploit.jfif)
 
-# Seccção Windows
+# Secção Windows
 
 ![Windows joke](Assets/Windows/joke.jfif)

