@@ -176,7 +176,7 @@ Nessas notas podemos ver que o servidor Web é feito com Xampp, e fala novamente
 
 Neste ponto temos de fazer um break e expor as informações que temos:
 
--   Temos a possibilidade de fazer que o usuário "admin" abra um ficheiro.js disponível no nosso servidor http, através de um XSS na página de um usuário não privilegiado logado.
+-   Temos a possibilidade de fazer com que o usuário "admin" abra um ficheiro.js disponível no nosso servidor http, através de um XSS na página de um usuário não privilegiado logado.
 
 -   Temos ainda a possibilidade de ler arquivos do sistema com SQLi (no primeiro campo)na página Web do usuário "admin"
 
