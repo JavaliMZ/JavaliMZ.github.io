@@ -186,7 +186,7 @@ Aí é que surge a magia! E se, através de um XSS, o "admin" simulado executar 
 
 Sabemos que:
 
--       Estamos perante um Xampp
+-   Estamos perante um Xampp
 -   Se tentarmos enviar um dir, podemos ver o request, ou através de burpsuite, ou logo pelo navegador:
 
 ![dir backdoorchecker.php](Assets/HTB-Windows-Insane-Bankrobber/dir_backdoorchecker.png)
@@ -228,11 +228,12 @@ request.send(params)
 
 # PrivEsc
 
-Depois de um café, vamos enumerar um pouco a máquina. 
+Depois de um café, vamos enumerar um pouco a máquina.
 
 ```powershell
 netstat -ano
 ```
+
 ![Porta nova](Assets/HTB-Windows-Insane-Bankrobber/newport.png)
 
 Existe uma porta nova, que não existia no NMAP, por estar bloqueado a nível de firewall para se poder operar apenas por localhost. Porta 910!
@@ -240,6 +241,7 @@ Existe uma porta nova, que não existia no NMAP, por estar bloqueado a nível de
 ```powershell
 tasklist
 ```
+
 ![tasklist](Assets/HTB-Windows-Insane-Bankrobber/tasklist.png)
 
 Através do PID, verificamos que o programa que está a ocupar esta porta é o bankv2.exe.
@@ -318,6 +320,7 @@ def main():
 
 main()
 ```
+
 Com esse simples script, vou testando todos os PINs até que me reporta qual é:
 
 ![PIN](Assets/HTB-Windows-Insane-Bankrobber/pin.png)
@@ -330,11 +333,12 @@ Dá para tentar reescrever o commando que é suposto aparecer ali, para ver o qu
 
 ![Admin RCE](Assets/HTB-Windows-Insane-Bankrobber/admin_pwned.png)
 
-Isto não é bem um BufferOverFlow, mas a base é a mesma. Reescrever uma instrução. 
+Isto não é bem um BufferOverFlow, mas a base é a mesma. Reescrever uma instrução.
 
 ![Admin whoami](Assets/HTB-Windows-Insane-Bankrobber/admin_whoami_authority-system.png)
 
 As flags estão sempre no mesmo sítio...
+
 ```powershell
 type C:\Users\Cortin\Desktop\user.txt
 #>  f635346600876a43441cf1..........

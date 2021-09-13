@@ -259,10 +259,7 @@ request.send()
 <p>Aí é que surge a magia! E se, através de um XSS, o &quot;admin&quot; simulado executar um request a partir da sua própria máquina (esperemos que esteja no localhost da máquina 10.10.10.154) para que executa um comando no tal segundo campo da sua própria pagina admin?! Cuidado AIAI xD Mas ainda falta uma coisinha. Não temos a possíbilidade de saber como funciona o tal segundo campo (onde se pode executar um dir). Bem não sabemos ainda...</p>
 <p>Sabemos que:</p>
 <ul>
-<li>
-<pre><code>  Estamos perante um Xampp
-</code></pre>
-</li>
+<li>Estamos perante um Xampp</li>
 <li>Se tentarmos enviar um dir, podemos ver o request, ou através de burpsuite, ou logo pelo navegador:</li>
 </ul>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/dir_backdoorchecker.png" alt="dir backdoorchecker.php" /></p>
@@ -297,7 +294,7 @@ request.send(params)
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/rce.png" alt="rce.js" /></p>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/in-the-target-machine.png" alt="In the target machine" /></p>
 <h1 id="privesc"><a class="header" href="#privesc">PrivEsc</a></h1>
-<p>Depois de um café, vamos enumerar um pouco a máquina. </p>
+<p>Depois de um café, vamos enumerar um pouco a máquina.</p>
 <pre><code class="language-powershell">netstat -ano
 </code></pre>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/newport.png" alt="Porta nova" /></p>
@@ -374,7 +371,7 @@ main()
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/bufferOverflow.png" alt="BufferOverFlow" /></p>
 <p>Dá para tentar reescrever o commando que é suposto aparecer ali, para ver o que acontece. Depois de perceber quantos caracteres são precisos para reescrever o comando (32 caracteres), é só concatenar a essas 32 caracteres, um comando nosso:</p>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_pwned.png" alt="Admin RCE" /></p>
-<p>Isto não é bem um BufferOverFlow, mas a base é a mesma. Reescrever uma instrução. </p>
+<p>Isto não é bem um BufferOverFlow, mas a base é a mesma. Reescrever uma instrução.</p>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_whoami_authority-system.png" alt="Admin whoami" /></p>
 <p>As flags estão sempre no mesmo sítio...</p>
 <pre><code class="language-powershell">type C:\Users\Cortin\Desktop\user.txt
