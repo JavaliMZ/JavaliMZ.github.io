@@ -1,1 +1,1 @@
-# http://JavaliMZ.github.io
+# https://javalimz.github.io/book/HTB-Windows-Easy-Sauna.html
