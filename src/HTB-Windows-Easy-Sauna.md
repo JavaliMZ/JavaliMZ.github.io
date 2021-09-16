@@ -326,7 +326,7 @@ A resposta é comprida... mas pelo meio encontra-se o Hash NTML do usuário de d
 
 ![Administrator Login](Assets/HTB-Windows-Easy-Sauna/PrivEsc-Administrator-login.png)
 
-E já somos donos de todo o Domain Controller! Podemos fazer o que quisermos...
+E já somos donos de todo o Domain Controller! Podemos fazer o que quisermos... Agora podemos facilmente ver as flags...
 
 ```bash
 cmd /c 'dir /r /s root.txt user.txt'  # As flags encontram-se repetidos e diferentes locais. Para não se procurar muito manualmente lool
@@ -335,4 +335,3 @@ type 'C:\Users\Administrator\Desktop\root.txt'
 type 'C:\Users\FSmith\Desktop\user.txt'
 #>  f60d2f69c67ec56ad618ef..........
 ```
-
