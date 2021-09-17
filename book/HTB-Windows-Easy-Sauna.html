@@ -96,7 +96,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="Windows.html"><strong aria-hidden="true">1.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">1.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item expanded "><a href="HTB-Windows-Easy-Sauna.html" class="active"><strong aria-hidden="true">1.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">1.3.</strong> HTB-Windows-Insane-Bankrobber</a></li></ol></li><li class="chapter-item "><a href="Linux.html"><strong aria-hidden="true">2.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">2.1.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="Windows.html"><strong aria-hidden="true">1.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">1.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item expanded "><a href="HTB-Windows-Easy-Sauna.html" class="active"><strong aria-hidden="true">1.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">1.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item "><a href="HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">1.4.</strong> HTB-Windows-Insane-Bankrobber</a></li></ol></li><li class="chapter-item "><a href="Linux.html"><strong aria-hidden="true">2.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">2.1.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -405,7 +405,7 @@ upload mimikatz.exe
 </code></pre>
 <p>A resposta é comprida... mas pelo meio encontra-se o Hash NTML do usuário de domínio Administrator. Verificamos as credenciais, sempre com a mesma ferramenta crackmapexec</p>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/PrivEsc-Administrator-login.png" alt="Administrator Login" /></p>
-<p>E já somos donos de todo o Domain Controller! Podemos fazer o que quisermos...</p>
+<p>E já somos donos de todo o Domain Controller! Podemos fazer o que quisermos... Agora podemos facilmente ver as flags...</p>
 <pre><code class="language-bash">cmd /c 'dir /r /s root.txt user.txt'  # As flags encontram-se repetidos e diferentes locais. Para não se procurar muito manualmente lool
 type 'C:\Users\Administrator\Desktop\root.txt'
 #&gt;  1e5fcd4ecf49643b2ef3cf..........
@@ -420,7 +420,7 @@ type 'C:\Users\FSmith\Desktop\user.txt'
                             <a rel="prev" href="HTB-Windows-Easy-Omni.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                            <a rel="next" href="HTB-Windows-Insane-Bankrobber.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="HTB-Windows-Medium-Resolute.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -432,7 +432,7 @@ type 'C:\Users\FSmith\Desktop\user.txt'
                     <a rel="prev" href="HTB-Windows-Easy-Omni.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                    <a rel="next" href="HTB-Windows-Insane-Bankrobber.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="HTB-Windows-Medium-Resolute.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

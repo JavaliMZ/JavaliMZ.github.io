@@ -6,6 +6,8 @@
 
 	-	[HTB-Windows-Easy-Sauna](./HTB-Windows-Easy-Sauna.md)
 
+	-	[HTB-Windows-Medium-Resolute](./HTB-Windows-Medium-Resolute.md)
+
 	-	[HTB-Windows-Insane-Bankrobber](./HTB-Windows-Insane-Bankrobber.md)
 
 
