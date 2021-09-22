@@ -8,6 +8,8 @@
 
 	-	[HTB-Windows-Medium-Resolute](./HTB-Windows-Medium-Resolute.md)
 
+	-	[HTB-Windows-Medium-Cascade](./HTB-Windows-Medium-Cascade.md)
+
 	-	[HTB-Windows-Insane-Bankrobber](./HTB-Windows-Insane-Bankrobber.md)
 
 
