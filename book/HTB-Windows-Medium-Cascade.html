@@ -96,7 +96,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="Windows.html"><strong aria-hidden="true">1.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">1.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">1.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">1.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item expanded "><a href="HTB-Windows-Medium-Cascade.html" class="active"><strong aria-hidden="true">1.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item "><a href="HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">1.5.</strong> HTB-Windows-Insane-Bankrobber</a></li></ol></li><li class="chapter-item "><a href="Linux.html"><strong aria-hidden="true">2.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">2.1.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="Windows.html"><strong aria-hidden="true">1.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">1.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">1.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">1.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item expanded "><a href="HTB-Windows-Medium-Cascade.html" class="active"><strong aria-hidden="true">1.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item "><a href="HTB-Windows-Hard-Blackfield.html"><strong aria-hidden="true">1.5.</strong> HTB-Windows-Hard-Blackfield</a></li><li class="chapter-item "><a href="HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">1.6.</strong> HTB-Windows-Insane-Bankrobber</a></li></ol></li><li class="chapter-item "><a href="Linux.html"><strong aria-hidden="true">2.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">2.1.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -419,11 +419,11 @@ crackmapexec winrm 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
 <p><img src="Assets/HTB-Windows-Medium-Cascade/evil-winrm-arksvc.png" alt="Evil-winrm de arksvc" /></p>
 <p>A ultima fase para escalar privilégios até administrador é a seguinte: Este usuário está no grupo &quot;<em>CASCADE\AD Recycle Bin</em>&quot;. Isto permite ver todos os objectos do active directory que foram removidos. Isto inclui o tal usuário TempAdmin, cuja a sua password poderá ser a mesma do que a do Administrator.</p>
 <p>Para reaver todos os objectos removidos, basta uma linha de comando...</p>
-<pre><code class="language-powershell">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties *
+<pre><code class="language-bash">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties *
 </code></pre>
 <p>Á resposta deste comando nesta máquina não é muito grande... mas normalmente é enorme. Por isso, recomendo exportar para um ficheiro, fazer o download deste para a nossa maquina, e fazer um grep por &quot;<strong>LegacyPwd e CanonicalName</strong>&quot;
 ´</p>
-<pre><code class="language-powershell">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties * &gt; output.txt
+<pre><code class="language-bash">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties * &gt; output.txt
 # Pelo evil-winrm, é possível fazer donwload e upload directamente com a ferramenta:
 download &quot;C:/Users/arksvc/Documents/output.txt&quot;
 </code></pre>
@@ -446,7 +446,7 @@ cat output.txt | grep -Ei &quot;Legacypwd|canonicalName&quot;
 <p>Esta password era do usuário TempAdmin, mas o ficheiro html nos indicava que este usuário tinha a mesma password do que o administrador. Vamos fazer um spray na mesma com crackmapexec, mas à partida não há dúvidas</p>
 <p><img src="Assets/HTB-Windows-Medium-Cascade/crackmapexec-admin.png" alt="crackmapexec Administrator" /></p>
 <p>Está feito! Somos donos da máquina...</p>
-<pre><code class="language-powershell">cmd /c 'dir /r /s root.txt user.txt 2&gt;NUL'
+<pre><code class="language-bash">cmd /c 'dir /r /s root.txt user.txt 2&gt;NUL'
 
 (type C:\Users\Administrator\Desktop\root.txt).SubString(0,15)
 #&gt;  84c82c72c538ca8
@@ -461,7 +461,7 @@ cat output.txt | grep -Ei &quot;Legacypwd|canonicalName&quot;
                             <a rel="prev" href="HTB-Windows-Medium-Resolute.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                            <a rel="next" href="HTB-Windows-Insane-Bankrobber.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="HTB-Windows-Hard-Blackfield.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -473,7 +473,7 @@ cat output.txt | grep -Ei &quot;Legacypwd|canonicalName&quot;
                     <a rel="prev" href="HTB-Windows-Medium-Resolute.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                    <a rel="next" href="HTB-Windows-Insane-Bankrobber.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="HTB-Windows-Hard-Blackfield.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

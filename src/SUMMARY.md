@@ -10,6 +10,8 @@
 
 	-	[HTB-Windows-Medium-Cascade](./HTB-Windows-Medium-Cascade.md)
 
+	-	[HTB-Windows-Hard-Blackfield](./HTB-Windows-Hard-Blackfield.md)
+
 	-	[HTB-Windows-Insane-Bankrobber](./HTB-Windows-Insane-Bankrobber.md)
 
 

