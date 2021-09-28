@@ -14,6 +14,8 @@
 
 	-	[HTB-Windows-Insane-Bankrobber](./HTB-Windows-Insane-Bankrobber.md)
 
+	-	[HTB-Windows-Insane-APT](./HTB-Windows-Insane-APT.md)
+
 
 
 -   [Máquinas Linux](./Linux.md)
