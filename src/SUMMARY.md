@@ -26,4 +26,4 @@
 
 -	[Projectos Antigos de programação em puro Javascript]()
 
-	-	[Tetrix](./)
+	-	[Tetrix](../../OldProjects/tetrix/index.html)
