@@ -44,6 +44,10 @@ function criar_sistema_solar() {
 	let lua            = new Moon(15, 2.5, 30, 0.95, terra, imgs['lua'])
 	let lua_de_marte   = new Moon(15, 2.1, 60, 0.95, marte, imgs[`lua${floor(random(1, 11))}`])
 	let lua_de_marte_2 = new Moon(10.5, 2.9, 50, 0.95, marte, imgs[`lua${floor(random(1, 11))}`])
+	let luas_de_jupiter = 10 // Não é o número real...
+	let luas_de_saturno = 8  // Não é o número real...
+	let luas_de_urano = 6    // Não é o número real...
+	let luas_de_neptuno = 5  // Não é o número real...
 
 	astros.push(
 		sol,
@@ -61,7 +65,7 @@ function criar_sistema_solar() {
 		lua_de_marte_2
 	)
 
-	for (let i = 0; i < 79; i++) {
+	for (let i = 0; i < luas_de_jupiter; i++) {
 		let dist, r, s, a, img
 		dist  = random(1.5, 50)
 		r     = random(0.25, 2.5)
@@ -72,7 +76,7 @@ function criar_sistema_solar() {
 		astros.push(lua_i)
 	}
 
-	for (let i = 0; i < 82; i++) {
+	for (let i = 0; i < luas_de_saturno; i++) {
 		let dist, r, s, a, img
 		dist  = random(1.5, 75)
 		r     = random(0.25, 2.5)
@@ -83,7 +87,7 @@ function criar_sistema_solar() {
 		astros.push(lua_i)
 	}
 
-	for (let i = 0; i < 27; i++) {
+	for (let i = 0; i < luas_de_urano; i++) {
 		let dist, r, s, a, img
 		dist  = random(1.5, 100)
 		r     = random(0.25, 2.5)
@@ -94,7 +98,7 @@ function criar_sistema_solar() {
 		astros.push(lua_i)
 	}
 
-	for (let i = 0; i < 14; i++) {
+	for (let i = 0; i < luas_de_neptuno; i++) {
 		let dist, r, s, a, img
 		dist  = random(1.5, 125)
 		r     = random(0.25, 2.5)
