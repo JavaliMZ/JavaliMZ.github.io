@@ -22,8 +22,6 @@
 
 	-   [HTB-Linux-Hard-Falafel](./HTB-Linux-Hard-Falafel.md)
 
--------------------------------
+------------------------------------
 
--	[Projectos Antigos de programação em puro Javascript]()
-
-	-	[Tetrix](../../OldProjects/tetrix/index.html)
+-	[Projetos Antigos de programação em puro Javascript](./Projetos-Antigos.md)
