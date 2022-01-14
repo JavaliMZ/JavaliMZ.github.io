@@ -39,7 +39,7 @@ Esta máquina tem apenas 2 portas abertas! E para não engonhar, para não ter u
 
 ### Porta 80
 
-O servidor web tem paginas de internet mas não se consegue entrar por ai... Apenas há uma informação de relevo, mas que nem sequer é perciso entrar pelo browser para ver isso
+O servidor web tem paginas de internet mas não se consegue entrar por ai... Apenas há uma informação de relevo, mas que nem sequer é preciso entrar pelo browser para ver isso
 
 ```bash
 whatweb http://10.10.10.213/ | sed 's/, /\n/g'
@@ -70,22 +70,22 @@ rcpclient 10.10.10.213 -U 'anonymous' -N
 rcpclient 10.10.10.213 -U '%'
 ```
 
-Todas as tentativas de conexão falharam... e agora?! Poderíamos tentar analisar portas UDP, visto que o scan que foi feito com o NMAP foi apenas portas TCP. Mas não vai resultar. O que acontece é que as portas devem estar bloqueados com regras de firewall.
+Todas as tentativas de conexão falharam... e agora?! Poderíamos tentar analisar portas UDP, visto que o scan que foi feito com o NMAP foi apenas portas TCP. Mas não há portas UDP abertas. O que acontece é que as portas devem estar bloqueadas com regras de firewall.
 
 ## Firewall
 
-É preciso desde já entender uma coisa. Administradores comuns só estão habituados a trabalhar com IPv4. Pode acontecer que não liguem às regras por IPv6! É exatamente esse o ponto desta máquina. Para burlar o firewall, apenas temos de arranjar formas de descobrir o IPv6 da máquina.
+Um problema comum entre os administradores de redes é que só estão habituados a trabalhar com IPv4. Pode acontecer que não liguem às regras por IPv6! É exatamente esse o ponto desta máquina. Para burlar o firewall, apenas temos de arranjar formas de descobrir o IPv6 da máquina.
 
-Para isso, com a ajuda do serviço RPC que está aberto, podemos chamar uma função, ServerAlive2() do objecto IObjectExporter sem estar autenticado. Esse comando devolve o que é chamado de OXID resolution, que é o que indica ao cliente por que via se pode conectar aos demais objectos. As informações que nos dá é só o nome da máquina, e os seus IP (Tanto IPv4 como o IPv6). Basicamente, é o comparado ao Ping.
+Para isso, com a ajuda do serviço RPC que está aberto, podemos chamar uma função, ServerAlive2() do objecto IObjectExporter sem estar autenticado. Esse comando devolve o que é chamado de OXID resolution, que é o que indica ao cliente por que via se pode conectar aos demais objectos. As informações que nos dá é só o nome da máquina, e os seus IPs (Tanto IPv4 como o IPv6). Basicamente, é o comparado ao Ping.
 
 -   O ping é o que permite determinar a responsividade do alvo através do protocolo ARP, e
 -   IObjectExporter::ServerAlive2 é o que permite receber os IPs do alvo através do protocolo DCERPC/IOXIDResolver.
 
-> **!!ATENÇÃO!!** Todo o parágrafo acima é para se ler de relance... Porque, eu não percebi tudo do que li, e certamente falta muitas informações...
+> **!!ATENÇÃO!!** Todo o parágrafo acima é para se ler de relance... Porque, eu não percebi tudo do que li, e certamente falta muita informação...
 
 ### IOXIDResolver
 
-Para conceguir saber o IPv6, por RPC, basta usar esta ferramenta
+Para conseguir saber o IPv6, por RPC, basta usar esta ferramenta
 
 > https://github.com/mubix/IOXIDResolver
 
