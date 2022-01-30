@@ -9,8 +9,8 @@ title = "WriteUps HackTheBox - by JavaliMZ"
 [output.html]
 additional-css = ["theme/css/additional.css",]
 additional-js = []
-default-theme = "dark"
-preferred-dark-theme = "ayu"
+default-theme = "Ayu"
+preferred-dark-theme = "Ayu"
 site-url = "/"
 
 [output.html.print]
