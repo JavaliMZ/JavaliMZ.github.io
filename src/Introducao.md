@@ -1,14 +1,14 @@
 # JavaliMZ
 
-![Javali Icon](Assets/Introducao/javali.png)
+<img src="Assets/Introducao/javali.png" width="300">
 
 Este site foi desenhado apenas a título pessoal, na brincadeira quase, apenas para orientar um pouco mais as minhas ideias enquanto encontro dificuldades no meu objetivo principal: Aprender o chamado Hacking Ético.
 
-Depositarei aqui alguns writeups de máquinas do HackTheBox e pouco mais
+Depositarei aqui alguns writeups de máquinas do HackTheBox e pouco mais.
 
 Na barra do lado esquerdo estão disponíveis os links do diferentes writeups que foram "uploadados" ao longo do tempo.
 
-"ATACA-TE PRIMEIRO, ANTES QUE OUTROS O FAÇAm COM INTENÇÕES MENOS BENÉVOLAS"
+"ATACA PRIMEIRO, ANTES QUE OUTROS O FAÇAM COM INTENÇÕES MENOS LOUVÁVEIS"
 
 ![Cadeado cybersecurity](Assets/Introducao/cyber.jpg)
 
