@@ -167,7 +167,7 @@
 <p><img src="Assets/HTB-Linux-Easy-Pandora/nmap1.png" alt="nmap1" /></p>
 <p>Existem aparentemente apenas 2 portas aberta em TCP, a porta SSH e a porta HTTP.</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/nmap2.png" alt="nmap2" /></p>
-<p>Com a ferramenta <em>whatweb</em>, vemos ums emails relacionado com a máquina: <em><strong>contact@panda.htb</strong></em> e <em><strong>support@panda.htb</strong></em>. Podemos pensar em VirtualHosting, e servidor de email SMTP. Mas nenhuma porta está aberta...</p>
+<p>Com a ferramenta <em>whatweb</em>, vemos uns emails relacionado com a máquina: <em><strong>contact@panda.htb</strong></em> e <em><strong>support@panda.htb</strong></em>. Podemos pensar em VirtualHosting, e servidor de email SMTP. Mas nenhuma porta está aberta...</p>
 <h2 id="virtualhosting-e-webpage"><a class="header" href="#virtualhosting-e-webpage">VirtualHosting e WebPage</a></h2>
 <p>Para verificar se existe virtual hosting, vamos começar pelo básico, adicionar o host ao /etc/hosts. Temos um potencial hostname válido, o <strong>panda.htb</strong></p>
 <pre><code class="language-bash">sudo su
@@ -231,10 +231,10 @@ ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-11
 <h2 id="virtualhost"><a class="header" href="#virtualhost">VirtualHost</a></h2>
 <p>Agora que estamos na máquina, podemos verificar se existe virtual hosting. Para isso, tenho feito da seguinte maneira:</p>
 <ul>
-<li>Verificar o CMS</li>
-<li>Sabendo o CMS, pesquisar o diretório/ficheiro onde está armazenado a informação de virtual hosting.</li>
+<li>Verificar o servidor web</li>
+<li>Sabendo o servidor web, pesquisar o diretório/ficheiro onde está armazenado a informação de virtual hosting.</li>
 </ul>
-<p>Para este caso, nos já sabemos o CMS que está a ser usado, pelo comando &quot;<strong><em>whatweb</em></strong>&quot; que efetuamos logo no início, depois do nosso &quot;<strong><em>nmap</em></strong>&quot;. É um Apache 2.4.41. Normalmente, a pretendida informação encontra-se no diretório /etc/apache2/sites-available/</p>
+<p>Para este caso, nos já sabemos o servidor web que está a ser usado, pelo comando &quot;<strong><em>whatweb</em></strong>&quot; que efetuamos logo no início, depois do nosso &quot;<strong><em>nmap</em></strong>&quot;. É um Apache 2.4.41. Normalmente, a pretendida informação encontra-se no diretório /etc/apache2/sites-available/</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/virtualhost.png" alt="virtualhost" /></p>
 <p>Agora sim podemos afirmar que existe algo mais. Exite um site geral, acessível por toda a web <strong>(&lt;VirtualHost *:80&gt;)</strong> com o seu conteúdo definido em /var/www/html, e existe outro site, acessível apenas pelo localhost <strong>(&lt;VirtualHost localhost:80&gt;)</strong> cujo diretório referente encontra-se em /var/www/pandora.</p>
 <blockquote>

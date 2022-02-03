@@ -28,7 +28,7 @@ Existem aparentemente apenas 2 portas aberta em TCP, a porta SSH e a porta HTTP.
 
 ![nmap2](Assets/HTB-Linux-Easy-Pandora/nmap2.png)
 
-Com a ferramenta _whatweb_, vemos ums emails relacionado com a máquina: ***contact@panda.htb*** e ***support@panda.htb***. Podemos pensar em VirtualHosting, e servidor de email SMTP. Mas nenhuma porta está aberta...
+Com a ferramenta _whatweb_, vemos uns emails relacionado com a máquina: ***contact@panda.htb*** e ***support@panda.htb***. Podemos pensar em VirtualHosting, e servidor de email SMTP. Mas nenhuma porta está aberta...
 
 ## VirtualHosting e WebPage
 
@@ -120,10 +120,10 @@ Existe um binário bastante suspeito! pandora_backup. É SUID. Significa que, ne
 
 Agora que estamos na máquina, podemos verificar se existe virtual hosting. Para isso, tenho feito da seguinte maneira:
 
--   Verificar o CMS
--   Sabendo o CMS, pesquisar o diretório/ficheiro onde está armazenado a informação de virtual hosting.
+-   Verificar o servidor web
+-   Sabendo o servidor web, pesquisar o diretório/ficheiro onde está armazenado a informação de virtual hosting.
 
-Para este caso, nos já sabemos o CMS que está a ser usado, pelo comando "**_whatweb_**" que efetuamos logo no início, depois do nosso "**_nmap_**". É um Apache 2.4.41. Normalmente, a pretendida informação encontra-se no diretório /etc/apache2/sites-available/
+Para este caso, nos já sabemos o servidor web que está a ser usado, pelo comando "**_whatweb_**" que efetuamos logo no início, depois do nosso "**_nmap_**". É um Apache 2.4.41. Normalmente, a pretendida informação encontra-se no diretório /etc/apache2/sites-available/
 
 ![virtualhost](Assets/HTB-Linux-Easy-Pandora/virtualhost.png)
 
