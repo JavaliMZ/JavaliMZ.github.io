@@ -1,0 +1,36 @@
+body {
+	background: hsl(210, 25%, 8%);
+	font      : normal 15pt arial;
+	margin    : auto;
+	text-align: center;
+}
+
+header {
+	color     : rgb(75, 255, 30);
+	text-align: center;
+}
+
+section {
+	background   : rgb(199, 199, 199);
+	border-radius: 10px;
+	padding      : 15px;
+	width        : min-content;
+	margin       : auto;
+	text-align   : center;
+	box-shadow   : 5px 5px 10px rgba(0, 0, 0, 0.313);
+}
+
+canvas {
+	box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.313);
+}
+
+footer {
+	color     : rgb(7, 7, 7);
+	text-align: center;
+	font-style: italic;
+}
+
+p {
+	font: normal 10pt arial;
+	color :rgb(199, 199, 199)
+}
