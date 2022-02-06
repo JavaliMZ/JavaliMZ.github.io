@@ -1,4 +1,4 @@
-# JavaliMZ
+# Sylvain "JavaliMZ" Júlio
 
 <img src="Assets/Introducao/javali.png" width="300">
 
