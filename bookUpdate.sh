@@ -5,6 +5,8 @@ cd /home/javali/Documents/JavaliMZ.github.io
 # Check status of the git repo, add new files and commit
 mdbook build
 
+rm -drf docs
+mkdir docs
 cp book/* docs -r
 
 git status
