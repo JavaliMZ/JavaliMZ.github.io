@@ -14,7 +14,7 @@
 
 # Introduction
 
-This writeup was made for 2 purposes. Normally, my writeups are in Portuguese, but this time, I do it in English because I am in a Cyber Security degree, and I need to do an assignment for English class in the 2022 winter break. The assignment was to summarize and explain 3 good articles about something we like, but I didn't know what to choose, so I decided to make the "Precious" machine from HTB and read some articles about the machine's vulnerabilities. Also, teacher Maria's goal is to keep us interested and active in English, so I think I'm respecting the global rules =).
+This writeup was made for 2 purposes. Normally, my writeups are in Portuguese, but this time, I do it in English because I am in a Cyber Security degree, and I need to do an assignment for English class in the 2022 winter break. The assignment was to summarize and explain 3 good articles about something I like, but I didn't know what to choose, so I decided to make the "Precious" machine from HTB and read some articles about the machine's vulnerabilities. Also, teacher Maria's goal is to keep us interested and active in English, so I think I'm respecting the global rules =).
 
 For this time, I don't go to talk about possible ways to find something or explain different stuffs that not in the machine, because it's already a lot of work write and think in English. I just go to talk about the machine and the way to get Administrator of the machine, and only that.
 
