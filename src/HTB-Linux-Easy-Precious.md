@@ -1,4 +1,4 @@
-![](Assets\HTB-Linux-Easy-Precious.md\Precious.png)
+![](Assets/HTB-Linux-Easy-Precious/Precious.png)
 
 <img src="https://img.shields.io/badge/Precious-HackTheBox-green?style=plastic" width="200">
 
