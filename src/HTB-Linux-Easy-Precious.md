@@ -36,17 +36,17 @@ ping -c 1 10.10.11.189
     # rtt min/avg/max/mdev = 72.530/72.530/72.530/0.000 ms
 ```
 
-We send a ICMP packet, and the target machine send it back. With the **ping** command (like ping pong), we know the machine is alive and we can start scanning the ports. We noticed one more thing with ping command. The result gives us TTL (Time to Live) and refers to the number of hops that a packet is allowed to make before it is discarded. When a packet run through the Internet, every time this packet passes through a route, the router decrements this value by 1. For Windows, TTL starts at 128, and for Linux, TTL starts at 64. We can use this information by approximation to know the OS of the target machine. In this case, is likely a Linux machine. It is important for future commands on the target machine.
+We send a ICMP packet, and the target machine send it back. With the **ping** command (like ping pong), we know the machine is alive and we can start scanning the ports. We noticed one more thing with ping command. The result gives us TTL (Time to Live) and refers to the number of hops that a packet is allowed to make before it is discarded. When a packet run through the Internet, every time this packet passes through a router, the router decrements this value by 1. For Windows, TTL starts at 128, and for Linux, TTL starts at 64. We can use this information by approximation to know the Operating System of the target machine. In this case, is likely a Linux machine. It is important for future commands on the target machine.
 
 ![Enumeration all ports](Assets/HTB-Linux-Easy-Precious/EnumerationAllPorts.png)
 
-With the response of the big **nmap** command, we know that on the target machine, we got 2 ports open: port 22 and port 80. Normally, port 22 is for a server SSH and the port 80 is for a Web Server. The server SSH is a remote secure shell, for interact my command line with the machine when we connect in with the right credentials. We don't have any credentials so we can't do nothing here. We just have one more port. The Web Server.
+With the response of the big **nmap** command, we know that on the target machine, we got 2 ports open: port 22 and port 80. Normally, port 22 is for a server SSH and the port 80 is for a Web Server. The server SSH is a remote secure shell, for connect my command line with the machine when we connect in with the right credentials. We don't have any credentials so we can't do nothing here. We just have one more port. The Web Server.
 
 Before we start locking the Website, we can do a more powerful scan, with **nmap** too.
 
 ![Enumeration targeted ports](Assets/HTB-Linux-Easy-Precious/EnumerationTargeted.png)
 
-This new command gives us more information. The Webserver redirect us to http://precious.htb/, but that Website don't exist. We know the site is on this IP but the Webserver want us to get in by the URL http://precious.htb/. We can do that by saying to our machine that the IP for this URL is the IP of the target machine. For that, we can edit as root (Super User) the file **/etc/hosts** and add the line:
+This new command gives us more information. The Webserver redirect us to http://precious.htb/, but that Website don't exist. We know the site is on this IP but the Webserver want us to get in by the URL http://precious.htb/. We can do that by saying to our machine that the URL http://precious.htb/ correspond to the IP of the target machine. For that, we can edit as root (Super User) the file **/etc/hosts** and add the line:
 
 ```bash
 echo "10.10.11.189\tprecious.htb" >> /etc/hosts
