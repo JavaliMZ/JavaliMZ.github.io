@@ -24,7 +24,10 @@
 
 	-	[HTB-Linux-Easy-Pandora](./HTB-Linux-Easy-Pandora.md)
 
+	-	[HTB-Linux-Easy-Precious](./HTB-Linux-Easy-Precious.md)
+
 	-   [HTB-Linux-Hard-Falafel](./HTB-Linux-Hard-Falafel.md)
+
 
 ------------------------------------
 
