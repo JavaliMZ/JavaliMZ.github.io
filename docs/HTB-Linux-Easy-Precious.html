@@ -172,7 +172,7 @@
 <p>For this time, I don't go to talk about possible ways to find something or explain different stuffs that not in the machine, because it's already a lot of work write and think in English. I just go to talk about the machine and the way to get Administrator of the machine, and only that.</p>
 <p>I try to do a lot of analogies to the real world for my teacher don't get too lost xD. I will try to do my best</p>
 <h1 id="enumeration"><a class="header" href="#enumeration">Enumeration</a></h1>
-<p>Like every machine, we need to know where to get in. HTB give us the IP address but, we don't know nothing more. The IP address is like a house, but we need to figure out where are the doors to get in. In a machine, the doors are called &quot;Ports&quot;. They are always 65355 ports in all machines. It is a lot!! But we are not knock on all the ports manually... For that we have a tool called <strong>nmap</strong>.</p>
+<p>Like every machine, we need to know where to get in. HTB give us the IP address but, we don't know nothing more. The IP address is like an address of a house, but we need to figure out what doors is open to get in. In a machine, the doors are called &quot;Ports&quot; (in reference to the ports of ships that allow the arrival of goods from the outside world). They are always 65355 ports in all machines. It is a lot!! But we are not knock on all the ports manually... For that we have a tool called <strong>nmap</strong>.</p>
 <p>First, we need to confirm that we can reach the IP:</p>
 <pre><code class="language-bash">ping -c 1 10.10.11.189
     # PING 10.10.11.189 (10.10.11.189) 56(84) bytes of data.
@@ -192,7 +192,7 @@
 </code></pre>
 <p>Now, we can access the Website:</p>
 <p><img src="Assets/HTB-Linux-Easy-Precious/WebSite.png" alt="Website" /></p>
-<p>It is an website to convert Websites to PDF. We can do some basic tests to get more information about the Website. We can try to serve a Webserver and enter the new URL to see what happens:</p>
+<p>It is a website to convert Websites to PDF. We can do some basic tests to get more information about the Website. We can try to serve a Webserver and enter the new URL to see what happens:</p>
 <pre><code class="language-bash">python -m http.server 80
 </code></pre>
 <p>This is a really simple Webserver, but it is enough for us. We can enter our URL <strong>(http://10.10.14.144/)</strong> to our Webserver and see what happens:</p>

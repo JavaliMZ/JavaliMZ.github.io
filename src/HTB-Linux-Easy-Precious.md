@@ -22,7 +22,7 @@ I try to do a lot of analogies to the real world for my teacher don't get too lo
 
 # Enumeration
 
-Like every machine, we need to know where to get in. HTB give us the IP address but, we don't know nothing more. The IP address is like a house, but we need to figure out where are the doors to get in. In a machine, the doors are called "Ports". They are always 65355 ports in all machines. It is a lot!! But we are not knock on all the ports manually... For that we have a tool called **nmap**.
+Like every machine, we need to know where to get in. HTB give us the IP address but, we don't know nothing more. The IP address is like an address of a house, but we need to figure out what doors is open to get in. In a machine, the doors are called "Ports" (in reference to the ports of ships that allow the arrival of goods from the outside world). They are always 65355 ports in all machines. It is a lot!! But we are not knock on all the ports manually... For that we have a tool called **nmap**.
 
 First, we need to confirm that we can reach the IP:
 
@@ -56,7 +56,7 @@ Now, we can access the Website:
 
 ![Website](Assets/HTB-Linux-Easy-Precious/WebSite.png)
 
-It is an website to convert Websites to PDF. We can do some basic tests to get more information about the Website. We can try to serve a Webserver and enter the new URL to see what happens:
+It is a website to convert Websites to PDF. We can do some basic tests to get more information about the Website. We can try to serve a Webserver and enter the new URL to see what happens:
 
 ```bash
 python -m http.server 80
