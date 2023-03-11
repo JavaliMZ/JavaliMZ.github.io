@@ -1,0 +1,455 @@
+<!DOCTYPE HTML>
+<html lang="pt" class="sidebar-visible no-js ayu">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Configuração avançada de um servidor SSH - WriteUps HackTheBox - by JavaliMZ</title>
+
+
+        <!-- Custom HTML head -->
+        <!-- Content here gets appended to the <html><head> of all the pages -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script
+        	async
+        	src='https://www.googletagmanager.com/gtag/js?id=G-ZCM4NEDCZB'
+        ></script>
+        <script>
+        	window.dataLayer = window.dataLayer || []; function
+        	gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config',
+        	'G-ZCM4NEDCZB');
+        </script>
+        <!-- Custom HTML head: Twitter support -->
+        <script
+        	async
+        	src='https://platform.twitter.com/widgets.js'
+        	charset='utf-8'
+        ></script>
+        
+        <meta
+        	name='google-site-verification'
+        	content='g05a2qliKESUMKBSl7XG8sosQoaFtDugS6F9MlUbe1Y'
+        />
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/css/additional.css">
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../../index.html"><strong aria-hidden="true">1.</strong> Introdução</a></li><li class="chapter-item "><a href="../../Windows.html"><strong aria-hidden="true">2.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../HTB/HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">2.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">2.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">2.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Medium-Cascade.html"><strong aria-hidden="true">2.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Hard-Blackfield.html"><strong aria-hidden="true">2.5.</strong> HTB-Windows-Hard-Blackfield</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">2.6.</strong> HTB-Windows-Insane-Bankrobber</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Insane-APT.html"><strong aria-hidden="true">2.7.</strong> HTB-Windows-Insane-APT</a></li></ol></li><li class="chapter-item "><a href="../../Linux.html"><strong aria-hidden="true">3.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../HTB/HTB-Linux-Easy-Pandora.html"><strong aria-hidden="true">3.1.</strong> HTB-Linux-Easy-Pandora</a></li><li class="chapter-item "><a href="../../HTB/HTB-Linux-Easy-Precious.html"><strong aria-hidden="true">3.2.</strong> HTB-Linux-Easy-Precious</a></li><li class="chapter-item "><a href="../../HTB/HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">3.3.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li><li class="chapter-item expanded "><a href="../../CiberSeguranca.html"><strong aria-hidden="true">4.</strong> Trabalhos do Curso de Ciber Segurança</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../CursoCiberSeguranca/Trabalho2/Trabalho2.html"><strong aria-hidden="true">4.1.</strong> Acesso Remoto (SSH)</a></li><li class="chapter-item expanded "><a href="../../CursoCiberSeguranca/Trabalho3/Trabalho3.html" class="active"><strong aria-hidden="true">4.2.</strong> Configuração avançada de um servidor SSH</a></li><li class="spacer"></li></ol></li><li class="chapter-item "><a href="../../Projetos-Antigos.html"><strong aria-hidden="true">5.</strong> Projetos Antigos de programação em puro Javascript</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu (default)</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">WriteUps HackTheBox - by JavaliMZ</h1>
+
+                    <div class="right-buttons">
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="t03---configuração-avançada-de-um-servidor-ssh"><a class="header" href="#t03---configuração-avançada-de-um-servidor-ssh">T03 - Configuração avançada de um servidor SSH</a></h1>
+<blockquote>
+<p>Para este trabalho, foi pedido que fosse configurado um servidor SSH da seguinte forma:</p>
+<ul>
+<li>Não permitir autenticação com utilizador root</li>
+<li>Desativar acesso sem password</li>
+<li>Criar um Banner com msg &quot;Bem-vindo ao SSH de ARS! CUIDADO!&quot;</li>
+<li>Mudar porto lógico para 5555</li>
+<li>Mudar número de tentativas de ligação para 2</li>
+<li>Mudar tempo de espera para autenticação para 5 segundos</li>
+<li>Permitir apenas a autenticação de 2 utilizadores (criados no sistema)</li>
+<li>Permitir apenas a autenticação de 2 endereços IP</li>
+</ul>
+</blockquote>
+<h2 id="1-não-permitir-autenticação-com-utilizador-root"><a class="header" href="#1-não-permitir-autenticação-com-utilizador-root">1. Não permitir autenticação com utilizador root</a></h2>
+<p>De facto, esta configuração é bastante pertinente, pois, como sabemos, o utilizador root é o utilizador com mais privilégios no sistema. Se por algum motivo, as credenciais deste utilizador forem roubadas, o atacante continuará a não poder aceder à máquina mesmo que o serviço SSH esteja aberto. Terá de roubar 2 credenciais no mínimo (utilizador normal para aceder ao SSH e utilizador root para escalar privilégios), o que é mais difícil...</p>
+<p>Para fazer esta configuração, iremos informar o servidor <strong>sshd</strong> de que o root não pode efetuar login da seguinte forma:</p>
+<center>
+<img src="./Assets/Trabalho3ssh1.png" width="">
+<br>
+<br>
+<br>
+<img src="./Assets/Trabalho3ssh2.png" width="">
+</center>
+<p>(As cores do terminal estão um pouco estranhas, mas é tema do zsh e das suas extensões...)</p>
+<p>:exclamation: Um ponto importante: O root já não tem acesso, mas pede na mesma a password, e leva o seu tempo a verificar a mesma. Faz exatamente o mesmo com outro nome de utilizador que nem sequer existe. Isso é muito bom, pois é uma forma de evitar enumerar utilizadores da máquina por mudanças de comportamento no tempo de resposta do servidor SSH. :exclamation:</p>
+<h2 id="2-desativar-acesso-sem-password"><a class="header" href="#2-desativar-acesso-sem-password">2. Desativar acesso sem password</a></h2>
+<p>Esta configuração é bastante simples, basta apenas adicionar/descomentar a linha do ficheiro de configuração do <strong>sshd</strong> que menciona a autenticação sem password:</p>
+<pre><code class="language-bash">cat /etc/ssh/sshd_config | grep -i empty
+        #PermitEmptyPasswords no
+
+sed -i 's/#PermitEmptyPasswords no/PermitEmptyPasswords no/g' /etc/ssh/sshd_config
+cat /etc/ssh/sshd_config | grep -i empty
+        PermitEmptyPasswords no
+</code></pre>
+<div style="page-break-after: always;"></div>
+<h2 id="3-criar-um-banner-com-msg-bem-vindo-ao-ssh-de-ars-cuidado"><a class="header" href="#3-criar-um-banner-com-msg-bem-vindo-ao-ssh-de-ars-cuidado">3. Criar um Banner com msg &quot;Bem-vindo ao SSH de ARS! CUIDADO!&quot;</a></h2>
+<p>Para esta configuração, iremos criar um ficheiro de texto com a mensagem que queremos que apareça no banner, e depois iremos indicar ao <strong>sshd</strong> onde está esse ficheiro:</p>
+<pre><code class="language-bash">echo &quot;Bem-vindo ao SSH de ARS! CUIDADO\!&quot; &gt; /etc/ssh/banner.txt
+cat /etc/ssh/banner.txt
+        Bem-vindo ao SSH de ARS! CUIDADO!
+
+cat /etc/ssh/sshd_config | grep -i banner
+        # no default banner path
+        #Banner none
+
+sed -i 's/#Banner none/Banner \/etc\/ssh\/banner.txt/g' /etc/ssh/sshd_config
+cat /etc/ssh/sshd_config | grep -i banner
+        Banner /etc/ssh/banner.txt
+</code></pre>
+<h2 id="4-mudar-porto-lógico-para-5555"><a class="header" href="#4-mudar-porto-lógico-para-5555">4. Mudar porto lógico para 5555</a></h2>
+<p>Para esta configuração, iremos replicar o que fizemos no trabalho anterior. A recordar, o processo foi mais complexo do que apenas mudar o ficheiro /etc/ssh/sshd_config, pois tivemos de alterar as <strong>políticas</strong> e a <strong>firewall</strong> para se adequar ao novo porto lógico.</p>
+<pre><code class="language-bash"># Alteração da porta lógica no ficheiro de configuração do sshd
+cat /etc/ssh/sshd_config | grep 4444
+        Port 4444
+
+sed -i 's/4444/5555/g' /etc/ssh/sshd_config
+cat /etc/ssh/sshd_config | grep 5555
+        Port 5555
+
+# Alteração da porta lógica nas políticas do sistema
+semanage port -a -t ssh_port_t -p tcp 5555
+semanage port -m -t ssh_port_t -p tcp 5555
+semanage port -l | grep ssh
+        ssh_port_t                    tcp      22, 4444, 5555
+
+# Eliminar a porta antiga
+semanage port -d -t ssh_port_t -p tcp 4444
+semanage port -l | grep ssh
+        ssh_port_t                    tcp      22, 5555
+
+# Alteração da porta lógica na firewall
+firewall-cmd --state
+firewall-cmd --permanent --remove-service=ssh
+firewall-cmd --permanent --add-port=5555/tcp
+firewall-cmd --reload
+
+# Reiniciar o serviço sshd
+systemctl restart sshd
+</code></pre>
+<h2 id="5-mudar-número-de-tentativas-de-ligação-para-2"><a class="header" href="#5-mudar-número-de-tentativas-de-ligação-para-2">5. Mudar número de tentativas de ligação para 2</a></h2>
+<p>Para esta configuração, iremos apenas adicionar/descomentar a linha do ficheiro de configuração do <strong>sshd</strong> que menciona o número de tentativas de login:</p>
+<pre><code class="language-bash">cat /etc/ssh/sshd_config | grep -i max
+        #MaxAuthTries 6
+        #MaxSessions 10
+        #ClientAliveCountMax 3
+        #MaxStartups 10:30:100
+sed -i 's/#MaxAuthTries 6/MaxAuthTries 2/g' /etc/ssh/sshd_config
+cat /etc/ssh/sshd_config | grep -i max
+        MaxAuthTries 2
+        #MaxSessions 10
+        #ClientAliveCountMax 3
+        #MaxStartups 10:30:100
+</code></pre>
+<h2 id="6-mudar-tempo-de-espera-para-autenticação-para-5-segundos"><a class="header" href="#6-mudar-tempo-de-espera-para-autenticação-para-5-segundos">6. Mudar tempo de espera para autenticação para 5 segundos</a></h2>
+<p>Para esta configuração, iremos apenas adicionar/descomentar a linha do ficheiro de configuração do <strong>sshd</strong> que menciona o tempo de espera para autenticação:</p>
+<pre><code class="language-bash">cat /etc/ssh/sshd_config | grep -i LoginGraceTime
+        #LoginGraceTime 2m
+sed -i 's/#LoginGraceTime 2m/LoginGraceTime 5/g' /etc/ssh/sshd_config
+cat /etc/ssh/sshd_config | grep -i LoginGraceTime
+        LoginGraceTime 5
+</code></pre>
+<h2 id="7-permitir-apenas-a-autenticação-de-2-utilizadores-criados-no-sistema"><a class="header" href="#7-permitir-apenas-a-autenticação-de-2-utilizadores-criados-no-sistema">7. Permitir apenas a autenticação de 2 utilizadores (criados no sistema)</a></h2>
+<p>Este passo consiste em limitar o nome de utilizadores que se podem autenticar ao servidor SSH. Até agora, criei de forma voluntária 2 utilizadores, que são &quot;javali&quot; e &quot;guest&quot;. Para informar o <strong>sshd</strong> que só estes 2 utilizadores podem aceder ao servidor, iremos adicionar as seguintes configurações ao ficheiro de configuração do <strong>sshd</strong>:</p>
+<pre><code class="language-bash">cat /etc/ssh/sshd_config | grep -i AllowUsers
+echo &quot;AllowUsers javali guest&quot; &gt;&gt; /etc/ssh/sshd_config
+
+cat /etc/ssh/sshd_config | grep -i AllowUsers
+        AllowUsers javali guest
+</code></pre>
+<h2 id="8-permitir-apenas-a-autenticação-de-2-endereços-ip"><a class="header" href="#8-permitir-apenas-a-autenticação-de-2-endereços-ip">8. Permitir apenas a autenticação de 2 endereços IP</a></h2>
+<p>Esta configuração permite reduzir os riscos de ataques a quase zero, pois só permitimos que 2 endereços IP (controlados pela organização) se autentiquem ao servidor SSH. Apesar da ideia ser muito boa, não encontrei nenhuma maneira simples de a fazer dentro do <strong>sshd_config</strong>. Poderia tratar de fazer isto com a firewall, mas como o trabalho consiste em configurar o SSH, e que provavelmente iremos ter outro trabalho sobre como configurar a firewall, vou tratar de resolver o problema pelo lado do SSH.</p>
+<p>A configuração anterior permitiu-nos restringir o acesso a apenas 2 utilizadores através da configuração chamada de <strong>&quot;AllowUsers&quot;</strong>. Segundo a documentação do <strong>sshd_config</strong>, esta configuração pode ser usada para restringir não só o utilizador, mas também o endereço IP que o utilizador está a usar. Para isso, irei alterar a configuração anterior para:</p>
+<pre><code class="language-bash"># As duas primeiras linhas irei indicar todos os endereços que vem da mesma rede interna, como se fosse dentro de uma empresa por exemplo
+# As ultimas linhas serão para um endereço de fora da rede interna, como se fosse um IP público de casa por exemplo.
+
+sed -i 's/AllowUsers javali guest/AllowUsers javali@192.168.1.*/g' /etc/ssh/sshd_config
+echo &quot;AllowUsers guest@192.168.1.*&quot; &gt;&gt; /etc/ssh/sshd_config
+echo &quot;AllowUsers javali@&lt;ip address especifico&gt;&quot; &gt;&gt; /etc/ssh/sshd_config
+echo &quot;AllowUsers guest@&lt;ip address especifico&gt;&quot; &gt;&gt; /etc/ssh/sshd_config
+
+cat /etc/ssh/sshd_config | grep -i AllowUsers
+        AllowUsers javali@192.168.1.*
+        AllowUsers guest@192.168.1.*
+        AllowUsers javali@&lt;ip address especifico&gt;
+        AllowUsers guest@&lt;ip address especifico&gt;
+
+</code></pre>
+<div style="page-break-after: always;"></div>
+<h1 id="outras-configurações-que-podem-ser-feitas"><a class="header" href="#outras-configurações-que-podem-ser-feitas">Outras configurações que podem ser feitas</a></h1>
+<h2 id="9-desativar-o-acesso-por-password"><a class="header" href="#9-desativar-o-acesso-por-password">9. Desativar o acesso por password</a></h2>
+<p>Esta configuração tem como objetivo desativar o acesso por password. Isso traz mais uma segurança ao sistema, pois mesmo que haja uma fuga de informação, só será possível aceder ao sistema com uma chave privada. Poderá adicionar-se uma passfrase à chave privada, que iria aumentar ainda mais a segurança.</p>
+<p>Para esta configuração, teremos de fazer duas coisas. A configuração em si é só uma, mas para conseguirmos ligar-nos ao servidor SSH novamente, teremos de criar uma chave pública e privada do lado do cliente, adicionar a chave pública ao ficheiro que iremos criar chamado authorized_keys.</p>
+<pre><code class="language-bash"># --- Cliente ---
+# Criar uma chave pública e privada
+ssh-keygen
+        Generating public/private rsa key pair.
+        Enter file in which to save the key (/home/&lt;username&gt;/.ssh/id_rsa):
+        Created directory '/home/&lt;username&gt;/.ssh'.
+        Enter passphrase (empty for no passphrase):
+        Enter same passphrase again:
+        Your identification has been saved in /home/&lt;username&gt;/.ssh/id_rsa
+        Your public key has been saved in /home/&lt;username&gt;/.ssh/id_rsa.pub
+        The key fingerprint is:
+        SHA256:2+brO2aThilvxP2FKI/Trjt162qA/AggBgV1KgdWEWU &lt;username&gt;@RockyBalboa
+        The key s randomart image is:
+        +---[RSA 3072]----+
+        |o=++=E           |
+        |o. o.            |
+        |o o              |
+        |.+.              |
+        |.. . . oS. . .   |
+        |    . o =o+ o .  |
+        |     . +.Xo+ o   |
+        |      o Oo@ o    |
+        |       ++%BB.    |
+        +----[SHA256]-----+
+
+# Copiar a chave pública para o servidor SSH com o nome authorized_keys
+scp -P 5555 id_rsa.pub &lt;username&gt;@192.168.56.101:~/.ssh/authorized_keys
+
+# Se já houver uma chave pública no servidor SSH, terá de adicionar a nova chave pública ao ficheiro authorized_keys sem apagar a chave pública anterior
+# --- Cliente ---
+scp -P 5555 id_rsa.pub &lt;username&gt;@192.168.56.101:~/.ssh/new_authorized_key
+# --- Servidor ---
+cat ~/.ssh/new_authorized_key &gt;&gt; ~/.ssh/authorized_keys
+
+</code></pre>
+<p>Com a chave pública no servidor SSH, podemos desativar o acesso por password no ficheiro de configuração do <strong>sshd</strong> sem perder o acesso ao servidor SSH:</p>
+<pre><code class="language-bash"># --- Servidor ---
+# Desativar o acesso por password
+cat /etc/ssh/sshd_config | grep PasswordAuthentication
+        #PasswordAuthentication yes
+sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
+cat /etc/ssh/sshd_config | grep PasswordAuthentication
+        PasswordAuthentication no
+
+# Reiniciar o serviço sshd
+systemctl restart sshd
+</code></pre>
+<p>A partir de agora, para nos ligarmos a este servidor SSH, teremos de usar a chave privada que criámos no cliente:</p>
+<pre><code class="language-bash"># --- Cliente ---
+# Verificar permissões da chave privada
+ls -l id_rsa
+chmod 400 id_rsa  # Se as permissões não estiverem corretas (600 também é aceite)
+
+# Usar a chave privada para nos ligarmos ao servidor SSH
+ssh -i id_rsa -p 5555 &lt;username&gt;@&lt;ip&gt;
+</code></pre>
+<div style="page-break-after: always;"></div>
+<h2 id="10-ficheiro-de-logs"><a class="header" href="#10-ficheiro-de-logs">10. Ficheiro de logs</a></h2>
+<p>O ficheiro de logs do SSH é o <strong>/var/log/secure</strong>. Este ficheiro contém todos os logs de autenticação do SSH, como por exemplo, quando um utilizador se autentica com sucesso, quando um utilizador falha a autenticação, quando um utilizador tenta aceder ao servidor SSH com uma chave privada errada, etc.</p>
+<p>Consoante as permissões que o ficheiro de logs tenha, um atacante que por uma razão qualquer tenha capacidade de LFI (Local File Inclusion), dependendo do serviço que for, poderá tentar executar comandos através de LogPoisoning. Exemplo concreto:</p>
+<p>O servidor SSH está numa máquina que serve uma página web. Um atacante conseguiu encontrar uma falha de segurança no servidor web e conseguiu ler o ficheiro de logs do SSH pelo browser através da falha LFI. Ele sabe que o serviço web executa comando PHP por exemplo. Ele poderá tentar executar comandos através do LogPoisoning da seguinte forma:</p>
+<pre><code class="language-bash"># --- Atacante ---
+# LogPoisoning
+echo ssh &quot;&lt;?php system($_GET['cmd']); ?&gt;&quot;@&lt;ip da máquina&gt; -p 5555
+</code></pre>
+<p>A partir deste momento, quando o atacante ler o arquivo <strong>/var/log/secure</strong> através da LFI, poderá adicionar um parâmetro <strong>cmd</strong> à URL e executar comandos remotamente (RCE).</p>
+<p>Para evitar este tipo de ataque, o ficheiro de logs do SSH deverá ter as seguintes permissões:</p>
+<pre><code class="language-bash"># --- Servidor ---
+ls -l /var/log/secure
+-rw-------. 1 root root 0 Jul  1 15:00 /var/log/secure  # Permissões corretas
+</code></pre>
+<p>Estas serão as permissões corretas, mas se o serviço web estiver mal configurado e estiver a correr com o utilizador root, o ficheiro de logs poderá ser visto através da LFI...</p>
+<blockquote>
+<p>Para resumir: Mesmo que o servidor SSH esteja perfeitamente configurado com as mais altas medidas de segurança, outros serviços podem aproveitar funções do SSH bem configurado para comprometer a máquina.</p>
+</blockquote>
+<h2 id="11-impedir-portforwarding"><a class="header" href="#11-impedir-portforwarding">11. Impedir PortForwarding</a></h2>
+<p>O PortForwarding é uma funcionalidade do SSH que permite que um utilizador possa aceder a um serviço que esteja em rede privada através de um servidor SSH que esteja em rede pública. Por exemplo, um utilizador que esteja em casa e que queira aceder ao seu servidor web da rede privada, poderá aceder ao servidor web através do servidor SSH da máquina. O servidor SSH irá fazer o PortForwarding e o utilizador irá aceder ao servidor web através do servidor SSH.</p>
+<p>Isso é muito bom e útil para muitas coisas, mas também para pessoas mal intencionadas. Um hacker que tenha credenciais de acesso válidas via SSH poderá fazer PortForwarding para um serviço que esteja em rede privada ou local, e poderá aceder a esse serviço. Por exemplo, um atacante está na máquina por SSH. Identificou um serviço web/sql que está a correr na máquina, mas apenas acessível localmente. Ele faz PortForwarding para esse serviço e consegue aceder ao serviço web/sql. A partir daí, poderá encontrar outras falhas, ou extrair informações/passwords, etc...</p>
+<p>Existe ainda o X11Forwarding que permite que um utilizador possa aceder a uma aplicação gráfica que esteja em rede privada através de um servidor SSH que esteja em rede pública. Mas hacker que é hacker só usa uma tela preta com letras verdes :sunglasses:.</p>
+<p>Para impedir o PortForwarding e X11Forwarding, devemos adicionar as seguintes linhas ao ficheiro de configuração do SSH:</p>
+<pre><code class="language-bash"># --- Servidor ---
+# Impedir PortForwarding
+cat /etc/ssh/sshd_config | grep Forwarding
+        #AllowTcpForwarding yes
+        #X11Forwarding no
+
+sed -i 's/#AllowTcpForwarding yes/AllowTcpForwarding no/g' /etc/ssh/sshd_config
+sed -i 's/#X11Forwarding no/X11Forwarding no/g' /etc/ssh/sshd_config
+
+cat /etc/ssh/sshd_config | grep Forwarding
+        AllowTcpForwarding no
+        X11Forwarding no
+</code></pre>
+<div style="page-break-after: always;"></div>
+<h1 id="resumo"><a class="header" href="#resumo">Resumo:</a></h1>
+<p>As configurações que foram efetuadas neste artigo foram as seguinte:</p>
+<center>
+<img src="./Assets/Trabalho3ssh3.png" width="">
+</center>
+<h2 id="fontes"><a class="header" href="#fontes">Fontes:</a></h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Secure_Shell">SSH - Wikipedia</a></li>
+<li>man sshd_config (comando para ver a documentação do ficheiro de configuração do SSH)</li>
+<li><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-openssh#doc-wrapper">Documentação RedHat - SSH </a></li>
+<li><a href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-ssh">Hacktricks - pentesting-ssh</a></li>
+</ul>
+<center>
+<img src="./Assets/Coding-bro.svg" width="40%">
+</center>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../CursoCiberSeguranca/Trabalho2/Trabalho2.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../Projetos-Antigos.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../CursoCiberSeguranca/Trabalho2/Trabalho2.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../Projetos-Antigos.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>
