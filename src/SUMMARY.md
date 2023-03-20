@@ -32,6 +32,8 @@
 
     -   [Configuração avançada de um servidor SSH](./CursoCiberSeguranca/Trabalho3/Trabalho3.md)
 
+    -   [Servidor Web com nginx e virtualhost](./CursoCiberSeguranca/Trabalho5/Trabalho5.md)
+
 ---
 
 -   [Projetos Antigos de programação em puro Javascript](./Projetos-Antigos.md)
