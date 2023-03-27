@@ -26,11 +26,11 @@ img {
     padding: 1em;
 }
 
-code.hljs {
+code .hljs {
     text-align: justify;
     white-space: break-spaces;
 }
 
-p {
+* {
     text-align: justify;
 }
