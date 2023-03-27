@@ -20,3 +20,19 @@ img {
     margin: 1.5em auto 1.5em auto;
     border-radius: 0.7em;
 }
+
+// Javali settings
+
+.hljs {
+    text-align: justify;
+    white-space: break-spaces;
+}
+
+code {
+    border-radius: 0.7em;
+    padding: 1em;
+}
+
+p {
+    text-align: justify;
+}

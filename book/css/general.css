@@ -216,23 +216,3 @@ blockquote {
 .result-no-output {
     font-style: italic;
 }
-
-// Javali settings
-
-.hljs {
-    border-radius: 0.7em;
-    padding: 1em;
-}
-
-code .hljs {
-    text-align: justify;
-    white-space: break-spaces;
-}
-
-* {
-    text-align: justify;
-}
-
-p {
-    text-align: justify;
-}
