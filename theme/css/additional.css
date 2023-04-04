@@ -31,9 +31,12 @@ img {
 code {
     border-radius: 0.7em;
     padding: 1em;
-    font-family: 'Fira Code', monospace;
 }
 
 p {
     text-align: justify;
+}
+
+code:nth-of-type(1) .hljs {
+    border: 3px solid #f1f1f1;
 }
