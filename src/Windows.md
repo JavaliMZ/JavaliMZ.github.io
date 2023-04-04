@@ -1,11 +1,15 @@
 # Máquinas HackTheBox
 
-Bem-vindo a todos! Aqui serão expostos alguns relatórios das máquinas que irei fazer, para partilhar com vocês, conteúdo em português.
+Bem-vindos ao meu blog sobre hacking ético, pentesting e conhecimentos informáticos em geral! Aqui, irão encontrar relatórios das máquinas que resolvi, partilhados em português.
 
-Acho que nunca vi pela internet a resolução das máquinas em português (certamente que é normal, pois tem menos visibilidade...), e por isso decidi fazê-lo. Além de partilhar com quem quiser ler, isto reforça a minha aprendizagem, e organiza as minhas ideias... Recomendo a qualquer pessoa que esteja a estudar para cyber segurança ou para OSCP/CEH/... Os relatórios não são nada de muito elaborado, mas têm bastante conteúdo. ***E NUNCA JAMAIS IREI UTILIZAR METASPLOIT!!!*** 
+Acredito que é difícil encontrar conteúdo em português sobre resolução de máquinas, por isso decidi criar este espaço. Além de partilhar convosco, isto também reforça a minha aprendizagem e organiza as minhas ideias. Recomendo este blog a qualquer pessoa que esteja a estudar para cibersegurança ou para certificações como OSCP/CEH. Os relatórios não são muito elaborados, mas têm bastante conteúdo. E, para deixar claro, nunca utilizarei o **_Metasploit!_**
 
-![No Metasploit](Assets/Windows/no_metasploit.jfif)
+<center>
+<img src="Assets/Windows/no_metasploit.jfif" width="50%">
+</center>
 
 # Secção Windows
 
-![Windows joke](Assets/Windows/joke.jfif)
+<center>
+<img src="Assets/Windows/joke.jfif" width="70%">
+</center>

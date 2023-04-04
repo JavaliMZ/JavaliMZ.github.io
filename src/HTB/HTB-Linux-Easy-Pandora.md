@@ -14,34 +14,34 @@
 
 # Introdução
 
-Boas pessoal. Já não escrevo writeups há muito tempo, e decidi escrever este porque a máquina é relativamente simples, e traz conceitos interessantes. Além disso, só tinha (à hora da elaboração deste writeup) apenas 1 máquina Linux, contra 7 máquinas Windows... Então decidi que era hoje que ia criar conteúdo novo.
+Olá pessoal! Já faz um tempo desde que escrevi um writeup, mas decidi escrever este porque a máquina é relativamente simples e apresenta conceitos interessantes. Além disso, até o momento em que escrevo este artigo, eu tinha apenas uma máquina Linux, enquanto possuía sete máquinas Windows. Então, decidi que era hora de criar novo conteúdo.
 
 # Enumeração
 
 ## Nmap
 
-Seguindo a metodologia de sempre, começamos pela enumeração das portas da máquina:
+Seguindo a metodologia padrão, iniciamos a enumeração das portas da máquina utilizando o **nmap**:
 
 ![nmap1](Assets/HTB-Linux-Easy-Pandora/nmap1.png)
 
-Existem aparentemente apenas 2 portas aberta em TCP, a porta SSH e a porta HTTP.
+Após a execução do **nmap**, foi identificado que aparentemente apenas duas portas TCP estão abertas, a porta SSH e a porta HTTP.
 
 ![nmap2](Assets/HTB-Linux-Easy-Pandora/nmap2.png)
 
-Com a ferramenta _whatweb_, vemos uns emails relacionado com a máquina: ***contact@panda.htb*** e ***support@panda.htb***. Podemos pensar em VirtualHosting, e servidor de email SMTP. Mas nenhuma porta está aberta...
+Utilizando a ferramenta _whatweb_, foram encontrados dois endereços de e-mail relacionados à máquina: *contact@panda.htb* e *support@panda.htb*. Isso pode indicar a presença de um servidor de e-mail SMTP ou de Virtual Hosting. Acerca do serviço de e-mail, não existe nenhuma porta relacionada aberta. Como se trata de uma máquina de dificuldade fácil, vamos descartar a possibilidade de existir um servidor de e-mail SMTP.
 
 ## VirtualHosting e WebPage
 
-Para verificar se existe virtual hosting, vamos começar pelo básico, adicionar o host ao /etc/hosts. Temos um potencial hostname válido, o **panda.htb**
+Para verificar se existe Virtual Hosting, vamos começar pelo básico: adicionar o host ao arquivo /etc/hosts. Temos um potencial hostname válido, o **panda.htb**
 
 ```bash
 sudo su
 echo "\n\n10.10.11.136\tpanda.htb" >> /etc/hosts
 ```
 
-Ao abrir o url http://10.10.11.136/ ou a http://panda.htb, não se verifica alterações nenhumas...
+Ao acessar o URL http://10.10.11.136/ ou http://panda.htb, não foram encontradas alterações na página.
 
-Ao enumerar as rotas do site, tanto pelo http://10.10.11.136/ e pelo http://panda.htb, não se verifica nada de interessante. Enumerei também os nomes do hosts diferentes com a mesma ferramenta, e depois rodei todos os nomes dos novos hosts sem que nada de novo aparecesse. Para isso é preciso também adicionar os novos hosts ao /etc/hosts
+Após a enumeração das rotas do site, tanto pelo http://10.10.11.136/ quanto pelo http://panda.htb, nada de interessante foi encontrado. Também foram testados outros nomes de hosts com a mesma ferramenta, mas nada de novo foi descoberto. Para isso, é necessário adicionar os novos hosts ao arquivo /etc/hosts.
 
 ```bash
 # Enumeração das rotas do site http://panda.htb, bem como de possíveis ficheiros txt, js, html, php. Para o site http://10.10.11.136/ é só substituir... mas o resultado é o mesmo
@@ -54,16 +54,16 @@ curl -s -H "Host: iuagveifjhbakjdsbfkjabskdfjba.panda.htb" http://panda.htb | wc
 ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -u http://panda.htb -H "Host: FUZZ.panda.htb" -t 200 -fs 33560
 ```
 
-Não houve respostas nenhuma ao último comando... O site não apresenta nenhum campo editável, nenhum parâmetro por explorar... Estamos bloqueados... O que fazer agora?
+Não houve resposta ao último comando e o site não apresenta nenhum campo editável ou parâmetro para explorar. Estamos bloqueados. O que fazer agora?
 
-Bem ainda não fizemos nada acerca das portas UDP! Por defeito, o nmap usa a flag -sT (TCP SCAN) mesmo não especificando manualmente a flag, mas existem mais. Para fazer um escaneamento às portas UDP, é preciso indicar-lhe a flag -sU (Necessita ser **root**!). Este método de Scan é extremamente lento, devido ao próprio protocolo em si.
+Bem, ainda não exploramos as portas UDP! Por padrão, o Nmap usa a flag -sT (TCP SCAN), mesmo que não seja especificado manualmente, mas existem outras opções. Para escanear as portas UDP, é necessário usar a flag -sU (e ser **root**!). Esse método de scan é extremamente lento devido à natureza do protocolo.
 
--   Em TCP, existe sempre a confirmação da resposta, em primeira instância para confirmar que o alvo está recetivo, e em segunda instância para confirmar que recebeu a mensagem
--   Em UDP, é mais ao menos _Tenho isto para enviar, então envio. Só. Que se lixe se alguém recebe... Estou-me nas tintas_. São ditas **_ConnectionLess_**
+-   Em TCP, sempre há uma confirmação de resposta, primeiro para confirmar que o alvo está receptivo e, em segundo lugar, para confirmar que recebeu a mensagem.
+-   Em UDP, é mais ou menos _Tenho isto para enviar, então envio. Só. Que se lixe se alguém recebe... Estou-me nas tintas_. É chamado de **_ConnectionLess_**
 
-Por isso, em UDP, o nmap não tem como saber se a conexão está a demorar porque não está aberta, ou porque foi bloqueada por firewall, ou se está aberto mas para um programa que não tem por função enviar uma resposta (está a receber caladinho a informação que o nmap enviou), ou seja o que for...
+Portanto, no UDP, o Nmap não pode saber se a conexão está demorando porque não está aberta, se foi bloqueada por um firewall ou se está aberta, mas para um programa que não tem a função de enviar uma resposta (está recebendo silenciosamente a informação que o Nmap enviou), ou seja, o que for...
 
-Em suma, em UDP (e visto que estamos num CTF), é recomendado limitar o número de portas às top 20 portas comuns (por exemplo).
+Em resumo, no UDP (e considerando que estamos em um CTF), é recomendável limitar o número de portas às 20 portas mais comuns (por exemplo).
 
 ```bash
 sudo nmap --top-ports 20 -sU $IP -vvv
@@ -72,11 +72,15 @@ sudo nmap --top-ports 20 -sU $IP -vvv
 # ...
 ```
 
-Temos no meio da resposta, a confirmação que uma porta está aberta! A porta UDP 161. Existem várias ferramentas para "bruteforcear" do serviço SNMP associado. O _snmpwalk_ e o _snmp-check_
+Encontramos a confirmação de que uma porta está aberta! A porta UDP 161. Existem várias ferramentas para "bruteforcear" o serviço SNMP associado, como o _snmpwalk_ e o _snmp-check_.
 
-Ambos fazem o mesmo, mas o snmpwalk apresenta o resultado em bruto! O que não é agradável à vista. Sendo assim, recomendo mesmo o snmp-check para a enumeração do serviço SNMP
+Ambos realizam a mesma tarefa, mas o snmpwalk apresenta o resultado em bruto, o que não é agradável à vista. Portanto, recomendo o uso do snmp-check para a enumeração do serviço SNMP.
 
 ## SNMP
+
+Já agora, o que é este serviço?
+
+SNMP (Simple Network Management Protocol) é um protocolo padrão para gerenciamento de redes. Ele é usado para monitorar e gerenciar dispositivos de rede, como roteadores, switches, servidores e outros dispositivos de rede. O SNMP permite que os administradores de rede monitorem o desempenho da rede, detectem problemas e gerenciem dispositivos de rede remotamente. Ele usa uma arquitetura cliente-servidor, onde os dispositivos de rede são os servidores e os computadores de gerenciamento são os clientes. O SNMP é um protocolo de rede amplamente utilizado e é suportado por muitos dispositivos de rede.
 
 ```bash
 snmp-check 10.10.11.136
@@ -90,9 +94,8 @@ snmp-check 10.10.11.136
 
 No meio de um pouco mais de 1200 linhas, podemos ver duas informações relevantes.
 
--   Está a ser executado por uma tarefa cronica um comando **"host_check"** e vemos em texto claro possíveis credenciais...
+-   Está a ser executado por uma tarefa cronica um comando **"host_check"** e vemos em texto claro possíveis credenciais... **_daniel:HotelBabylon23_**
 -   Existe realmente um serviço de virtualhosting a rodar na porta 53. Ainda não sabemos se é relevante ou não.
-	> daniel:HotelBabylon23
 
 # Getting Shell
 
@@ -114,7 +117,7 @@ Após meia dúzia de comandos pela máquina, percebi o seguinte:
 
 ![pandorabackup](Assets/HTB-Linux-Easy-Pandora/pandorabackup.png)
 
-Existe um binário bastante suspeito! pandora_backup. É SUID. Significa que, neste caso, o usuário "**_matt_**" executa este ficheiro temporariamente enquanto usuário "**_root_**". Logo, se conseguirmos ser "**_matt_**", podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.
+Existe um binário bastante suspeito! pandora*backup. É SUID. Significa que, neste caso, o usuário "\*\*\_matt***" executa este ficheiro temporariamente enquanto usuário "**_root_**". Logo, se conseguirmos ser "**_matt_\*\*", podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.
 
 ## VirtualHost
 
@@ -248,8 +251,7 @@ which tar
 # /usr/bin/tar
 ```
 
-Ok. Mas como é que o computador sabe que está ali o programa? 
-Existe uma variável no shell que indica isso. Chama-se PATH:
+Ok. Mas como é que o computador sabe que está ali o programa? Existe uma variável no shell que indica isso. Chama-se PATH:
 
 ```bash
 echo $PATH
@@ -266,7 +268,7 @@ echo $PATH
 
 Adicionamos um ponto "." à primeira pasta onde o computador vai procurar pelo programa. Significa que o computador vai procurar no diretório atual, e só depois nos outros diretórios.
 
-Assim, basta criar um executável de nome "**_tar_**" numa pasta qualquer, e executar o binário pandora_backup a partir da mesma posição, para o linux assumir que o "**_tar_**" correto é o nosso próprio ficheiro "**_tar_**". E, já que o binário pandora_backup é SUID, e o seu proprietário é "**_root_**", significa que podemos escrever o que nos apetecer para que seja executado como "**_root_**". O mais fácil é chamar um bash novo...
+Assim, basta criar um executável de nome "**_tar_**" numa pasta qualquer, e executar o binário pandora*backup a partir da mesma posição, para o linux assumir que o "\*\*\_tar***" correto é o nosso próprio ficheiro "**_tar_**". E, já que o binário pandora_backup é SUID, e o seu proprietário é "**_root_**", significa que podemos escrever o que nos apetecer para que seja executado como "**_root_\*\*". O mais fácil é chamar um bash novo...
 
 ![pathhijacknotwork](Assets/HTB-Linux-Easy-Pandora/pathhijacknotwork.png)
 

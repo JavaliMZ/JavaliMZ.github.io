@@ -168,21 +168,21 @@
 <hr />
 <hr />
 <h1 id="introdução"><a class="header" href="#introdução">Introdução</a></h1>
-<p>Boas pessoal. Já não escrevo writeups há muito tempo, e decidi escrever este porque a máquina é relativamente simples, e traz conceitos interessantes. Além disso, só tinha (à hora da elaboração deste writeup) apenas 1 máquina Linux, contra 7 máquinas Windows... Então decidi que era hoje que ia criar conteúdo novo.</p>
+<p>Olá pessoal! Já faz um tempo desde que escrevi um writeup, mas decidi escrever este porque a máquina é relativamente simples e apresenta conceitos interessantes. Além disso, até o momento em que escrevo este artigo, eu tinha apenas uma máquina Linux, enquanto possuía sete máquinas Windows. Então, decidi que era hora de criar novo conteúdo.</p>
 <h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
 <h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
-<p>Seguindo a metodologia de sempre, começamos pela enumeração das portas da máquina:</p>
+<p>Seguindo a metodologia padrão, iniciamos a enumeração das portas da máquina utilizando o <strong>nmap</strong>:</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/nmap1.png" alt="nmap1" /></p>
-<p>Existem aparentemente apenas 2 portas aberta em TCP, a porta SSH e a porta HTTP.</p>
+<p>Após a execução do <strong>nmap</strong>, foi identificado que aparentemente apenas duas portas TCP estão abertas, a porta SSH e a porta HTTP.</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/nmap2.png" alt="nmap2" /></p>
-<p>Com a ferramenta <em>whatweb</em>, vemos uns emails relacionado com a máquina: <em><strong>contact@panda.htb</strong></em> e <em><strong>support@panda.htb</strong></em>. Podemos pensar em VirtualHosting, e servidor de email SMTP. Mas nenhuma porta está aberta...</p>
+<p>Utilizando a ferramenta <em>whatweb</em>, foram encontrados dois endereços de e-mail relacionados à máquina: <em>contact@panda.htb</em> e <em>support@panda.htb</em>. Isso pode indicar a presença de um servidor de e-mail SMTP ou de Virtual Hosting. Acerca do serviço de e-mail, não existe nenhuma porta relacionada aberta. Como se trata de uma máquina de dificuldade fácil, vamos descartar a possibilidade de existir um servidor de e-mail SMTP.</p>
 <h2 id="virtualhosting-e-webpage"><a class="header" href="#virtualhosting-e-webpage">VirtualHosting e WebPage</a></h2>
-<p>Para verificar se existe virtual hosting, vamos começar pelo básico, adicionar o host ao /etc/hosts. Temos um potencial hostname válido, o <strong>panda.htb</strong></p>
+<p>Para verificar se existe Virtual Hosting, vamos começar pelo básico: adicionar o host ao arquivo /etc/hosts. Temos um potencial hostname válido, o <strong>panda.htb</strong></p>
 <pre><code class="language-bash">sudo su
 echo &quot;\n\n10.10.11.136\tpanda.htb&quot; &gt;&gt; /etc/hosts
 </code></pre>
-<p>Ao abrir o url http://10.10.11.136/ ou a http://panda.htb, não se verifica alterações nenhumas...</p>
-<p>Ao enumerar as rotas do site, tanto pelo http://10.10.11.136/ e pelo http://panda.htb, não se verifica nada de interessante. Enumerei também os nomes do hosts diferentes com a mesma ferramenta, e depois rodei todos os nomes dos novos hosts sem que nada de novo aparecesse. Para isso é preciso também adicionar os novos hosts ao /etc/hosts</p>
+<p>Ao acessar o URL http://10.10.11.136/ ou http://panda.htb, não foram encontradas alterações na página.</p>
+<p>Após a enumeração das rotas do site, tanto pelo http://10.10.11.136/ quanto pelo http://panda.htb, nada de interessante foi encontrado. Também foram testados outros nomes de hosts com a mesma ferramenta, mas nada de novo foi descoberto. Para isso, é necessário adicionar os novos hosts ao arquivo /etc/hosts.</p>
 <pre><code class="language-bash"># Enumeração das rotas do site http://panda.htb, bem como de possíveis ficheiros txt, js, html, php. Para o site http://10.10.11.136/ é só substituir... mas o resultado é o mesmo
 ffuf -c -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -u http://panda.htb/FUZZ -t 200 -r -e .txt,.js,.html,.php
 
@@ -192,22 +192,24 @@ curl -s -H &quot;Host: iuagveifjhbakjdsbfkjabskdfjba.panda.htb&quot; http://pand
 # Depois filtrar as resposta com esse tamanho para não aparecer uma lista enorme de falsos positivos adicionando &quot;-fs 33560&quot; ao commando para enumerar os hosts
 ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -u http://panda.htb -H &quot;Host: FUZZ.panda.htb&quot; -t 200 -fs 33560
 </code></pre>
-<p>Não houve respostas nenhuma ao último comando... O site não apresenta nenhum campo editável, nenhum parâmetro por explorar... Estamos bloqueados... O que fazer agora?</p>
-<p>Bem ainda não fizemos nada acerca das portas UDP! Por defeito, o nmap usa a flag -sT (TCP SCAN) mesmo não especificando manualmente a flag, mas existem mais. Para fazer um escaneamento às portas UDP, é preciso indicar-lhe a flag -sU (Necessita ser <strong>root</strong>!). Este método de Scan é extremamente lento, devido ao próprio protocolo em si.</p>
+<p>Não houve resposta ao último comando e o site não apresenta nenhum campo editável ou parâmetro para explorar. Estamos bloqueados. O que fazer agora?</p>
+<p>Bem, ainda não exploramos as portas UDP! Por padrão, o Nmap usa a flag -sT (TCP SCAN), mesmo que não seja especificado manualmente, mas existem outras opções. Para escanear as portas UDP, é necessário usar a flag -sU (e ser <strong>root</strong>!). Esse método de scan é extremamente lento devido à natureza do protocolo.</p>
 <ul>
-<li>Em TCP, existe sempre a confirmação da resposta, em primeira instância para confirmar que o alvo está recetivo, e em segunda instância para confirmar que recebeu a mensagem</li>
-<li>Em UDP, é mais ao menos <em>Tenho isto para enviar, então envio. Só. Que se lixe se alguém recebe... Estou-me nas tintas</em>. São ditas <strong><em>ConnectionLess</em></strong></li>
+<li>Em TCP, sempre há uma confirmação de resposta, primeiro para confirmar que o alvo está receptivo e, em segundo lugar, para confirmar que recebeu a mensagem.</li>
+<li>Em UDP, é mais ou menos <em>Tenho isto para enviar, então envio. Só. Que se lixe se alguém recebe... Estou-me nas tintas</em>. É chamado de <strong><em>ConnectionLess</em></strong></li>
 </ul>
-<p>Por isso, em UDP, o nmap não tem como saber se a conexão está a demorar porque não está aberta, ou porque foi bloqueada por firewall, ou se está aberto mas para um programa que não tem por função enviar uma resposta (está a receber caladinho a informação que o nmap enviou), ou seja o que for...</p>
-<p>Em suma, em UDP (e visto que estamos num CTF), é recomendado limitar o número de portas às top 20 portas comuns (por exemplo).</p>
+<p>Portanto, no UDP, o Nmap não pode saber se a conexão está demorando porque não está aberta, se foi bloqueada por um firewall ou se está aberta, mas para um programa que não tem a função de enviar uma resposta (está recebendo silenciosamente a informação que o Nmap enviou), ou seja, o que for...</p>
+<p>Em resumo, no UDP (e considerando que estamos em um CTF), é recomendável limitar o número de portas às 20 portas mais comuns (por exemplo).</p>
 <pre><code class="language-bash">sudo nmap --top-ports 20 -sU $IP -vvv
 # ...
 # 161/udp   open          snmp         udp-response ttl 63
 # ...
 </code></pre>
-<p>Temos no meio da resposta, a confirmação que uma porta está aberta! A porta UDP 161. Existem várias ferramentas para &quot;bruteforcear&quot; do serviço SNMP associado. O <em>snmpwalk</em> e o <em>snmp-check</em></p>
-<p>Ambos fazem o mesmo, mas o snmpwalk apresenta o resultado em bruto! O que não é agradável à vista. Sendo assim, recomendo mesmo o snmp-check para a enumeração do serviço SNMP</p>
+<p>Encontramos a confirmação de que uma porta está aberta! A porta UDP 161. Existem várias ferramentas para &quot;bruteforcear&quot; o serviço SNMP associado, como o <em>snmpwalk</em> e o <em>snmp-check</em>.</p>
+<p>Ambos realizam a mesma tarefa, mas o snmpwalk apresenta o resultado em bruto, o que não é agradável à vista. Portanto, recomendo o uso do snmp-check para a enumeração do serviço SNMP.</p>
 <h2 id="snmp"><a class="header" href="#snmp">SNMP</a></h2>
+<p>Já agora, o que é este serviço?</p>
+<p>SNMP (Simple Network Management Protocol) é um protocolo padrão para gerenciamento de redes. Ele é usado para monitorar e gerenciar dispositivos de rede, como roteadores, switches, servidores e outros dispositivos de rede. O SNMP permite que os administradores de rede monitorem o desempenho da rede, detectem problemas e gerenciem dispositivos de rede remotamente. Ele usa uma arquitetura cliente-servidor, onde os dispositivos de rede são os servidores e os computadores de gerenciamento são os clientes. O SNMP é um protocolo de rede amplamente utilizado e é suportado por muitos dispositivos de rede.</p>
 <pre><code class="language-bash">snmp-check 10.10.11.136
 # ...
 # 127.0.0.1    3306         0.0.0.0      0            listen
@@ -218,12 +220,8 @@ ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-11
 </code></pre>
 <p>No meio de um pouco mais de 1200 linhas, podemos ver duas informações relevantes.</p>
 <ul>
-<li>Está a ser executado por uma tarefa cronica um comando <strong>&quot;host_check&quot;</strong> e vemos em texto claro possíveis credenciais...</li>
-<li>Existe realmente um serviço de virtualhosting a rodar na porta 53. Ainda não sabemos se é relevante ou não.
-<blockquote>
-<p>daniel:HotelBabylon23</p>
-</blockquote>
-</li>
+<li>Está a ser executado por uma tarefa cronica um comando <strong>&quot;host_check&quot;</strong> e vemos em texto claro possíveis credenciais... <strong><em>daniel:HotelBabylon23</em></strong></li>
+<li>Existe realmente um serviço de virtualhosting a rodar na porta 53. Ainda não sabemos se é relevante ou não.</li>
 </ul>
 <h1 id="getting-shell"><a class="header" href="#getting-shell">Getting Shell</a></h1>
 <h2 id="ssh"><a class="header" href="#ssh">SSH</a></h2>
@@ -235,7 +233,7 @@ ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-11
 <h2 id="enumeração-do-sistema"><a class="header" href="#enumeração-do-sistema">Enumeração do sistema</a></h2>
 <p>Após meia dúzia de comandos pela máquina, percebi o seguinte:</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/pandorabackup.png" alt="pandorabackup" /></p>
-<p>Existe um binário bastante suspeito! pandora_backup. É SUID. Significa que, neste caso, o usuário &quot;<strong><em>matt</em></strong>&quot; executa este ficheiro temporariamente enquanto usuário &quot;<strong><em>root</em></strong>&quot;. Logo, se conseguirmos ser &quot;<strong><em>matt</em></strong>&quot;, podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.</p>
+<p>Existe um binário bastante suspeito! pandora<em>backup. É SUID. Significa que, neste caso, o usuário &quot;**_matt</em>**&quot; executa este ficheiro temporariamente enquanto usuário &quot;<strong><em>root</em></strong>&quot;. Logo, se conseguirmos ser &quot;**<em>matt</em>**&quot;, podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.</p>
 <h2 id="virtualhost"><a class="header" href="#virtualhost">VirtualHost</a></h2>
 <p>Agora que estamos na máquina, podemos verificar se existe virtual hosting. Para isso, tenho feito da seguinte maneira:</p>
 <ul>
@@ -330,8 +328,7 @@ stty rows 40 columns 170  # Tem corresponder ao vosso ecrã (stty -a numa consol
 <pre><code class="language-bash">which tar
 # /usr/bin/tar
 </code></pre>
-<p>Ok. Mas como é que o computador sabe que está ali o programa? 
-Existe uma variável no shell que indica isso. Chama-se PATH:</p>
+<p>Ok. Mas como é que o computador sabe que está ali o programa? Existe uma variável no shell que indica isso. Chama-se PATH:</p>
 <pre><code class="language-bash">echo $PATH
 # /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 </code></pre>
@@ -341,7 +338,7 @@ echo $PATH
 # .:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 </code></pre>
 <p>Adicionamos um ponto &quot;.&quot; à primeira pasta onde o computador vai procurar pelo programa. Significa que o computador vai procurar no diretório atual, e só depois nos outros diretórios.</p>
-<p>Assim, basta criar um executável de nome &quot;<strong><em>tar</em></strong>&quot; numa pasta qualquer, e executar o binário pandora_backup a partir da mesma posição, para o linux assumir que o &quot;<strong><em>tar</em></strong>&quot; correto é o nosso próprio ficheiro &quot;<strong><em>tar</em></strong>&quot;. E, já que o binário pandora_backup é SUID, e o seu proprietário é &quot;<strong><em>root</em></strong>&quot;, significa que podemos escrever o que nos apetecer para que seja executado como &quot;<strong><em>root</em></strong>&quot;. O mais fácil é chamar um bash novo...</p>
+<p>Assim, basta criar um executável de nome &quot;<strong><em>tar</em></strong>&quot; numa pasta qualquer, e executar o binário pandora<em>backup a partir da mesma posição, para o linux assumir que o &quot;**_tar</em>**&quot; correto é o nosso próprio ficheiro &quot;<strong><em>tar</em></strong>&quot;. E, já que o binário pandora_backup é SUID, e o seu proprietário é &quot;<strong><em>root</em></strong>&quot;, significa que podemos escrever o que nos apetecer para que seja executado como &quot;**<em>root</em>**&quot;. O mais fácil é chamar um bash novo...</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/pathhijacknotwork.png" alt="pathhijacknotwork" /></p>
 <h4 id="não-funcionou-porquê"><a class="header" href="#não-funcionou-porquê">Não funcionou! Porquê?</a></h4>
 <p>Sinceramente não sei, o que sei é que pelo ssh funcionou nesta máquina... Quando vi que não funcionou, procurei outra solução. criei uma chave id_rsa só para ter melhor conexão, conectei-me via SSH e o mesmo exploit funcionou... OK. Mistérios do Hacking!</p>

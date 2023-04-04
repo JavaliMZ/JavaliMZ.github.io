@@ -1,8 +1,6 @@
 # Projetos Antigos de programação em puro Javascript
 
-Todos os seguintes projetos foram feitos durante uma fase de aprendizagem, e muitos deles estão inacabados por não ter seguido com o projeto até ao fim, visto que o objetivo do momento foi alcançado. 
-- Já tinha aprendido o conceito que estava a aprender durante o projeto, e não quis continuar a perder tempo com "COPY/PAST",
-- Foram todos projetos pessoais, e na altura nunca foi objetivo de os publicar. (Mas já que os tenho a apodrecer no PC, decidi publicá-los no site)
+Durante uma fase de aprendizagem, realizei vários projetos, muitos dos quais ficaram inacabados por ter alcançado o objetivo do momento. Já tinha aprendido o conceito que estava a explorar durante o projeto e não quis continuar a perder tempo com "**COPY/PAST**". Todos os projetos foram pessoais e, na altura, não tinha intenção de os publicar. No entanto, como os tenho guardados no meu computador, decidi partilhá-los no site.
 
 <a href="OldProjects/tetrix" target="_blank">Tetrix
 
@@ -23,4 +21,3 @@ Todos os seguintes projetos foram feitos durante uma fase de aprendizagem, e mui
 <a href="OldProjects/stars" target="_blank">stars
 
 <a href="OldProjects/super_mario" target="_blank">super_mario
-

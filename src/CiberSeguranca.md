@@ -1,6 +1,6 @@
-# Trabalhos do curso de Ciber Segurança
+# Trabalhos do curso de Cibersegurança
 
-Bem-vindo a todos! Aqui serão expostos alguns trabalhos que irei fazer no decorrer do curso de Ciber Segurança, para partilhar com vocês. O conteúdo será em português como de costume.
+Sejam bem-vindos! Neste espaço, irei partilhar alguns dos trabalhos que realizarei durante o meu curso de Cibersegurança, em português, como é habitual. Espero que possam acompanhar e aprender comigo.
 
 <center>
 <img src="Assets/Introducao/javali.png" width="200">
