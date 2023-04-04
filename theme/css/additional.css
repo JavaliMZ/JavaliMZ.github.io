@@ -25,18 +25,15 @@ img {
 
 .hljs {
     text-align: justify;
-    white-space: break-spaces;
+    white-space: pre-wrap;
 }
 
 code {
     border-radius: 0.7em;
     padding: 1em;
+    white-space: pre-wrap;
 }
 
 p {
     text-align: justify;
-}
-
-code:nth-of-type(1) .hljs {
-    border: 3px solid #f1f1f1;
 }

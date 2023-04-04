@@ -191,13 +191,13 @@
 <p>O SELinux (Security-Enhanced Linux) é um sistema de segurança desenvolvido pela NSA (Agência de Segurança Nacional dos EUA) que adiciona uma camada adicional de segurança ao sistema operacional Linux. Ele controla o acesso de processos e usuários a recursos do sistema, como arquivos, diretórios e portas de rede, com base em políticas de segurança definidas. O SELinux é projetado para proteger contra ataques de exploração de vulnerabilidades de software e para limitar o impacto de um ataque bem-sucedido. Ele é usado em muitas distribuições Linux, incluindo Red Hat, CentOS e Fedora.</p>
 <h3 id="dac-discretionary-access-control-vs-mac-mandatory-access-control"><a class="header" href="#dac-discretionary-access-control-vs-mac-mandatory-access-control">DAC (Discretionary Access Control) vs MAC (Mandatory Access Control)</a></h3>
 <p>O DAC é o sistema padrão do LINUX. É o sistema de controle de acesso baseado em permissões de arquivos (leitura, escrita, execução Ex: -rw-r--r--). É o que se vê do lado esquerdo dos arquivos quando executamos o comando ls -l.</p>
-<pre><code class="language-powershell">$ ls -l
+<pre><code class="language-bash">$ ls -l
 -rw-r--r-- 1 root root 0 Jan 1 00:00 file1
 -rwx------ 1 root root 0 Jan 1 00:00 file2
 -r-x------ 1 root root 0 Jan 1 00:00 file3
 </code></pre>
 <p>O MAC é um sistema de controle de acesso baseado em rótulos. É o que se vê do lado direito dos arquivos quando executamos o comando ls -Z. Isso adiciona um rótulo de segurança a cada arquivo, que é usado para determinar se um usuário/serviço pode acessar um arquivo ou não, conforme definido pelas políticas de segurança.</p>
-<pre><code class="language-powershell">$ ls -Z
+<pre><code class="language-bash">$ ls -Z
 -rw-r--r--. root root system_u:object_r:unlabeled_t:s0 file1
 -rwx------. root root system_u:object_r:unlabeled_t:s0 file2
 -r-x------. root root system_u:object_r:unlabeled_t:s0 file3
@@ -205,10 +205,10 @@
 <div style="page-break-after: always;"></div>
 <h2 id="2-instalação"><a class="header" href="#2-instalação">2. Instalação</a></h2>
 <p>Nos sistemas baseados em Red Hat, o SELinux é instalado por padrão. Para verificar se o SELinux está instalado, execute o comando abaixo:</p>
-<pre><code class="language-powershell">sestatus
+<pre><code class="language-bash">sestatus
 </code></pre>
 <p>Poderá adicionar funcionalidades adicionais ao SELinux, como o SELinux para Apache (entre muitos outros), instalando o pacote policycoreutils-python. Para instalar o pacote, execute o comando abaixo:</p>
-<pre><code class="language-powershell">yum install policycoreutils-python
+<pre><code class="language-bash">yum install policycoreutils-python
 </code></pre>
 <p>Existem ainda outros pacotes que poderão ser instalados dependendo das necessidades. Na documentação oficial do Red Hat, encontramos a seguinte lista de pacotes:</p>
 <pre><code>- policies: selinux-policy-targeted, selinux-policy-mls
@@ -232,7 +232,7 @@
 <p>Será talvez a ferramenta mais importante para gerir o SELinux.</p>
 <h4 id="semanage---fcontext"><a class="header" href="#semanage---fcontext">Semanage - fcontext</a></h4>
 <p>O &quot;semanage fcontext&quot; é usado para gerir os contextos de arquivos e pastas. Permite informar o SELinux de que um dado ficheiro pertence a um determinado tipo de ficheiro. Por exemplo, se tivermos um ficheiro html para ser lido por um servidor web, poderemos informar o SELinux de que este ficheiro pertence ao tipo de ficheiro httpd_sys_content_t. Para isso, executamos o comando abaixo:</p>
-<pre><code class="language-powershell"># Adicionar um ficheiro html ao tipo de ficheiro httpd_sys_content_t
+<pre><code class="language-bash"># Adicionar um ficheiro html ao tipo de ficheiro httpd_sys_content_t
 semanage fcontext -a -t httpd_sys_content_t /var/www/html/index.html
 # Aplicar as alterações
 restorecon -v /var/www/html/index.html
@@ -242,23 +242,23 @@ ls -Z /var/www/html/index.html
 	# -rw-r--r--. root root system_u:object_r:httpd_sys_content_t:s0 /var/www/html/index.html
 </code></pre>
 <p>De referir que o semanage entende regex, pelo que poderá adicionar-se todos os ficheiros de uma dada pasta, por exemplo:</p>
-<pre><code class="language-powershell"># Adicionar todos os ficheiros existentes dentro da pasta /var/www/html/ ao tipo de ficheiro httpd_sys_content_t
+<pre><code class="language-bash"># Adicionar todos os ficheiros existentes dentro da pasta /var/www/html/ ao tipo de ficheiro httpd_sys_content_t
 semanage fcontext -a -t httpd_sys_content_t '/var/www/html(/.*)?'
 restorecon -R -v /var/www/html  # -R para aplicar recursivamente
 </code></pre>
 <p>Para remover um ficheiro de um tipo de ficheiro, execute o comando abaixo:</p>
-<pre><code class="language-powershell">semanage fcontext -d -t httpd_sys_content_t /var/www/html/index.html
+<pre><code class="language-bash">semanage fcontext -d -t httpd_sys_content_t /var/www/html/index.html
 restorecon -v /var/www/html/index.html
 ls -Z /var/www/html/index.html
 	# -rw-r--r--. root root system_u:object_r:unlabeled_t:s0 /var/www/html/index.html
 </code></pre>
 <div style="page-break-after: always;"></div>
 <p>Existem dezenas de tipos de ficheiros, e poderá consultar a lista completa das políticas existentes executando o comando abaixo:</p>
-<pre><code class="language-powershell">semanage fcontext -l
+<pre><code class="language-bash">semanage fcontext -l
 </code></pre>
 <h4 id="semanage---port"><a class="header" href="#semanage---port">Semanage - port</a></h4>
 <p>O <strong>&quot;semanage port&quot;</strong> é usado para gerir os contextos de portas. Permite informar o SELinux de que uma determinada porta pertence a um determinado tipo de porta. Por exemplo, se tivermos um serviço web rodando na porta 80, poderemos informar o SELinux de que esta porta pertence ao tipo de porta http_port_t. Para isso, executamos o comando abaixo:</p>
-<pre><code class="language-powershell"># Adicionar a porta 80 ao tipo de porta http_port_t
+<pre><code class="language-bash"># Adicionar a porta 80 ao tipo de porta http_port_t
 semanage port -a -t http_port_t -p tcp 80
 # Verificar se a porta foi adicionada ao tipo de porta http_port_t
 semanage port -l | grep 80 # ou
@@ -271,7 +271,7 @@ semanage port -d -t http_port_t -p tcp 80
 <div style="page-break-after: always;"></div>
 <h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
 <p>Após modificar algo no sistema e não funcionar como deveria, poderá ser necessário verificar o log do SELinux para ver se há alguma mensagem de erro. Para isso, execute o comando abaixo:</p>
-<pre><code class="language-powershell">sealert -a /var/log/audit/audit.log
+<pre><code class="language-bash">sealert -a /var/log/audit/audit.log
 </code></pre>
 <p>Este comando é uma maravilha! Indica os erros e dá sugestões de como corrigir, e tudo isso de forma bem clara e bem detalhada. No entanto, as soluções são quase sempre para alterar os módulos SELinux, e não para alterar as políticas SELinux. Normalmente, as soluções passam pelo comando <strong>semanage</strong>. Mas com a mensagem de erro, poderá pesquisar online e encontrar a solução correspondente via <strong>semanage</strong>.</p>
 <h1 id="referências"><a class="header" href="#referências">Referências</a></h1>

@@ -190,7 +190,7 @@
 </blockquote>
 <h2 id="criação-dos-sites"><a class="header" href="#criação-dos-sites">Criação dos sites</a></h2>
 <p>Para criar os sites, vamos criar um diretório para cada um deles com um <strong>index.html</strong> muito simples, apenas para ver se funcionam. Irei criar os diretórios em <strong>/var/www</strong>. Para criar os diretórios, irei usar o comando <strong>mkdir</strong>.</p>
-<pre><code class="language-powershell">mkdir /var/www/a.ipg.pt
+<pre><code class="language-bash">mkdir /var/www/a.ipg.pt
 mkdir /var/www/b.ipg.pt
 mkdir /var/www/c.ipg.pt
 </code></pre>
@@ -217,14 +217,14 @@ mkdir /var/www/c.ipg.pt
 &lt;/html&gt;
 </code></pre>
 <p>Agora, passo extremamente importante, dar as permissões adequadas às pastas e aos ficheiros.</p>
-<pre><code class="language-powershell">chmod -R 755 /var/www
+<pre><code class="language-bash">chmod -R 755 /var/www
 chmod 644 /var/www/*/index.html
 # Este &quot;*&quot; refere-se a todos os diretórios dentro de /var/www
 </code></pre>
 <h2 id="configuração-do-nginx"><a class="header" href="#configuração-do-nginx">Configuração do Nginx</a></h2>
 <p>Agora que já temos os sites criados, vamos configurar o Nginx para que ele saiba onde estão os ficheiros e como servir os mesmos.</p>
 <p>Para isso, vamos criar um ficheiro de configuração para indicar os servidores (de Server Block) disponíveis. O ficheiro irá estar na pasta <strong>/etc/nginx/conf.d</strong> e chamar-se-á <strong>javali.conf</strong>. O nginx irá perceber que este ficheiro é de configuração pois o seu ficheiro de configuração base irá chamar todos os ficheiro dentro de <strong>/etc/nginx/conf.d</strong> que acabem em <strong>.conf</strong>. Cada server deve ser criado independentemente dentro do mesmo ficheiro (ou separado).</p>
-<pre><code class="language-powershell">cd /etc/nginx/conf.d
+<pre><code class="language-bash">cd /etc/nginx/conf.d
 nano javali.conf
 </code></pre>
 <pre><code class="language-nginx">server {
@@ -255,36 +255,36 @@ nano javali.conf
 </code></pre>
 <h2 id="configurações-do-firewall-e-do-selinux-policy-management-tool"><a class="header" href="#configurações-do-firewall-e-do-selinux-policy-management-tool">Configurações do Firewall e do &quot;SELinux Policy Management tool&quot;</a></h2>
 <p>No nosso caso, o firewall já se encontra aberto para a porta 80. No entanto, caso o firewall não esteja aberto, podemos fazer o seguinte:</p>
-<pre><code class="language-powershell">firewall-cmd --permanent --add-port=80/tcp
+<pre><code class="language-bash">firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --reload
 </code></pre>
 <p>Para o <strong>SELinux Policy Management tool</strong>, vamos permitir que o Nginx possa aceder aos ficheiros que criámos.</p>
-<pre><code class="language-powershell"># Adiciona a política
+<pre><code class="language-bash"># Adiciona a política
 semanage fcontext -a -t httpd_sys_content_t '/var/www(/.*)?'
 # Aplica a política
 restorecon -Rv /var/www
 </code></pre>
 <h2 id="ficheiros-de-log"><a class="header" href="#ficheiros-de-log">Ficheiros de log</a></h2>
 <p>Para cada um dos sites, criamos um ficheiro de log separado, tanto para o access_log como para o error_log. Decidimos arbitrariamente que os ficheiros de log iriam estar na pasta <strong>/var/log/nginx</strong>, conforme o ficheiro de configurações que criamos <strong>/etc/nginx/conf.d/javali.conf</strong>. Apenas temos que criar os diretórios para os ficheiros de log.</p>
-<pre><code class="language-powershell">mkdir -p /var/log/nginx
+<pre><code class="language-bash">mkdir -p /var/log/nginx
 </code></pre>
 <h2 id="testar-a-configuração"><a class="header" href="#testar-a-configuração">Testar a configuração</a></h2>
 <p>Para testar, o Nginx tem um comando que permite verificar se a configuração está correta. Para isso, basta executar o comando <strong>nginx -t</strong>. Se tudo estiver correcto, iremos reiniciar o serviço do Nginx.</p>
-<pre><code class="language-powershell">nginx -t
+<pre><code class="language-bash">nginx -t
 systemctl restart nginx
 </code></pre>
 <h2 id="configuração-do-nome-de-domínio"><a class="header" href="#configuração-do-nome-de-domínio">Configuração do nome de domínio</a></h2>
 <p>Para configurar o nome de domínio, vamos editar o ficheiro <strong>/etc/hosts</strong> e adicionar as seguintes linhas:</p>
-<pre><code class="language-powershell"># o &quot;-e&quot; permite-nos usar o &quot;\t&quot; para tabular
+<pre><code class="language-bash"># o &quot;-e&quot; permite-nos usar o &quot;\t&quot; para tabular
 echo -e &quot;127.0.0.1\ta.ipg.pt b.ipg.pt c.ipg.pt&quot; &gt;&gt; /etc/hosts
 echo -e &quot;192.168.16.204\ta.ipg.pt b.ipg.pt c.ipg.pt&quot; &gt;&gt; /etc/hosts
 </code></pre>
 <h1 id="verificação-do-funcionamento"><a class="header" href="#verificação-do-funcionamento">Verificação do funcionamento</a></h1>
 <p>Como estamos num servidor sem interface gráfica, vamos usar o comando <strong>curl</strong> para verificar se os sites estão a funcionar.</p>
-<pre><code class="language-powershell">curl http://a.ipg.pt
+<pre><code class="language-bash">curl http://a.ipg.pt
 </code></pre>
 <p>Por se tratar de uma máquina virtual, para podermos ver o site no nosso browser, podemos ainda alterar o ficheiro hosts do nosso computador (neste caso Windows) e adicionar a seguinte linha:</p>
-<pre><code class="language-powershell"># Ip da máquina virtual
+<pre><code class="language-bash"># Ip da máquina virtual
 192.168.56.101	a.ipg.pt b.ipg.pt c.ipg.pt
 </code></pre>
 <center>

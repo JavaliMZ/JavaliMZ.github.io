@@ -22,7 +22,7 @@ O SELinux (Security-Enhanced Linux) é um sistema de segurança desenvolvido pel
 
 O DAC é o sistema padrão do LINUX. É o sistema de controle de acesso baseado em permissões de arquivos (leitura, escrita, execução Ex: -rw-r--r--). É o que se vê do lado esquerdo dos arquivos quando executamos o comando ls -l.
 
-```powershell
+```bash
 $ ls -l
 -rw-r--r-- 1 root root 0 Jan 1 00:00 file1
 -rwx------ 1 root root 0 Jan 1 00:00 file2
@@ -31,7 +31,7 @@ $ ls -l
 
 O MAC é um sistema de controle de acesso baseado em rótulos. É o que se vê do lado direito dos arquivos quando executamos o comando ls -Z. Isso adiciona um rótulo de segurança a cada arquivo, que é usado para determinar se um usuário/serviço pode acessar um arquivo ou não, conforme definido pelas políticas de segurança.
 
-```powershell
+```bash
 $ ls -Z
 -rw-r--r--. root root system_u:object_r:unlabeled_t:s0 file1
 -rwx------. root root system_u:object_r:unlabeled_t:s0 file2
@@ -44,13 +44,13 @@ $ ls -Z
 
 Nos sistemas baseados em Red Hat, o SELinux é instalado por padrão. Para verificar se o SELinux está instalado, execute o comando abaixo:
 
-```powershell
+```bash
 sestatus
 ```
 
 Poderá adicionar funcionalidades adicionais ao SELinux, como o SELinux para Apache (entre muitos outros), instalando o pacote policycoreutils-python. Para instalar o pacote, execute o comando abaixo:
 
-```powershell
+```bash
 yum install policycoreutils-python
 ```
 
@@ -86,7 +86,7 @@ Será talvez a ferramenta mais importante para gerir o SELinux.
 
 O "semanage fcontext" é usado para gerir os contextos de arquivos e pastas. Permite informar o SELinux de que um dado ficheiro pertence a um determinado tipo de ficheiro. Por exemplo, se tivermos um ficheiro html para ser lido por um servidor web, poderemos informar o SELinux de que este ficheiro pertence ao tipo de ficheiro httpd_sys_content_t. Para isso, executamos o comando abaixo:
 
-```powershell
+```bash
 # Adicionar um ficheiro html ao tipo de ficheiro httpd_sys_content_t
 semanage fcontext -a -t httpd_sys_content_t /var/www/html/index.html
 # Aplicar as alterações
@@ -99,7 +99,7 @@ ls -Z /var/www/html/index.html
 
 De referir que o semanage entende regex, pelo que poderá adicionar-se todos os ficheiros de uma dada pasta, por exemplo:
 
-```powershell
+```bash
 # Adicionar todos os ficheiros existentes dentro da pasta /var/www/html/ ao tipo de ficheiro httpd_sys_content_t
 semanage fcontext -a -t httpd_sys_content_t '/var/www/html(/.*)?'
 restorecon -R -v /var/www/html  # -R para aplicar recursivamente
@@ -107,7 +107,7 @@ restorecon -R -v /var/www/html  # -R para aplicar recursivamente
 
 Para remover um ficheiro de um tipo de ficheiro, execute o comando abaixo:
 
-```powershell
+```bash
 semanage fcontext -d -t httpd_sys_content_t /var/www/html/index.html
 restorecon -v /var/www/html/index.html
 ls -Z /var/www/html/index.html
@@ -118,7 +118,7 @@ ls -Z /var/www/html/index.html
 
 Existem dezenas de tipos de ficheiros, e poderá consultar a lista completa das políticas existentes executando o comando abaixo:
 
-```powershell
+```bash
 semanage fcontext -l
 ```
 
@@ -126,7 +126,7 @@ semanage fcontext -l
 
 O **"semanage port"** é usado para gerir os contextos de portas. Permite informar o SELinux de que uma determinada porta pertence a um determinado tipo de porta. Por exemplo, se tivermos um serviço web rodando na porta 80, poderemos informar o SELinux de que esta porta pertence ao tipo de porta http_port_t. Para isso, executamos o comando abaixo:
 
-```powershell
+```bash
 # Adicionar a porta 80 ao tipo de porta http_port_t
 semanage port -a -t http_port_t -p tcp 80
 # Verificar se a porta foi adicionada ao tipo de porta http_port_t
@@ -145,7 +145,7 @@ O semanage port não subtitui uma firewall, mas pode ser usado para limitar muit
 
 Após modificar algo no sistema e não funcionar como deveria, poderá ser necessário verificar o log do SELinux para ver se há alguma mensagem de erro. Para isso, execute o comando abaixo:
 
-```powershell
+```bash
 sealert -a /var/log/audit/audit.log
 ```
 

