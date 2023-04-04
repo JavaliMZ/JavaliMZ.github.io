@@ -210,12 +210,9 @@ ssh javali@192.168.56.101  # ssh &lt;username&gt;@&lt;ip&gt; (porto lógico 22 p
 </code></pre>
 <p>Este utilizador terá um diretório home (parâmetro <strong>-m</strong>) e uma shell atribuida (parâmetro <strong>-s</strong>). Neste caso, a shell atribuida é o Bash.</p>
 <p>Este utilizador irá ter demasiados privilégios para dar-mos o acesso à nossa máquina dentro do nosso curso. E como estamos em Cibersegurança, irei criar um utilizador que unicamente será capaz de executar o comando <strong>&quot;ls&quot;</strong>.</p>
-<pre><code>- Para limitar os privilégios, podemos lhe dar uma shell restrita. O Bash tem uma shell restrita, e é possível chamá-lo através do comando bash -r. Porém, o ficheiro &quot;/etc/passwd&quot; não permite que seja dada um parâmetro à shell. Para contornar este problema, podemos criar um link simbólico para o Bash, e dar-lhe o nome de &quot;rbash&quot;. O software &quot;bash&quot; entende que, se o seu nome for &quot;rbash&quot;, significa que terá de se iniciar em modo restrito.
-
-- Para limitar ainda mais o acesso aos convidados, podemos limitar a variável de ambiente &quot;$PATH&quot;, para que a shell não consiga encontrar os comandos normais do Linux. Irei criar uma pasta para colocar os links simbólicos dos comandos que o utilizador poderá executar.
-
-- Afim de controlar o utilizador, irei bloquear a escrita nos seus ficheiros de configuração, para que não possa alterar a sua &quot;$PATH&quot; e reentrar numa nova sessão com acesso aos novos comandos. Além disso, o rbash impede de que as variáveis de ambiente sejam alteradas (apenas leitura).
-</code></pre>
+<p>Para limitar os privilégios, podemos lhe dar uma shell restrita. O Bash tem uma shell restrita, e é possível chamá-lo através do comando <strong>bash -r</strong>. Porém, o ficheiro <strong>&quot;/etc/passwd&quot;</strong> não permite que seja dada um parâmetro à shell. Para contornar este problema, podemos criar um link simbólico para o Bash, e dar-lhe o nome de &quot;rbash&quot;. O software &quot;bash&quot; entende que, se o seu nome for &quot;rbash&quot;, significa que terá de se iniciar em modo restrito.</p>
+<p>Para limitar ainda mais o acesso aos convidados, podemos limitar a <em>variável de ambiente</em> <strong>&quot;$PATH&quot;</strong>, para que a shell não consiga encontrar os comandos normais do Linux. Irei criar uma pasta para colocar os <strong>links simbólicos</strong> dos comandos que o utilizador poderá executar.</p>
+<p>Afim de controlar o utilizador, irei bloquear a escrita nos seus ficheiros de configuração, para que não possa alterar a sua &quot;$PATH&quot; e reentrar numa nova sessão com acesso aos novos comandos. Além disso, o <strong>rbash</strong> impede de que as variáveis de ambiente sejam alteradas (apenas leitura).</p>
 <div style="page-break-after: always;"></div>
 <pre><code class="language-bash"># Criar o utilizador e atribuir uma password
 useradd -m guest

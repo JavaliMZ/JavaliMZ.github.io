@@ -70,11 +70,11 @@ Este utilizador terá um diretório home (parâmetro **-m**) e uma shell atribui
 
 Este utilizador irá ter demasiados privilégios para dar-mos o acesso à nossa máquina dentro do nosso curso. E como estamos em Cibersegurança, irei criar um utilizador que unicamente será capaz de executar o comando **"ls"**.
 
-    - Para limitar os privilégios, podemos lhe dar uma shell restrita. O Bash tem uma shell restrita, e é possível chamá-lo através do comando bash -r. Porém, o ficheiro "/etc/passwd" não permite que seja dada um parâmetro à shell. Para contornar este problema, podemos criar um link simbólico para o Bash, e dar-lhe o nome de "rbash". O software "bash" entende que, se o seu nome for "rbash", significa que terá de se iniciar em modo restrito.
+Para limitar os privilégios, podemos lhe dar uma shell restrita. O Bash tem uma shell restrita, e é possível chamá-lo através do comando **bash -r**. Porém, o ficheiro **"/etc/passwd"** não permite que seja dada um parâmetro à shell. Para contornar este problema, podemos criar um link simbólico para o Bash, e dar-lhe o nome de "rbash". O software "bash" entende que, se o seu nome for "rbash", significa que terá de se iniciar em modo restrito.
 
-    - Para limitar ainda mais o acesso aos convidados, podemos limitar a variável de ambiente "$PATH", para que a shell não consiga encontrar os comandos normais do Linux. Irei criar uma pasta para colocar os links simbólicos dos comandos que o utilizador poderá executar.
+Para limitar ainda mais o acesso aos convidados, podemos limitar a _variável de ambiente_ **"$PATH"**, para que a shell não consiga encontrar os comandos normais do Linux. Irei criar uma pasta para colocar os **links simbólicos** dos comandos que o utilizador poderá executar.
 
-    - Afim de controlar o utilizador, irei bloquear a escrita nos seus ficheiros de configuração, para que não possa alterar a sua "$PATH" e reentrar numa nova sessão com acesso aos novos comandos. Além disso, o rbash impede de que as variáveis de ambiente sejam alteradas (apenas leitura).
+Afim de controlar o utilizador, irei bloquear a escrita nos seus ficheiros de configuração, para que não possa alterar a sua "$PATH" e reentrar numa nova sessão com acesso aos novos comandos. Além disso, o **rbash** impede de que as variáveis de ambiente sejam alteradas (apenas leitura).
 
 <div style="page-break-after: always;"></div>
 
