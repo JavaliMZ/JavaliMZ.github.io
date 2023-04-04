@@ -160,7 +160,41 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p><img src="Assets/HTB-Linux-Easy-Pandora/icon.png" alt="" /></p>
+                        <ol>
+<li><a href="#resolu%C3%A7%C3%A3o-da-m%C3%A1quina-pandora">Resolução da máquina <strong>Pandora</strong></a> 1. <a href="#m%C3%A1quina-easy-hacktheboxcom">Máquina EASY (hackthebox.com)</a> 2. <a href="#by-javalimz---02022022">by <strong><em>JavaliMZ</em></strong> - 02/02/2022</a></li>
+<li><a href="#introdu%C3%A7%C3%A3o">Introdução</a></li>
+<li><a href="#enumera%C3%A7%C3%A3o">Enumeração</a>
+<ol>
+<li><a href="#nmap">Nmap</a></li>
+<li><a href="#virtualhosting-e-webpage">VirtualHosting e WebPage</a></li>
+<li><a href="#snmp">SNMP</a></li>
+</ol>
+</li>
+<li><a href="#getting-shell">Getting Shell</a>
+<ol>
+<li><a href="#ssh">SSH</a></li>
+<li><a href="#enumera%C3%A7%C3%A3o-do-sistema">Enumeração do sistema</a></li>
+<li><a href="#virtualhost">VirtualHost</a></li>
+<li><a href="#portforwarding">PortForwarding</a></li>
+<li><a href="#cve-2021-32099">CVE-2021-32099</a></li>
+<li><a href="#rce-com-usu%C3%A1rio-matt">RCE com usuário <strong>matt</strong></a>
+<ol>
+<li><a href="#estabilizar-o-reverse-shell">Estabilizar o Reverse Shell</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a href="#escalada-de-privil%C3%A9gio">Escalada de privilégio</a>
+<ol>
+<li><a href="#path-hijacking">Path Hijacking</a>
+<ol>
+<li><a href="#n%C3%A3o-funcionou-porqu%C3%AA">Não funcionou! Porquê?</a></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p><img src="Assets/HTB-Linux-Easy-Pandora/icon.png" alt="" /></p>
 <img src="https://img.shields.io/badge/Pandora-HackTheBox-green?style=plastic" width="200">
 <h1 id="resolução-da-máquina-pandora"><a class="header" href="#resolução-da-máquina-pandora">Resolução da máquina <strong>Pandora</strong></a></h1>
 <h4 id="máquina-easy-hacktheboxcom"><a class="header" href="#máquina-easy-hacktheboxcom">Máquina EASY (hackthebox.com)</a></h4>
@@ -233,7 +267,7 @@ ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-11
 <h2 id="enumeração-do-sistema"><a class="header" href="#enumeração-do-sistema">Enumeração do sistema</a></h2>
 <p>Após meia dúzia de comandos pela máquina, percebi o seguinte:</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/pandorabackup.png" alt="pandorabackup" /></p>
-<p>Existe um binário bastante suspeito! pandora<em>backup. É SUID. Significa que, neste caso, o usuário &quot;**_matt</em>**&quot; executa este ficheiro temporariamente enquanto usuário &quot;<strong><em>root</em></strong>&quot;. Logo, se conseguirmos ser &quot;**<em>matt</em>**&quot;, podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.</p>
+<p>Existe um binário bastante suspeito! pandora*backup. É SUID. Significa que, neste caso, o usuário &quot;**_matt***&quot; executa este ficheiro temporariamente enquanto usuário &quot;<strong><em>root</em></strong>&quot;. Logo, se conseguirmos ser &quot;**<em>matt</em>**&quot;, podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.</p>
 <h2 id="virtualhost"><a class="header" href="#virtualhost">VirtualHost</a></h2>
 <p>Agora que estamos na máquina, podemos verificar se existe virtual hosting. Para isso, tenho feito da seguinte maneira:</p>
 <ul>
@@ -338,7 +372,7 @@ echo $PATH
 # .:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 </code></pre>
 <p>Adicionamos um ponto &quot;.&quot; à primeira pasta onde o computador vai procurar pelo programa. Significa que o computador vai procurar no diretório atual, e só depois nos outros diretórios.</p>
-<p>Assim, basta criar um executável de nome &quot;<strong><em>tar</em></strong>&quot; numa pasta qualquer, e executar o binário pandora<em>backup a partir da mesma posição, para o linux assumir que o &quot;**_tar</em>**&quot; correto é o nosso próprio ficheiro &quot;<strong><em>tar</em></strong>&quot;. E, já que o binário pandora_backup é SUID, e o seu proprietário é &quot;<strong><em>root</em></strong>&quot;, significa que podemos escrever o que nos apetecer para que seja executado como &quot;**<em>root</em>**&quot;. O mais fácil é chamar um bash novo...</p>
+<p>Assim, basta criar um executável de nome &quot;<strong><em>tar</em></strong>&quot; numa pasta qualquer, e executar o binário pandora*backup a partir da mesma posição, para o linux assumir que o &quot;**_tar***&quot; correto é o nosso próprio ficheiro &quot;<strong><em>tar</em></strong>&quot;. E, já que o binário pandora_backup é SUID, e o seu proprietário é &quot;<strong><em>root</em></strong>&quot;, significa que podemos escrever o que nos apetecer para que seja executado como &quot;**<em>root</em>**&quot;. O mais fácil é chamar um bash novo...</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/pathhijacknotwork.png" alt="pathhijacknotwork" /></p>
 <h4 id="não-funcionou-porquê"><a class="header" href="#não-funcionou-porquê">Não funcionou! Porquê?</a></h4>
 <p>Sinceramente não sei, o que sei é que pelo ssh funcionou nesta máquina... Quando vi que não funcionou, procurei outra solução. criei uma chave id_rsa só para ter melhor conexão, conectei-me via SSH e o mesmo exploit funcionou... OK. Mistérios do Hacking!</p>

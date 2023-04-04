@@ -1,3 +1,16 @@
+1. [Resolução da máquina **Falafel**](#resolução-da-máquina-falafel) 1. [Máquina HARD (hackthebox.com)](#máquina-hard-hacktheboxcom) 2. [by **_JavaliMZ_** - 09/09/2021](#by-javalimz---09092021)
+2. [Enumeração](#enumeração)
+    1. [Nmap](#nmap)
+    2. [WebSite](#website)
+        1. [Fuzzing the website](#fuzzing-the-website)
+        2. [SQLi](#sqli)
+        3. [RCE](#rce)
+        4. [Reverse Shell](#reverse-shell)
+    3. [PrivEsc](#privesc)
+        1. [Group video](#group-video)
+        2. [Group disk](#group-disk)
+        3. [debugfs](#debugfs)
+
 ![](Assets/HTB-Linux-Hard-Falafel/icon.webp)
 
 <img src="https://img.shields.io/badge/Falafel-HackTheBox-red?style=plastic" width="200">
@@ -90,10 +103,10 @@ ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-l
 Bem, isto nos trás algumas informações...
 
 -   Potencial users:
-	-   devs (de devs@falafel.htb)
-	-   lawyers (de lawyers@falafel.htb)
-	-   chris (do próprio texto)
-	-   admin (da "assinatura")
+    -   devs (de devs@falafel.htb)
+    -   lawyers (de lawyers@falafel.htb)
+    -   chris (do próprio texto)
+    -   admin (da "assinatura")
 
 Ainda nos diz que o usuário chris conseguiu ter FULL CONTROL do site usando um recurso de uploads de imagens, que ainda não descobrimos. Sabemos ainda que o url de upload de imagens está filtrado, por isso não deve ser assim tão fácil... Prossigamos
 

@@ -1,3 +1,15 @@
+1. [T02 - Acesso Remoto (SSH)](#t02---acesso-remoto-ssh)
+    1. [1. Instalação do OpenSSH do cliente](#1-instalação-do-openssh-do-cliente)
+    2. [2. Instalação do OpenSSH do lado do servidor](#2-instalação-do-openssh-do-lado-do-servidor)
+    3. [Ligação entre o cliente e o servidor](#ligação-entre-o-cliente-e-o-servidor)
+    4. [Execução de comandos no servidor](#execução-de-comandos-no-servidor)
+    5. [Criação de um utilizador no servidor](#criação-de-um-utilizador-no-servidor)
+    6. [Acesso ao servidor através do utilizador criado](#acesso-ao-servidor-através-do-utilizador-criado)
+    7. [Acesso de utilizadores guest por parte dos camaradas de curso](#acesso-de-utilizadores-guest-por-parte-dos-camaradas-de-curso)
+    8. [Mudar o porto lógico de acesso do servidor](#mudar-o-porto-lógico-de-acesso-do-servidor)
+    9. [Verificação do acesso ao servidor SSH](#verificação-do-acesso-ao-servidor-ssh)
+    10. [Conclusão](#conclusão)
+
 # T02 - Acesso Remoto (SSH)
 
 ## 1. Instalação do OpenSSH do cliente
@@ -118,22 +130,22 @@ Para alterar o porto lógico de acesso ao servidor SSH, bast editar o ficheiro d
 # Alterar o porto lógico de acesso do servidor SSH
 sed -i 's/#Port 22/Port 4444/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep Port
-        Port 4444
-        #GatewayPorts no
+		Port 4444
+		#GatewayPorts no
 
 # Reiniciar o serviço do OpenSSH
 systemctl restart sshd
-        Job for sshd.service failed because the control process exited with error code.
-        See "systemctl status sshd.service" and "journalctl -xeu sshd.service" for details.
+		Job for sshd.service failed because the control process exited with error code.
+		See "systemctl status sshd.service" and "journalctl -xeu sshd.service" for details.
 
 # Verificar os logs:
 journalctl -xeu sshd.service
-        ...
-        Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on 0.0.0.0 failed: Permission denied.
-        Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on :: failed: Permission denied.
-        Mar 09 20:30:30 RockyBalboa sshd[2425]: fatal: Cannot bind any address.
-        Mar 09 20:30:30 RockyBalboa systemd[1]: sshd.service: Main process exited, code=exited, status=255/EXCEPTION
-        ...
+		...
+		Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on 0.0.0.0 failed: Permission denied.
+		Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on :: failed: Permission denied.
+		Mar 09 20:30:30 RockyBalboa sshd[2425]: fatal: Cannot bind any address.
+		Mar 09 20:30:30 RockyBalboa systemd[1]: sshd.service: Main process exited, code=exited, status=255/EXCEPTION
+		...
 ```
 
 <center>
@@ -166,7 +178,7 @@ Agora parece estar tudo certo. Mas ao sair e voltar a entrar, não me é possív
 ```bash
 # Verificar o estado do firewall
 firewall-cmd --state
-        running
+		running
 
 # Alterar as regras do firewall
 firewall-cmd --permanent --remove-service=ssh

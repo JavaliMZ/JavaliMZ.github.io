@@ -160,7 +160,30 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p><img src="Assets/HTB-Windows-Medium-Cascade/icon.webp" alt="" /></p>
+                        <ol>
+<li><a href="#resolu%C3%A7%C3%A3o-da-m%C3%A1quina-cascade">Resolução da máquina <strong>Cascade</strong></a> 1. <a href="#m%C3%A1quina-medium-hacktheboxcom">Máquina Medium (hackthebox.com)</a> 2. <a href="#by-javalimz---21092021">by <strong><em>JavaliMZ</em></strong> - 21/09/2021</a></li>
+<li><a href="#enumera%C3%A7%C3%A3o">Enumeração</a>
+<ol>
+<li><a href="#nmap">Nmap</a></li>
+<li><a href="#rdp">RDP</a></li>
+<li><a href="#getnpuserspy">GetNPUsers.py</a></li>
+<li><a href="#ldapsearch">LDAPSearch</a></li>
+</ol>
+</li>
+<li><a href="#privesc">PrivEsc</a>
+<ol>
+<li><a href="#smbclient">SMBClient</a></li>
+<li><a href="#sqlite3">sqlite3</a></li>
+<li><a href="#dotpeek-jetbrains">dotPeek (JetBrains)</a>
+<ol>
+<li><a href="#decrypt-password">Decrypt Password</a></li>
+</ol>
+</li>
+<li><a href="#privesc-1">PrivEsc</a></li>
+</ol>
+</li>
+</ol>
+<p><img src="Assets/HTB-Windows-Medium-Cascade/icon.webp" alt="" /></p>
 <img src="https://img.shields.io/badge/Cascade-HackTheBox-green?style=plastic" width="200">
 <h1 id="resolução-da-máquina-cascade"><a class="header" href="#resolução-da-máquina-cascade">Resolução da máquina <strong>Cascade</strong></a></h1>
 <h4 id="máquina-medium-hacktheboxcom"><a class="header" href="#máquina-medium-hacktheboxcom">Máquina Medium (hackthebox.com)</a></h4>
@@ -298,9 +321,7 @@ GetNPUsers.py cascade.local/ -no-pass -usersfile contents/users
 smb: \&gt; recurse on
 mget *
 </code></pre>
-<p>Existem 2 ficheiros interessantes:
--	&quot;IT/Email Archives/Meeting_Notes_June_2018.html&quot;
--   &quot;IT/Temp/s.smith/VNC Install.reg&quot;</p>
+<p>Existem 2 ficheiros interessantes: - &quot;IT/Email Archives/Meeting_Notes_June_2018.html&quot; - &quot;IT/Temp/s.smith/VNC Install.reg&quot;</p>
 <p>O ficheiro html contem informações de que existiu um usuário temporário de nome &quot;TempAdmin&quot; com uma nota (password is the same as the normal admin account password). Se por alguma razão conseguirmos obter a palavra passe se TempAdmin, provavelmente será a mesma de Administrator...</p>
 <blockquote>
 <p>Ficheiro Meeting_Notes_June_2018.html</p>
@@ -313,11 +334,11 @@ Sent:�������������������������
 
 Subject:������������������������������������ Meeting Notes
 
- 
+
 
 For anyone that missed yesterday�s meeting (I�m looking at you Ben). Main points are below:
 
- 
+
 
 -- New production network will be going live on Wednesday so keep an eye out for any issues.
 
@@ -325,7 +346,7 @@ For anyone that missed yesterday�s meeting (I�m looking at you Ben). Main po
 
 -- The winner of the �Best GPO� competition will be announced on Friday so get your submissions in soon.
 
- 
+
 
 Steve
 </code></pre>
@@ -422,8 +443,7 @@ crackmapexec winrm 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
 <p>Para reaver todos os objectos removidos, basta uma linha de comando...</p>
 <pre><code class="language-bash">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties *
 </code></pre>
-<p>Á resposta deste comando nesta máquina não é muito grande... mas normalmente é enorme. Por isso, recomendo exportar para um ficheiro, fazer o download deste para a nossa maquina, e fazer um grep por &quot;<strong>LegacyPwd e CanonicalName</strong>&quot;
-´</p>
+<p>Á resposta deste comando nesta máquina não é muito grande... mas normalmente é enorme. Por isso, recomendo exportar para um ficheiro, fazer o download deste para a nossa maquina, e fazer um grep por &quot;<strong>LegacyPwd e CanonicalName</strong>&quot; ´</p>
 <pre><code class="language-bash">Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties * &gt; output.txt
 # Pelo evil-winrm, é possível fazer donwload e upload directamente com a ferramenta:
 download &quot;C:/Users/arksvc/Documents/output.txt&quot;

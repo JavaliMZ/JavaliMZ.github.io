@@ -160,7 +160,21 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="vários-sites-num-servidor-nginx"><a class="header" href="#vários-sites-num-servidor-nginx">Vários sites num servidor Nginx</a></h1>
+                        <ol>
+<li><a href="#v%C3%A1rios-sites-num-servidor-nginx">Vários sites num servidor Nginx</a>
+<ol>
+<li><a href="#cria%C3%A7%C3%A3o-dos-sites">Criação dos sites</a></li>
+<li><a href="#configura%C3%A7%C3%A3o-do-nginx">Configuração do Nginx</a></li>
+<li><a href="#configura%C3%A7%C3%B5es-do-firewall-e-do-selinux-policy-management-tool">Configurações do Firewall e do &quot;SELinux Policy Management tool&quot;</a></li>
+<li><a href="#ficheiros-de-log">Ficheiros de log</a></li>
+<li><a href="#testar-a-configura%C3%A7%C3%A3o">Testar a configuração</a></li>
+<li><a href="#configura%C3%A7%C3%A3o-do-nome-de-dom%C3%ADnio">Configuração do nome de domínio</a></li>
+</ol>
+</li>
+<li><a href="#verifica%C3%A7%C3%A3o-do-funcionamento">Verificação do funcionamento</a></li>
+<li><a href="#documenta%C3%A7%C3%A3o-e-ajudas">Documentação e ajudas</a></li>
+</ol>
+<h1 id="vários-sites-num-servidor-nginx"><a class="header" href="#vários-sites-num-servidor-nginx">Vários sites num servidor Nginx</a></h1>
 <blockquote>
 <p>O Nginx é um servidor HTTP (Web) gratuito, open-source e com alta performance. O Nginx foi criado em 2005 e tinha como principal objetivo ser um servidor estável, simples de configurar e que necessitasse de poucos recursos ao nível de hardware. Atualmente o Nginx é um dos servidores Web mais usados para publicação de sites na Internet.</p>
 <p>Vários sites num servidor Nginx</p>
@@ -214,29 +228,29 @@ chmod 644 /var/www/*/index.html
 nano javali.conf
 </code></pre>
 <pre><code class="language-nginx">server {
-    listen       80;
-    server_name  a.ipg.pt;
-    # server_name  b.ipg.pt;
-    # server_name  c.ipg.pt;
+	listen       80;
+	server_name  a.ipg.pt;
+	# server_name  b.ipg.pt;
+	# server_name  c.ipg.pt;
 
-    location / {
-        root   /var/www/a.ipg.pt;
-        # root  /var/www/b.ipg.pt;
-        # root   /var/www/c.ipg.pt;
-        index  index.html;
-    }
+	location / {
+		root   /var/www/a.ipg.pt;
+		# root  /var/www/b.ipg.pt;
+		# root   /var/www/c.ipg.pt;
+		index  index.html;
+	}
 
-    error_page   500 502 503 504  /50x.html;
-    location = /50x.html {
-        root   /usr/share/nginx/html;
-    }
+	error_page   500 502 503 504  /50x.html;
+	location = /50x.html {
+		root   /usr/share/nginx/html;
+	}
 
-    access_log /var/log/nginx/a.ipg.pt.access.log;
-    # access_log /var/log/nginx/b.ipg.pt.access.log;
-    # access_log /var/log/nginx/c.ipg.pt.access.log
-    error_log /var/log/nginx/a.ipg.pt.error.log;
-    # error_log /var/log/nginx/b.ipg.pt.error.log;
-    # error_log /var/log/nginx/c.ipg.pt.error.log
+	access_log /var/log/nginx/a.ipg.pt.access.log;
+	# access_log /var/log/nginx/b.ipg.pt.access.log;
+	# access_log /var/log/nginx/c.ipg.pt.access.log
+	error_log /var/log/nginx/a.ipg.pt.error.log;
+	# error_log /var/log/nginx/b.ipg.pt.error.log;
+	# error_log /var/log/nginx/c.ipg.pt.error.log
 }
 </code></pre>
 <h2 id="configurações-do-firewall-e-do-selinux-policy-management-tool"><a class="header" href="#configurações-do-firewall-e-do-selinux-policy-management-tool">Configurações do Firewall e do &quot;SELinux Policy Management tool&quot;</a></h2>

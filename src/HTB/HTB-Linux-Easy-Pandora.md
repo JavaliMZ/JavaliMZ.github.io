@@ -1,3 +1,21 @@
+1. [Resolução da máquina **Pandora**](#resolução-da-máquina-pandora) 1. [Máquina EASY (hackthebox.com)](#máquina-easy-hacktheboxcom) 2. [by **_JavaliMZ_** - 02/02/2022](#by-javalimz---02022022)
+2. [Introdução](#introdução)
+3. [Enumeração](#enumeração)
+    1. [Nmap](#nmap)
+    2. [VirtualHosting e WebPage](#virtualhosting-e-webpage)
+    3. [SNMP](#snmp)
+4. [Getting Shell](#getting-shell)
+    1. [SSH](#ssh)
+    2. [Enumeração do sistema](#enumeração-do-sistema)
+    3. [VirtualHost](#virtualhost)
+    4. [PortForwarding](#portforwarding)
+    5. [CVE-2021-32099](#cve-2021-32099)
+    6. [RCE com usuário **matt**](#rce-com-usuário-matt)
+        1. [Estabilizar o Reverse Shell](#estabilizar-o-reverse-shell)
+5. [Escalada de privilégio](#escalada-de-privilégio)
+    1. [Path Hijacking](#path-hijacking)
+        1. [Não funcionou! Porquê?](#não-funcionou-porquê)
+
 ![](Assets/HTB-Linux-Easy-Pandora/icon.png)
 
 <img src="https://img.shields.io/badge/Pandora-HackTheBox-green?style=plastic" width="200">
@@ -117,7 +135,7 @@ Após meia dúzia de comandos pela máquina, percebi o seguinte:
 
 ![pandorabackup](Assets/HTB-Linux-Easy-Pandora/pandorabackup.png)
 
-Existe um binário bastante suspeito! pandora*backup. É SUID. Significa que, neste caso, o usuário "\*\*\_matt***" executa este ficheiro temporariamente enquanto usuário "**_root_**". Logo, se conseguirmos ser "**_matt_\*\*", podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.
+Existe um binário bastante suspeito! pandora\*backup. É SUID. Significa que, neste caso, o usuário "\*\*\_matt**\*" executa este ficheiro temporariamente enquanto usuário "**_root_**". Logo, se conseguirmos ser "**_matt_\*\*", podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.
 
 ## VirtualHost
 
@@ -268,7 +286,7 @@ echo $PATH
 
 Adicionamos um ponto "." à primeira pasta onde o computador vai procurar pelo programa. Significa que o computador vai procurar no diretório atual, e só depois nos outros diretórios.
 
-Assim, basta criar um executável de nome "**_tar_**" numa pasta qualquer, e executar o binário pandora*backup a partir da mesma posição, para o linux assumir que o "\*\*\_tar***" correto é o nosso próprio ficheiro "**_tar_**". E, já que o binário pandora_backup é SUID, e o seu proprietário é "**_root_**", significa que podemos escrever o que nos apetecer para que seja executado como "**_root_\*\*". O mais fácil é chamar um bash novo...
+Assim, basta criar um executável de nome "**_tar_**" numa pasta qualquer, e executar o binário pandora\*backup a partir da mesma posição, para o linux assumir que o "\*\*\_tar**\*" correto é o nosso próprio ficheiro "**_tar_**". E, já que o binário pandora_backup é SUID, e o seu proprietário é "**_root_**", significa que podemos escrever o que nos apetecer para que seja executado como "**_root_\*\*". O mais fácil é chamar um bash novo...
 
 ![pathhijacknotwork](Assets/HTB-Linux-Easy-Pandora/pathhijacknotwork.png)
 

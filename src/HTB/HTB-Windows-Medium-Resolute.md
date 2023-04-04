@@ -1,3 +1,12 @@
+1. [Resolução da máquina **Resolute**](#resolução-da-máquina-resolute) 1. [Máquina Medium (hackthebox.com)](#máquina-medium-hacktheboxcom) 2. [by **_JavaliMZ_** - 17/09/2021](#by-javalimz---17092021)
+2. [Enumeração](#enumeração)
+    1. [Servidor Samba](#servidor-samba)
+    2. [Servidor RPC](#servidor-rpc)
+3. [PrivEsc](#privesc)
+4. [Grupo MEGABANK\\DnsAdmins](#grupo-megabankdnsadmins)
+    1. [Criação do ficheiro.dll malicioso](#criação-do-ficheirodll-malicioso)
+5. [We are authority\\system](#we-are-authoritysystem)
+
 ![](Assets/HTB-Windows-Medium-Resolute/icon.webp)
 
 <img src="https://img.shields.io/badge/Resolute-HackTheBox-green?style=plastic" width="200">
@@ -324,6 +333,7 @@ sc.exe stop dns
 
 sc.exe start dns
 ```
+
 ![Authority system](Assets/HTB-Windows-Medium-Resolute/Authority-system.png)
 
 # We are authority\system
@@ -334,6 +344,7 @@ A partir daí, podemos recuperar as flags... Mas antes, apenas para o fun, vamos
 net user javali J4v4li123! /add
 net localgroup Administrators javali /add
 ```
+
 Vamos validar com crackmapexec, e tentar entrar via WinRM
 
 ![Authority javali](Assets/HTB-Windows-Medium-Resolute/Authority_javali.png)

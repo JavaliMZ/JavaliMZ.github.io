@@ -160,7 +160,32 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="selinux"><a class="header" href="#selinux">SELinux</a></h1>
+                        <ol>
+<li><a href="#selinux">SELinux</a>
+<ol>
+<li><a href="#1-introdu%C3%A7%C3%A3o">1. Introdução</a>
+<ol>
+<li><a href="#o-que-%C3%A9-o-selinux">O que é o SELinux?</a></li>
+<li><a href="#dac-discretionary-access-control-vs-mac-mandatory-access-control">DAC (Discretionary Access Control) vs MAC (Mandatory Access Control)</a></li>
+</ol>
+</li>
+<li><a href="#2-instala%C3%A7%C3%A3o">2. Instalação</a></li>
+<li><a href="#3-configura%C3%A7%C3%A3o">3. Configuração</a>
+<ol>
+<li><a href="#semanage">Semanage</a>
+<ol>
+<li><a href="#semanage---fcontext">Semanage - fcontext</a></li>
+<li><a href="#semanage---port">Semanage - port</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ol>
+</li>
+<li><a href="#refer%C3%AAncias">Referências</a></li>
+</ol>
+<h1 id="selinux"><a class="header" href="#selinux">SELinux</a></h1>
 <h2 id="1-introdução"><a class="header" href="#1-introdução">1. Introdução</a></h2>
 <h3 id="o-que-é-o-selinux"><a class="header" href="#o-que-é-o-selinux">O que é o SELinux?</a></h3>
 <p>O SELinux (Security-Enhanced Linux) é um sistema de segurança desenvolvido pela NSA (Agência de Segurança Nacional dos EUA) que adiciona uma camada adicional de segurança ao sistema operacional Linux. Ele controla o acesso de processos e usuários a recursos do sistema, como arquivos, diretórios e portas de rede, com base em políticas de segurança definidas. O SELinux é projetado para proteger contra ataques de exploração de vulnerabilidades de software e para limitar o impacto de um ataque bem-sucedido. Ele é usado em muitas distribuições Linux, incluindo Red Hat, CentOS e Fedora.</p>

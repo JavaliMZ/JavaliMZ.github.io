@@ -1,3 +1,13 @@
+1. [Vários sites num servidor Nginx](#vários-sites-num-servidor-nginx)
+    1. [Criação dos sites](#criação-dos-sites)
+    2. [Configuração do Nginx](#configuração-do-nginx)
+    3. [Configurações do Firewall e do "SELinux Policy Management tool"](#configurações-do-firewall-e-do-selinux-policy-management-tool)
+    4. [Ficheiros de log](#ficheiros-de-log)
+    5. [Testar a configuração](#testar-a-configuração)
+    6. [Configuração do nome de domínio](#configuração-do-nome-de-domínio)
+2. [Verificação do funcionamento](#verificação-do-funcionamento)
+3. [Documentação e ajudas](#documentação-e-ajudas)
+
 # Vários sites num servidor Nginx
 
 > O Nginx é um servidor HTTP (Web) gratuito, open-source e com alta performance. O Nginx foi criado em 2005 e tinha como principal objetivo ser um servidor estável, simples de configurar e que necessitasse de poucos recursos ao nível de hardware. Atualmente o Nginx é um dos servidores Web mais usados para publicação de sites na Internet.
@@ -72,29 +82,29 @@ nano javali.conf
 
 ```nginx
 server {
-    listen       80;
-    server_name  a.ipg.pt;
-    # server_name  b.ipg.pt;
-    # server_name  c.ipg.pt;
+	listen       80;
+	server_name  a.ipg.pt;
+	# server_name  b.ipg.pt;
+	# server_name  c.ipg.pt;
 
-    location / {
-        root   /var/www/a.ipg.pt;
-        # root  /var/www/b.ipg.pt;
-        # root   /var/www/c.ipg.pt;
-        index  index.html;
-    }
+	location / {
+		root   /var/www/a.ipg.pt;
+		# root  /var/www/b.ipg.pt;
+		# root   /var/www/c.ipg.pt;
+		index  index.html;
+	}
 
-    error_page   500 502 503 504  /50x.html;
-    location = /50x.html {
-        root   /usr/share/nginx/html;
-    }
+	error_page   500 502 503 504  /50x.html;
+	location = /50x.html {
+		root   /usr/share/nginx/html;
+	}
 
-    access_log /var/log/nginx/a.ipg.pt.access.log;
-    # access_log /var/log/nginx/b.ipg.pt.access.log;
-    # access_log /var/log/nginx/c.ipg.pt.access.log
-    error_log /var/log/nginx/a.ipg.pt.error.log;
-    # error_log /var/log/nginx/b.ipg.pt.error.log;
-    # error_log /var/log/nginx/c.ipg.pt.error.log
+	access_log /var/log/nginx/a.ipg.pt.access.log;
+	# access_log /var/log/nginx/b.ipg.pt.access.log;
+	# access_log /var/log/nginx/c.ipg.pt.access.log
+	error_log /var/log/nginx/a.ipg.pt.error.log;
+	# error_log /var/log/nginx/b.ipg.pt.error.log;
+	# error_log /var/log/nginx/c.ipg.pt.error.log
 }
 ```
 

@@ -160,7 +160,47 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p><img src="Assets/HTB-Windows-Insane-APT/icon.webp" alt="" /></p>
+                        <ol>
+<li><a href="#resolu%C3%A7%C3%A3o-da-m%C3%A1quina-apt">Resolução da máquina <strong>APT</strong></a> 1. <a href="#m%C3%A1quina-insane-hacktheboxcom">Máquina Insane (hackthebox.com)</a> 2. <a href="#by-javalimz---27092021">by <strong><em>JavaliMZ</em></strong> - 27/09/2021</a></li>
+<li><a href="#introdu%C3%A7%C3%A3o">Introdução</a></li>
+<li><a href="#enumera%C3%A7%C3%A3o">Enumeração</a>
+<ol>
+<li><a href="#nmap">Nmap</a>
+<ol>
+<li><a href="#porta-80">Porta 80</a></li>
+<li><a href="#porta-135">Porta 135</a></li>
+</ol>
+</li>
+<li><a href="#firewall">Firewall</a>
+<ol>
+<li><a href="#ioxidresolver">IOXIDResolver</a></li>
+</ol>
+</li>
+<li><a href="#nmap-1">Nmap</a></li>
+<li><a href="#smb">SMB</a></li>
+<li><a href="#gettgtpy">getTGT.py</a></li>
+<li><a href="#regpy">reg.py</a></li>
+</ol>
+</li>
+<li><a href="#escalada-de-privil%C3%A9gios">Escalada de Privilégios</a>
+<ol>
+<li><a href="#winpeas64exe">winPEAS64.exe</a>
+<ol>
+<li><a href="#bypass-4msi">Bypass-4MSI</a>
+<ol>
+<li><a href="#exemplo-com-a-pr%C3%B3rpia-m%C3%A1quina-alvo"><em>exemplo com a prórpia máquina alvo:</em></a></li>
+</ol>
+</li>
+<li><a href="#invoke-binary">Invoke-Binary</a></li>
+</ol>
+</li>
+<li><a href="#responder">responder</a></li>
+<li><a href="#mscmdrunexe">MsCmdRun.exe</a></li>
+<li><a href="#secretsdumppy">Secretsdump.py</a></li>
+</ol>
+</li>
+</ol>
+<p><img src="Assets/HTB-Windows-Insane-APT/icon.webp" alt="" /></p>
 <img src="https://img.shields.io/badge/APT-HackTheBox-green?style=plastic" width="200">
 <h1 id="resolução-da-máquina-apt"><a class="header" href="#resolução-da-máquina-apt">Resolução da máquina <strong>APT</strong></a></h1>
 <h4 id="máquina-insane-hacktheboxcom"><a class="header" href="#máquina-insane-hacktheboxcom">Máquina Insane (hackthebox.com)</a></h4>
@@ -443,7 +483,7 @@ sudo nano /etc/responder/Responder.conf
 <blockquote>
 <p>APT$:d167c3238864b12f5f82feae86a7f798</p>
 </blockquote>
-<pre><code class="language-bash">crackmapexec smb apt -u 'APT$' -H 'd167c3238864b12f5f82feae86a7f798' 
+<pre><code class="language-bash">crackmapexec smb apt -u 'APT$' -H 'd167c3238864b12f5f82feae86a7f798'
 
 #&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
 #&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [+] htb.local\APT$ d167c3238864b12f5f82feae86a7f798

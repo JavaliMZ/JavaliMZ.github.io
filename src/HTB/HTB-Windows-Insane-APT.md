@@ -1,3 +1,24 @@
+1. [Resolução da máquina **APT**](#resolução-da-máquina-apt) 1. [Máquina Insane (hackthebox.com)](#máquina-insane-hacktheboxcom) 2. [by **_JavaliMZ_** - 27/09/2021](#by-javalimz---27092021)
+2. [Introdução](#introdução)
+3. [Enumeração](#enumeração)
+    1. [Nmap](#nmap)
+        1. [Porta 80](#porta-80)
+        2. [Porta 135](#porta-135)
+    2. [Firewall](#firewall)
+        1. [IOXIDResolver](#ioxidresolver)
+    3. [Nmap](#nmap-1)
+    4. [SMB](#smb)
+    5. [getTGT.py](#gettgtpy)
+    6. [reg.py](#regpy)
+4. [Escalada de Privilégios](#escalada-de-privilégios)
+    1. [winPEAS64.exe](#winpeas64exe)
+        1. [Bypass-4MSI](#bypass-4msi)
+            1. [_exemplo com a prórpia máquina alvo:_](#exemplo-com-a-prórpia-máquina-alvo)
+        2. [Invoke-Binary](#invoke-binary)
+    2. [responder](#responder)
+    3. [MsCmdRun.exe](#mscmdrunexe)
+    4. [Secretsdump.py](#secretsdumppy)
+
 ![](Assets/HTB-Windows-Insane-APT/icon.webp)
 
 <img src="https://img.shields.io/badge/APT-HackTheBox-green?style=plastic" width="200">
@@ -398,11 +419,12 @@ Já temos o hash NTLMv1 em claro:
 > APT$:d167c3238864b12f5f82feae86a7f798
 
 ```bash
-crackmapexec smb apt -u 'APT$' -H 'd167c3238864b12f5f82feae86a7f798' 
+crackmapexec smb apt -u 'APT$' -H 'd167c3238864b12f5f82feae86a7f798'
 
 #>  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
 #>  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [+] htb.local\APT$ d167c3238864b12f5f82feae86a7f798
 ```
+
 As credenciais funcionam. Mas não temos capacidade de escrita, nem de psexec, nem de evil-winrm. Sabemos que este usuário é de Domínio, visto que se fizermos um **"net users"** na máquina com o usuário henry.vinson_adm, não o vemos lá. E sabemos também que é este usuário que executou o Windows Defender. Tem que ter muitos privilégios... possivelmente não pertence ao administradores, porque não nos é possível nos connectar com evil-winrm, mas tem que pertencer a algum grupo com muitos privilégios... Sendo assim, podemos tentar extrair todos os hashes de usuários de domínio com o secretsdump.py em "Blind"...
 
 ## Secretsdump.py

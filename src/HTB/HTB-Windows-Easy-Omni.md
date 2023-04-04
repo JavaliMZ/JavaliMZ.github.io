@@ -1,3 +1,11 @@
+1. [Resolução da máquina **OMNI**](#resolução-da-máquina-omni) 1. [Máquina Fácil (hackthebox.com)](#máquina-fácil-hacktheboxcom) 2. [by **_JavaliMZ_** - 08/09/2021](#by-javalimz---08092021)
+2. [Enumeração](#enumeração)
+    1. [Nmap](#nmap)
+3. [Exploração](#exploração)
+4. [Escalada de privilégios](#escalada-de-privilégios)
+    1. [Enumeração do sistema](#enumeração-do-sistema)
+    2. [User "app"](#user-app)
+
 ![](Assets/HTB-Windows-Easy-omni/icon.webp)
 
 <img src="https://img.shields.io/badge/OMNI-HackTheBox-green?style=plastic" width="200">

