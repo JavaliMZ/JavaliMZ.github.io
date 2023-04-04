@@ -34,6 +34,8 @@
 
     -   [Servidor Web com nginx e virtualhost](./CursoCiberSeguranca/Trabalho5/Trabalho5.md)
 
+    -   [SELinux](./CursoCiberSeguranca/SELinux/TrabalhoSELinux.md)
+
 <!-- ---
 
 -   [Projetos Antigos de programação em puro Javascript](./Projetos-Antigos.md) -->
