@@ -31,7 +31,7 @@ img {
 code {
     border-radius: 0.7em;
     padding: 1em;
-    white-space: pre-wrap;
+    white-space: break-spaces;
 }
 
 p {
