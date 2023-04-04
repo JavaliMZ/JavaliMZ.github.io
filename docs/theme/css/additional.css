@@ -31,6 +31,7 @@ img {
 code {
     border-radius: 0.7em;
     padding: 1em;
+    font-family: 'Fira Code', monospace;
 }
 
 p {

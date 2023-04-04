@@ -214,7 +214,7 @@
 <p>:exclamation: Um ponto importante: O root já não tem acesso, mas pede na mesma a password, e leva o seu tempo a verificar a mesma. Faz exatamente o mesmo com outro nome de utilizador que nem sequer existe. Isso é muito bom, pois é uma forma de evitar enumerar utilizadores da máquina por mudanças de comportamento no tempo de resposta do servidor SSH. :exclamation:</p>
 <h2 id="2-desativar-acesso-sem-password"><a class="header" href="#2-desativar-acesso-sem-password">2. Desativar acesso sem password</a></h2>
 <p>Esta configuração é bastante simples, basta apenas adicionar/descomentar a linha do ficheiro de configuração do <strong>sshd</strong> que menciona a autenticação sem password:</p>
-<pre><code class="language-bash">cat /etc/ssh/sshd_config | grep -i empty
+<pre><code class="language-powershell">cat /etc/ssh/sshd_config | grep -i empty
 		#PermitEmptyPasswords no
 
 sed -i 's/#PermitEmptyPasswords no/PermitEmptyPasswords no/g' /etc/ssh/sshd_config
@@ -224,7 +224,7 @@ cat /etc/ssh/sshd_config | grep -i empty
 <div style="page-break-after: always;"></div>
 <h2 id="3-criar-um-banner-com-msg-bem-vindo-ao-ssh-de-ars-cuidado"><a class="header" href="#3-criar-um-banner-com-msg-bem-vindo-ao-ssh-de-ars-cuidado">3. Criar um Banner com msg &quot;Bem-vindo ao SSH de ARS! CUIDADO!&quot;</a></h2>
 <p>Para esta configuração, iremos criar um ficheiro de texto com a mensagem que queremos que apareça no banner, e depois iremos indicar ao <strong>sshd</strong> onde está esse ficheiro:</p>
-<pre><code class="language-bash">echo &quot;Bem-vindo ao SSH de ARS! CUIDADO\!&quot; &gt; /etc/ssh/banner.txt
+<pre><code class="language-powershell">echo &quot;Bem-vindo ao SSH de ARS! CUIDADO\!&quot; &gt; /etc/ssh/banner.txt
 cat /etc/ssh/banner.txt
 		Bem-vindo ao SSH de ARS! CUIDADO!
 
@@ -238,7 +238,7 @@ cat /etc/ssh/sshd_config | grep -i banner
 </code></pre>
 <h2 id="4-mudar-porto-lógico-para-5555"><a class="header" href="#4-mudar-porto-lógico-para-5555">4. Mudar porto lógico para 5555</a></h2>
 <p>Para esta configuração, iremos replicar o que fizemos no trabalho anterior. A recordar, o processo foi mais complexo do que apenas mudar o ficheiro /etc/ssh/sshd_config, pois tivemos de alterar as <strong>políticas</strong> e a <strong>firewall</strong> para se adequar ao novo porto lógico.</p>
-<pre><code class="language-bash"># Alteração da porta lógica no ficheiro de configuração do sshd
+<pre><code class="language-powershell"># Alteração da porta lógica no ficheiro de configuração do sshd
 cat /etc/ssh/sshd_config | grep 4444
 		Port 4444
 
@@ -268,7 +268,7 @@ systemctl restart sshd
 </code></pre>
 <h2 id="5-mudar-número-de-tentativas-de-ligação-para-2"><a class="header" href="#5-mudar-número-de-tentativas-de-ligação-para-2">5. Mudar número de tentativas de ligação para 2</a></h2>
 <p>Para esta configuração, iremos apenas adicionar/descomentar a linha do ficheiro de configuração do <strong>sshd</strong> que menciona o número de tentativas de login:</p>
-<pre><code class="language-bash">cat /etc/ssh/sshd_config | grep -i max
+<pre><code class="language-powershell">cat /etc/ssh/sshd_config | grep -i max
 		#MaxAuthTries 6
 		#MaxSessions 10
 		#ClientAliveCountMax 3
@@ -282,7 +282,7 @@ cat /etc/ssh/sshd_config | grep -i max
 </code></pre>
 <h2 id="6-mudar-tempo-de-espera-para-autenticação-para-5-segundos"><a class="header" href="#6-mudar-tempo-de-espera-para-autenticação-para-5-segundos">6. Mudar tempo de espera para autenticação para 5 segundos</a></h2>
 <p>Para esta configuração, iremos apenas adicionar/descomentar a linha do ficheiro de configuração do <strong>sshd</strong> que menciona o tempo de espera para autenticação:</p>
-<pre><code class="language-bash">cat /etc/ssh/sshd_config | grep -i LoginGraceTime
+<pre><code class="language-powershell">cat /etc/ssh/sshd_config | grep -i LoginGraceTime
 		#LoginGraceTime 2m
 sed -i 's/#LoginGraceTime 2m/LoginGraceTime 5/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep -i LoginGraceTime
@@ -290,7 +290,7 @@ cat /etc/ssh/sshd_config | grep -i LoginGraceTime
 </code></pre>
 <h2 id="7-permitir-apenas-a-autenticação-de-2-utilizadores-criados-no-sistema"><a class="header" href="#7-permitir-apenas-a-autenticação-de-2-utilizadores-criados-no-sistema">7. Permitir apenas a autenticação de 2 utilizadores (criados no sistema)</a></h2>
 <p>Este passo consiste em limitar o nome de utilizadores que se podem autenticar ao servidor SSH. Até agora, criei de forma voluntária 2 utilizadores, que são &quot;javali&quot; e &quot;guest&quot;. Para informar o <strong>sshd</strong> que só estes 2 utilizadores podem aceder ao servidor, iremos adicionar as seguintes configurações ao ficheiro de configuração do <strong>sshd</strong>:</p>
-<pre><code class="language-bash">cat /etc/ssh/sshd_config | grep -i AllowUsers
+<pre><code class="language-powershell">cat /etc/ssh/sshd_config | grep -i AllowUsers
 echo &quot;AllowUsers javali guest&quot; &gt;&gt; /etc/ssh/sshd_config
 
 cat /etc/ssh/sshd_config | grep -i AllowUsers
@@ -299,7 +299,7 @@ cat /etc/ssh/sshd_config | grep -i AllowUsers
 <h2 id="8-permitir-apenas-a-autenticação-de-2-endereços-ip"><a class="header" href="#8-permitir-apenas-a-autenticação-de-2-endereços-ip">8. Permitir apenas a autenticação de 2 endereços IP</a></h2>
 <p>Esta configuração permite reduzir os riscos de ataques a quase zero, pois só permitimos que 2 endereços IP (controlados pela organização) se autentiquem ao servidor SSH. Apesar da ideia ser muito boa, não encontrei nenhuma maneira simples de a fazer dentro do <strong>sshd_config</strong>. Poderia tratar de fazer isto com a firewall, mas como o trabalho consiste em configurar o SSH, e que provavelmente iremos ter outro trabalho sobre como configurar a firewall, vou tratar de resolver o problema pelo lado do SSH.</p>
 <p>A configuração anterior permitiu-nos restringir o acesso a apenas 2 utilizadores através da configuração chamada de <strong>&quot;AllowUsers&quot;</strong>. Segundo a documentação do <strong>sshd_config</strong>, esta configuração pode ser usada para restringir não só o utilizador, mas também o endereço IP que o utilizador está a usar. Para isso, irei alterar a configuração anterior para:</p>
-<pre><code class="language-bash"># As duas primeiras linhas irei indicar todos os endereços que vem da mesma rede interna, como se fosse dentro de uma empresa por exemplo
+<pre><code class="language-powershell"># As duas primeiras linhas irei indicar todos os endereços que vem da mesma rede interna, como se fosse dentro de uma empresa por exemplo
 # As ultimas linhas serão para um endereço de fora da rede interna, como se fosse um IP público de casa por exemplo.
 
 sed -i 's/AllowUsers javali guest/AllowUsers javali@192.168.1.*/g' /etc/ssh/sshd_config
@@ -319,7 +319,7 @@ cat /etc/ssh/sshd_config | grep -i AllowUsers
 <h2 id="9-desativar-o-acesso-por-password"><a class="header" href="#9-desativar-o-acesso-por-password">9. Desativar o acesso por password</a></h2>
 <p>Esta configuração tem como objetivo desativar o acesso por password. Isso traz mais uma segurança ao sistema, pois mesmo que haja uma fuga de informação, só será possível aceder ao sistema com uma chave privada. Poderá adicionar-se uma passfrase à chave privada, que iria aumentar ainda mais a segurança.</p>
 <p>Para esta configuração, teremos de fazer duas coisas. A configuração em si é só uma, mas para conseguirmos ligar-nos ao servidor SSH novamente, teremos de criar uma chave pública e privada do lado do cliente, adicionar a chave pública ao ficheiro que iremos criar chamado authorized_keys.</p>
-<pre><code class="language-bash"># --- Cliente ---
+<pre><code class="language-powershell"># --- Cliente ---
 # Criar uma chave pública e privada
 ssh-keygen
 		Generating public/private rsa key pair.
@@ -355,7 +355,7 @@ cat ~/.ssh/new_authorized_key &gt;&gt; ~/.ssh/authorized_keys
 
 </code></pre>
 <p>Com a chave pública no servidor SSH, podemos desativar o acesso por password no ficheiro de configuração do <strong>sshd</strong> sem perder o acesso ao servidor SSH:</p>
-<pre><code class="language-bash"># --- Servidor ---
+<pre><code class="language-powershell"># --- Servidor ---
 # Desativar o acesso por password
 cat /etc/ssh/sshd_config | grep PasswordAuthentication
 		#PasswordAuthentication yes
@@ -367,7 +367,7 @@ cat /etc/ssh/sshd_config | grep PasswordAuthentication
 systemctl restart sshd
 </code></pre>
 <p>A partir de agora, para nos ligarmos a este servidor SSH, teremos de usar a chave privada que criámos no cliente:</p>
-<pre><code class="language-bash"># --- Cliente ---
+<pre><code class="language-powershell"># --- Cliente ---
 # Verificar permissões da chave privada
 ls -l id_rsa
 chmod 400 id_rsa  # Se as permissões não estiverem corretas (600 também é aceite)
@@ -380,13 +380,13 @@ ssh -i id_rsa -p 5555 &lt;username&gt;@&lt;ip&gt;
 <p>O ficheiro de logs do SSH é o <strong>/var/log/secure</strong>. Este ficheiro contém todos os logs de autenticação do SSH, como por exemplo, quando um utilizador se autentica com sucesso, quando um utilizador falha a autenticação, quando um utilizador tenta aceder ao servidor SSH com uma chave privada errada, etc.</p>
 <p>Consoante as permissões que o ficheiro de logs tenha, um atacante que por uma razão qualquer tenha capacidade de LFI (Local File Inclusion), dependendo do serviço que for, poderá tentar executar comandos através de LogPoisoning. Exemplo concreto:</p>
 <p>O servidor SSH está numa máquina que serve uma página web. Um atacante conseguiu encontrar uma falha de segurança no servidor web e conseguiu ler o ficheiro de logs do SSH pelo browser através da falha LFI. Ele sabe que o serviço web executa comando PHP por exemplo. Ele poderá tentar executar comandos através do LogPoisoning da seguinte forma:</p>
-<pre><code class="language-bash"># --- Atacante ---
+<pre><code class="language-powershell"># --- Atacante ---
 # LogPoisoning
 echo ssh &quot;&lt;?php system($_GET['cmd']); ?&gt;&quot;@&lt;ip da máquina&gt; -p 5555
 </code></pre>
 <p>A partir deste momento, quando o atacante ler o arquivo <strong>/var/log/secure</strong> através da LFI, poderá adicionar um parâmetro <strong>cmd</strong> à URL e executar comandos remotamente (RCE).</p>
 <p>Para evitar este tipo de ataque, o ficheiro de logs do SSH deverá ter as seguintes permissões:</p>
-<pre><code class="language-bash"># --- Servidor ---
+<pre><code class="language-powershell"># --- Servidor ---
 ls -l /var/log/secure
 -rw-------. 1 root root 0 Jul  1 15:00 /var/log/secure  # Permissões corretas
 </code></pre>
@@ -399,7 +399,7 @@ ls -l /var/log/secure
 <p>Isso é muito bom e útil para muitas coisas, mas também para pessoas mal intencionadas. Um hacker que tenha credenciais de acesso válidas via SSH poderá fazer PortForwarding para um serviço que esteja em rede privada ou local, e poderá aceder a esse serviço. Por exemplo, um atacante está na máquina por SSH. Identificou um serviço web/sql que está a correr na máquina, mas apenas acessível localmente. Ele faz PortForwarding para esse serviço e consegue aceder ao serviço web/sql. A partir daí, poderá encontrar outras falhas, ou extrair informações/passwords, etc...</p>
 <p>Existe ainda o X11Forwarding que permite que um utilizador possa aceder a uma aplicação gráfica que esteja em rede privada através de um servidor SSH que esteja em rede pública. Mas hacker que é hacker só usa uma tela preta com letras verdes :sunglasses:.</p>
 <p>Para impedir o PortForwarding e X11Forwarding, devemos adicionar as seguintes linhas ao ficheiro de configuração do SSH:</p>
-<pre><code class="language-bash"># --- Servidor ---
+<pre><code class="language-powershell"># --- Servidor ---
 # Impedir PortForwarding
 cat /etc/ssh/sshd_config | grep Forwarding
 		#AllowTcpForwarding yes

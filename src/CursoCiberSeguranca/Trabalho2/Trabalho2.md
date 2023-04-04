@@ -16,7 +16,7 @@
 
 Para este trabalho, iremos usar o Arch(Linux) por WSL2 do Windows. Para instalar o OpenSSH, basta executar o seguinte comando:
 
-```bash
+```powershell
 yay openssh   # O Yay é um AUR Helper. É necessário selecionar a opção respetiva do OpenSSH para instalá-lo.
 ```
 
@@ -28,13 +28,13 @@ O OpenSSH no sistema RockyOS vem instalado por defeito. Inclusive, o servidor in
 
 No entanto, caso o software não estiver instalado, basta executar o seguinte comando:
 
-```bash
+```powershell
 sudo yum install openssh
 ```
 
 Além de o instalar, será necessário ativar o serviço do OpenSSH. Para isso, basta executar o seguinte comando:
 
-```bash
+```powershell
 systemctl start sshd  # Inicia o serviço do OpenSSH
 systemctl enable sshd # Indica ao sistema para iniciar o serviço do OpenSSH sempre que o sistema iniciar
 ```
@@ -43,7 +43,7 @@ systemctl enable sshd # Indica ao sistema para iniciar o serviço do OpenSSH sem
 
 Por fim, para ligar o cliente ao servidor, basta executar o seguinte comando:
 
-```bash
+```powershell
 # Do lado do cliente (Arch)
 ssh javali@192.168.56.101  # ssh <username>@<ip> (porto lógico 22 por defeito)
 ```
@@ -62,7 +62,7 @@ Após a ligação ser estabelecida, é possível executar comandos arbitrários 
 
 Em Linux, criar um utilizador é bastante simples. Basta executar o seguinte comando em root:
 
-```bash
+```powershell
 useradd -m -s /bin/bash <username>  # useradd -m -s <shell> <username>
 ```
 
@@ -78,7 +78,7 @@ Este utilizador irá ter demasiados privilégios para dar-mos o acesso à nossa 
 
 <div style="page-break-after: always;"></div>
 
-```bash
+```powershell
 # Criar o utilizador e atribuir uma password
 useradd -m guest
 passwd guest  # password = guest
@@ -106,7 +106,7 @@ chmod 444 .* -R  # 444 = read-only .* para todos os ficheiros e diretórios ocul
 
 Desta vez, iremos ligar-nos ao servidor através do utilizador que criámos. Irei usar uma ferramenta chamada **sshpass** para dar a password ao comando **ssh**. Esta ferramenta é boa para ganhar tempo, mas não é recomendada para ser usada com utilizadores reais, pois a password fica visível no histórico do terminal.
 
-```bash
+```powershell
 sshpass -p "guest" ssh guest@192.168.56.101
 ```
 
@@ -126,7 +126,7 @@ Para alterar o porto lógico de acesso ao servidor SSH, bast editar o ficheiro d
 
 <div style="page-break-after: always;"></div>
 
-```bash
+```powershell
 # Alterar o porto lógico de acesso do servidor SSH
 sed -i 's/#Port 22/Port 4444/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep Port
@@ -158,7 +158,7 @@ Após alguma pesquisa, percebi que o sistema operativo Rocky, derivado de RedHat
 
 Para resolver o problema das permissões, precisamos indicar ao sistema que o serviço daemon do SSH irá passar a usar o porto 4444. Precisaremos de uma nova ferramenta, que não vem por defeito no Rocky minimal, e que a sua instalação não é intuitiva, pois a ferramenta pertence a um conjunte de ferramentas chamada policycoreutils-python-utils.
 
-```bash
+```powershell
 # Instalar a ferramenta semanage
 yum install policycoreutils-python-utils
 yum provides /usr/sbin/semanage
@@ -175,7 +175,7 @@ systemctl restart sshd
 
 Agora parece estar tudo certo. Mas ao sair e voltar a entrar, não me é possível aceder ao servidor SSH. Além de ter políticas, o Rocky também tem um firewall por defeito, que está a bloquear o acesso ao porto 4444.
 
-```bash
+```powershell
 # Verificar o estado do firewall
 firewall-cmd --state
 		running

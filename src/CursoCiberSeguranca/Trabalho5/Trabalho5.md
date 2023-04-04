@@ -30,7 +30,7 @@
 
 Para criar os sites, vamos criar um diretório para cada um deles com um **index.html** muito simples, apenas para ver se funcionam. Irei criar os diretórios em **/var/www**. Para criar os diretórios, irei usar o comando **mkdir**.
 
-```bash
+```powershell
 mkdir /var/www/a.ipg.pt
 mkdir /var/www/b.ipg.pt
 mkdir /var/www/c.ipg.pt
@@ -63,7 +63,7 @@ Para cada pasta irei criar um **index.html** com o seguinte conteúdo (alterando
 
 Agora, passo extremamente importante, dar as permissões adequadas às pastas e aos ficheiros.
 
-```bash
+```powershell
 chmod -R 755 /var/www
 chmod 644 /var/www/*/index.html
 # Este "*" refere-se a todos os diretórios dentro de /var/www
@@ -75,7 +75,7 @@ Agora que já temos os sites criados, vamos configurar o Nginx para que ele saib
 
 Para isso, vamos criar um ficheiro de configuração para indicar os servidores (de Server Block) disponíveis. O ficheiro irá estar na pasta **/etc/nginx/conf.d** e chamar-se-á **javali.conf**. O nginx irá perceber que este ficheiro é de configuração pois o seu ficheiro de configuração base irá chamar todos os ficheiro dentro de **/etc/nginx/conf.d** que acabem em **.conf**. Cada server deve ser criado independentemente dentro do mesmo ficheiro (ou separado).
 
-```bash
+```powershell
 cd /etc/nginx/conf.d
 nano javali.conf
 ```
@@ -112,14 +112,14 @@ server {
 
 No nosso caso, o firewall já se encontra aberto para a porta 80. No entanto, caso o firewall não esteja aberto, podemos fazer o seguinte:
 
-```bash
+```powershell
 firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --reload
 ```
 
 Para o **SELinux Policy Management tool**, vamos permitir que o Nginx possa aceder aos ficheiros que criámos.
 
-```bash
+```powershell
 # Adiciona a política
 semanage fcontext -a -t httpd_sys_content_t '/var/www(/.*)?'
 # Aplica a política
@@ -130,7 +130,7 @@ restorecon -Rv /var/www
 
 Para cada um dos sites, criamos um ficheiro de log separado, tanto para o access_log como para o error_log. Decidimos arbitrariamente que os ficheiros de log iriam estar na pasta **/var/log/nginx**, conforme o ficheiro de configurações que criamos **/etc/nginx/conf.d/javali.conf**. Apenas temos que criar os diretórios para os ficheiros de log.
 
-```bash
+```powershell
 mkdir -p /var/log/nginx
 ```
 
@@ -138,7 +138,7 @@ mkdir -p /var/log/nginx
 
 Para testar, o Nginx tem um comando que permite verificar se a configuração está correta. Para isso, basta executar o comando **nginx -t**. Se tudo estiver correcto, iremos reiniciar o serviço do Nginx.
 
-```bash
+```powershell
 nginx -t
 systemctl restart nginx
 ```
@@ -147,7 +147,7 @@ systemctl restart nginx
 
 Para configurar o nome de domínio, vamos editar o ficheiro **/etc/hosts** e adicionar as seguintes linhas:
 
-```bash
+```powershell
 # o "-e" permite-nos usar o "\t" para tabular
 echo -e "127.0.0.1\ta.ipg.pt b.ipg.pt c.ipg.pt" >> /etc/hosts
 echo -e "192.168.16.204\ta.ipg.pt b.ipg.pt c.ipg.pt" >> /etc/hosts
@@ -157,13 +157,13 @@ echo -e "192.168.16.204\ta.ipg.pt b.ipg.pt c.ipg.pt" >> /etc/hosts
 
 Como estamos num servidor sem interface gráfica, vamos usar o comando **curl** para verificar se os sites estão a funcionar.
 
-```bash
+```powershell
 curl http://a.ipg.pt
 ```
 
 Por se tratar de uma máquina virtual, para podermos ver o site no nosso browser, podemos ainda alterar o ficheiro hosts do nosso computador (neste caso Windows) e adicionar a seguinte linha:
 
-```bash
+```powershell
 # Ip da máquina virtual
 192.168.56.101	a.ipg.pt b.ipg.pt c.ipg.pt
 ```

