@@ -36,6 +36,8 @@
 
     -   [SELinux](./CursoCiberSeguranca/SELinux/TrabalhoSELinux.md)
 
+    -   [HTTPS - SSL com NGINX](./CursoCiberSeguranca/Trabalho9SSL/Trabalho9SSL.md)
+
 <!-- ---
 
 -   [Projetos Antigos de programação em puro Javascript](./Projetos-Antigos.md) -->
