@@ -1,0 +1,373 @@
+<!DOCTYPE HTML>
+<html lang="pt" class="sidebar-visible no-js navy">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Acesso Remoto (SSH) - WriteUps HackTheBox - by JavaliMZ</title>
+
+
+        <!-- Custom HTML head -->
+        <!-- Content here gets appended to the <html><head> of all the pages -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script
+        	async
+        	src='https://www.googletagmanager.com/gtag/js?id=G-ZCM4NEDCZB'
+        ></script>
+        <script>
+        	window.dataLayer = window.dataLayer || []; function
+        	gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config',
+        	'G-ZCM4NEDCZB');
+        </script>
+        <!-- Custom HTML head: Twitter support -->
+        <script
+        	async
+        	src='https://platform.twitter.com/widgets.js'
+        	charset='utf-8'
+        ></script>
+        
+        <meta
+        	name='google-site-verification'
+        	content='g05a2qliKESUMKBSl7XG8sosQoaFtDugS6F9MlUbe1Y'
+        />
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/css/additional.css">
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../../index.html"><strong aria-hidden="true">1.</strong> Introdução</a></li><li class="chapter-item "><a href="../../Windows.html"><strong aria-hidden="true">2.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../HTB/HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">2.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">2.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">2.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Medium-Cascade.html"><strong aria-hidden="true">2.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Hard-Blackfield.html"><strong aria-hidden="true">2.5.</strong> HTB-Windows-Hard-Blackfield</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">2.6.</strong> HTB-Windows-Insane-Bankrobber</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Insane-APT.html"><strong aria-hidden="true">2.7.</strong> HTB-Windows-Insane-APT</a></li></ol></li><li class="chapter-item "><a href="../../Linux.html"><strong aria-hidden="true">3.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../HTB/HTB-Linux-Easy-Pandora.html"><strong aria-hidden="true">3.1.</strong> HTB-Linux-Easy-Pandora</a></li><li class="chapter-item "><a href="../../HTB/HTB-Linux-Easy-Precious.html"><strong aria-hidden="true">3.2.</strong> HTB-Linux-Easy-Precious</a></li><li class="chapter-item "><a href="../../HTB/HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">3.3.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li><li class="chapter-item expanded "><a href="../../CiberSeguranca.html"><strong aria-hidden="true">4.</strong> Trabalhos do Curso de Ciber Segurança</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../CursoCiberSeguranca/Trabalho2/Trabalho2.html" class="active"><strong aria-hidden="true">4.1.</strong> Acesso Remoto (SSH)</a></li><li class="chapter-item "><a href="../../CursoCiberSeguranca/Trabalho3/Trabalho3.html"><strong aria-hidden="true">4.2.</strong> Configuração avançada de um servidor SSH</a></li><li class="chapter-item "><a href="../../CursoCiberSeguranca/Trabalho5/Trabalho5.html"><strong aria-hidden="true">4.3.</strong> Servidor Web com nginx e virtualhost</a></li><li class="chapter-item "><a href="../../CursoCiberSeguranca/SELinux/TrabalhoSELinux.html"><strong aria-hidden="true">4.4.</strong> SELinux</a></li><li class="chapter-item "><a href="../../CursoCiberSeguranca/Trabalho9SSL/Trabalho9SSL.html"><strong aria-hidden="true">4.5.</strong> HTTPS - SSL com NGINX</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">WriteUps HackTheBox - by JavaliMZ</h1>
+
+                    <div class="right-buttons">
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <ol>
+<li><a href="#t02---acesso-remoto-ssh">T02 - Acesso Remoto (SSH)</a>
+<ol>
+<li><a href="#1-instala%C3%A7%C3%A3o-do-openssh-do-cliente">1. Instalação do OpenSSH do cliente</a></li>
+<li><a href="#2-instala%C3%A7%C3%A3o-do-openssh-do-lado-do-servidor">2. Instalação do OpenSSH do lado do servidor</a></li>
+<li><a href="#liga%C3%A7%C3%A3o-entre-o-cliente-e-o-servidor">Ligação entre o cliente e o servidor</a></li>
+<li><a href="#execu%C3%A7%C3%A3o-de-comandos-no-servidor">Execução de comandos no servidor</a></li>
+<li><a href="#cria%C3%A7%C3%A3o-de-um-utilizador-no-servidor">Criação de um utilizador no servidor</a></li>
+<li><a href="#acesso-ao-servidor-atrav%C3%A9s-do-utilizador-criado">Acesso ao servidor através do utilizador criado</a></li>
+<li><a href="#acesso-de-utilizadores-guest-por-parte-dos-camaradas-de-curso">Acesso de utilizadores guest por parte dos camaradas de curso</a></li>
+<li><a href="#mudar-o-porto-l%C3%B3gico-de-acesso-do-servidor">Mudar o porto lógico de acesso do servidor</a></li>
+<li><a href="#verifica%C3%A7%C3%A3o-do-acesso-ao-servidor-ssh">Verificação do acesso ao servidor SSH</a></li>
+<li><a href="#conclus%C3%A3o">Conclusão</a></li>
+</ol>
+</li>
+</ol>
+<h1 id="t02---acesso-remoto-ssh"><a class="header" href="#t02---acesso-remoto-ssh">T02 - Acesso Remoto (SSH)</a></h1>
+<h2 id="1-instalação-do-openssh-do-cliente"><a class="header" href="#1-instalação-do-openssh-do-cliente">1. Instalação do OpenSSH do cliente</a></h2>
+<p>Para este trabalho, iremos usar o Arch(Linux) por WSL2 do Windows. Para instalar o OpenSSH, basta executar o seguinte comando:</p>
+<pre><code class="language-bash">yay openssh   # O Yay é um AUR Helper. É necessário selecionar a opção respetiva do OpenSSH para instalá-lo.
+</code></pre>
+<p>Neste momento, já se pode usar o comando <strong>ssh</strong> enquanto cliente para nos conectarmos a um servidor SSH, sem mais configurações.</p>
+<h2 id="2-instalação-do-openssh-do-lado-do-servidor"><a class="header" href="#2-instalação-do-openssh-do-lado-do-servidor">2. Instalação do OpenSSH do lado do servidor</a></h2>
+<p>O OpenSSH no sistema RockyOS vem instalado por defeito. Inclusive, o servidor inicia automaticamente com o sistema.</p>
+<p>No entanto, caso o software não estiver instalado, basta executar o seguinte comando:</p>
+<pre><code class="language-bash">sudo yum install openssh
+</code></pre>
+<p>Além de o instalar, será necessário ativar o serviço do OpenSSH. Para isso, basta executar o seguinte comando:</p>
+<pre><code class="language-bash">systemctl start sshd  # Inicia o serviço do OpenSSH
+systemctl enable sshd # Indica ao sistema para iniciar o serviço do OpenSSH sempre que o sistema iniciar
+</code></pre>
+<h2 id="ligação-entre-o-cliente-e-o-servidor"><a class="header" href="#ligação-entre-o-cliente-e-o-servidor">Ligação entre o cliente e o servidor</a></h2>
+<p>Por fim, para ligar o cliente ao servidor, basta executar o seguinte comando:</p>
+<pre><code class="language-bash"># Do lado do cliente (Arch)
+ssh javali@192.168.56.101  # ssh &lt;username&gt;@&lt;ip&gt; (porto lógico 22 por defeito)
+</code></pre>
+<center>
+<img src="./Assets/Trabalho2ssh1.png" width="70%">
+</center>
+## Execução de comandos no servidor
+<p>Após a ligação ser estabelecida, é possível executar comandos arbitrários diretamente no servidor. Conforme o exercício pede, executamos o comando <strong>&quot;w&quot;</strong>. Em vez de <strong>&quot;w&quot;</strong>, costumo usar o comando <strong>&quot;who&quot;</strong>, por permitir ver o IP de origem do terminal (quando não aparece o IP, significa que o terminal está local).</p>
+<center>
+<img src="./Assets/Trabalho2ssh2.png" width="70%">
+</center>
+## Criação de um utilizador no servidor
+<p>Em Linux, criar um utilizador é bastante simples. Basta executar o seguinte comando em root:</p>
+<pre><code class="language-bash">useradd -m -s /bin/bash &lt;username&gt;  # useradd -m -s &lt;shell&gt; &lt;username&gt;
+</code></pre>
+<p>Este utilizador terá um diretório home (parâmetro <strong>-m</strong>) e uma shell atribuida (parâmetro <strong>-s</strong>). Neste caso, a shell atribuida é o Bash.</p>
+<p>Este utilizador irá ter demasiados privilégios para dar-mos o acesso à nossa máquina dentro do nosso curso. E como estamos em Cibersegurança, irei criar um utilizador que unicamente será capaz de executar o comando <strong>&quot;ls&quot;</strong>.</p>
+<p>Para limitar os privilégios, podemos lhe dar uma shell restrita. O Bash tem uma shell restrita, e é possível chamá-lo através do comando <strong>bash -r</strong>. Porém, o ficheiro <strong>&quot;/etc/passwd&quot;</strong> não permite que seja dada um parâmetro à shell. Para contornar este problema, podemos criar um link simbólico para o Bash, e dar-lhe o nome de &quot;rbash&quot;. O software &quot;bash&quot; entende que, se o seu nome for &quot;rbash&quot;, significa que terá de se iniciar em modo restrito.</p>
+<p>Para limitar ainda mais o acesso aos convidados, podemos limitar a <em>variável de ambiente</em> <strong>&quot;$PATH&quot;</strong>, para que a shell não consiga encontrar os comandos normais do Linux. Irei criar uma pasta para colocar os <strong>links simbólicos</strong> dos comandos que o utilizador poderá executar.</p>
+<p>Afim de controlar o utilizador, irei bloquear a escrita nos seus ficheiros de configuração, para que não possa alterar a sua &quot;$PATH&quot; e reentrar numa nova sessão com acesso aos novos comandos. Além disso, o <strong>rbash</strong> impede de que as variáveis de ambiente sejam alteradas (apenas leitura).</p>
+<div style="page-break-after: always;"></div>
+<pre><code class="language-bash"># Criar o utilizador e atribuir uma password
+useradd -m guest
+passwd guest  # password = guest
+
+# Criar o link para o Bash restrito
+ln -s /bin/bash /bin/rbash
+
+# Atribuir a shell restrita ao utilizador
+usermod -s /bin/rbash &lt;username&gt;
+
+# Criar a pasta para os links simbólicos e adicionar os comandos que o utilizador poderá executar
+mkdir -R /home/guest/.local/bin
+ln -s /bin/ls /home/guest/.local/bin/ls
+
+# Criar o ficheiro .bashrc em branco e limitar a variável de ambiente &quot;$PATH&quot;
+echo &quot;export PATH=/home/guest/.local/bin&quot; &gt; /home/guest/.bashrc
+
+# Bloquear a escrita nos ficheiros de configuração
+cd /home/guest
+chmod 444 .* -R  # 444 = read-only .* para todos os ficheiros e diretórios ocultos e -R para recursivo
+
+</code></pre>
+<h2 id="acesso-ao-servidor-através-do-utilizador-criado"><a class="header" href="#acesso-ao-servidor-através-do-utilizador-criado">Acesso ao servidor através do utilizador criado</a></h2>
+<p>Desta vez, iremos ligar-nos ao servidor através do utilizador que criámos. Irei usar uma ferramenta chamada <strong>sshpass</strong> para dar a password ao comando <strong>ssh</strong>. Esta ferramenta é boa para ganhar tempo, mas não é recomendada para ser usada com utilizadores reais, pois a password fica visível no histórico do terminal.</p>
+<pre><code class="language-bash">sshpass -p &quot;guest&quot; ssh guest@192.168.56.101
+</code></pre>
+<center>
+<img src="./Assets/Trabalho2ssh3.png" width="70%">
+</center>
+<h2 id="acesso-de-utilizadores-guest-por-parte-dos-camaradas-de-curso"><a class="header" href="#acesso-de-utilizadores-guest-por-parte-dos-camaradas-de-curso">Acesso de utilizadores guest por parte dos camaradas de curso</a></h2>
+<p><img src="./Assets/Trabalho2ssh5.png" alt="Acesso ao servidor através do utilizador criado pelos camaradas" /></p>
+<h2 id="mudar-o-porto-lógico-de-acesso-do-servidor"><a class="header" href="#mudar-o-porto-lógico-de-acesso-do-servidor">Mudar o porto lógico de acesso do servidor</a></h2>
+<p>O OpenSSH usa o porto lógico 22 por defeito para estabelecer ligações, por ser um porto conhecido. Isto significa que, pessoas mal intencionadas podem tentar conectar-se por esse porto através de bots automatizados. É evidente que um escaneamento exaustivo dos 65535 portos lógicos permita descobrir em que porto o servidor SSH está a correr, mas teria de ser feito manualmente e seria claramente um ataque visado.</p>
+<p>Para alterar o porto lógico de acesso ao servidor SSH, bast editar o ficheiro de configurações do OpenSSH, localizado em /etc/ssh/sshd_config. Neste ficheiro, basta alterar a linha &quot;#Port 22&quot; para &quot;Port 4444&quot; (conforme se é pedido no exercício. Poderia ser qualquer porto disponível).</p>
+<div style="page-break-after: always;"></div>
+<pre><code class="language-bash"># Alterar o porto lógico de acesso do servidor SSH
+sed -i 's/#Port 22/Port 4444/g' /etc/ssh/sshd_config
+cat /etc/ssh/sshd_config | grep Port
+		Port 4444
+		#GatewayPorts no
+
+# Reiniciar o serviço do OpenSSH
+systemctl restart sshd
+		Job for sshd.service failed because the control process exited with error code.
+		See &quot;systemctl status sshd.service&quot; and &quot;journalctl -xeu sshd.service&quot; for details.
+
+# Verificar os logs:
+journalctl -xeu sshd.service
+		...
+		Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on 0.0.0.0 failed: Permission denied.
+		Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on :: failed: Permission denied.
+		Mar 09 20:30:30 RockyBalboa sshd[2425]: fatal: Cannot bind any address.
+		Mar 09 20:30:30 RockyBalboa systemd[1]: sshd.service: Main process exited, code=exited, status=255/EXCEPTION
+		...
+</code></pre>
+<center>
+<img src='./Assets/Trabalho2ssh6.png' width=80%/>
+</center>
+<blockquote>
+<p>O servidor SSH não consegue iniciar! O erro informa que não temos permissões. Mas como é que isto é possível? Estou a executar os comandos enquanto <strong>root</strong>...</p>
+</blockquote>
+<p>Após alguma pesquisa, percebi que o sistema operativo Rocky, derivado de RedHat, tem por defeito um mecanismo para atribuir portos a serviços, certamente para impedir que outros portos sejam usados indevidamente.</p>
+<p>Para resolver o problema das permissões, precisamos indicar ao sistema que o serviço daemon do SSH irá passar a usar o porto 4444. Precisaremos de uma nova ferramenta, que não vem por defeito no Rocky minimal, e que a sua instalação não é intuitiva, pois a ferramenta pertence a um conjunte de ferramentas chamada policycoreutils-python-utils.</p>
+<pre><code class="language-bash"># Instalar a ferramenta semanage
+yum install policycoreutils-python-utils
+yum provides /usr/sbin/semanage
+semanage port -a -t ssh_port_t -p tcp 4444
+semanage port -m -t ssh_port_t -p tcp 4444
+
+# Reiniciar o serviço do OpenSSH
+systemctl restart sshd
+</code></pre>
+<center>
+<img src='./Assets/Trabalho2ssh7.png'>
+</center>
+<p>Agora parece estar tudo certo. Mas ao sair e voltar a entrar, não me é possível aceder ao servidor SSH. Além de ter políticas, o Rocky também tem um firewall por defeito, que está a bloquear o acesso ao porto 4444.</p>
+<pre><code class="language-bash"># Verificar o estado do firewall
+firewall-cmd --state
+		running
+
+# Alterar as regras do firewall
+firewall-cmd --permanent --remove-service=ssh
+firewall-cmd --permanent --add-port=4444/tcp
+
+# Reiniciar o firewall
+firewall-cmd --reload
+</code></pre>
+<div style="page-break-after: always;"></div>
+<h2 id="verificação-do-acesso-ao-servidor-ssh"><a class="header" href="#verificação-do-acesso-ao-servidor-ssh">Verificação do acesso ao servidor SSH</a></h2>
+<blockquote>
+<p>Após mudar o porto lógico de acesso pelo /etc/ssh/sshd_config para 4444, ter definido as políticas de segurança que o servidor irá trabalhar pelo porto 4444 e ter alterado as regras do firewall para permitir o acesso ao porto 4444, é possível aceder ao servidor SSH com o respetivo parametro <strong>-p</strong>.</p>
+</blockquote>
+<center>
+<img src="./Assets/Trabalho2ssh8.png" alt="Acesso ao servidor SSH pelo porto 4444" style="zoom:50%;" />
+</center>
+<div style="page-break-after: always;"></div>
+<h2 id="conclusão"><a class="header" href="#conclusão">Conclusão</a></h2>
+<p>Neste trabalho, demonstrei como é possível limitar um utilizador a uns meros comandos, como instalar e habilitar um servidor SSH, como alterar o porto lógico de acesso ao mesmo. Deparei-me com um problema de permissões devido a políticas de segurança do sistema operativo Rocky e aprendi a resolve-lo, com a ajuda do <strong>journal</strong>, assim como alterar as regras do firewall também instalado por defeito neste sistema.</p>
+<pre><code>- Fontes úteis:
+  - https://serverfault.com/questions/998399/how-to-create-a-very-limited-linux-user
+  - https://docs.rackspace.com/support/how-to/change-the-ssh-port-in-centos-and-redhat/
+  - https://www.digitalocean.com/community/tutorials/additional-recommended-steps-for-new-centos-7-servers
+</code></pre>
+<center >
+<image src='./Assets/Coding-bro.svg' width=50%>
+</center>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../CiberSeguranca.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../../CursoCiberSeguranca/Trabalho3/Trabalho3.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../CiberSeguranca.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../../CursoCiberSeguranca/Trabalho3/Trabalho3.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

