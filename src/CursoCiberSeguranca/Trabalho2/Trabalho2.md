@@ -1,16 +1,15 @@
-1. [T02 - Acesso Remoto (SSH)](#t02---acesso-remoto-ssh)
-    1. [1. Instalação do OpenSSH do cliente](#1-instalação-do-openssh-do-cliente)
-    2. [2. Instalação do OpenSSH do lado do servidor](#2-instalação-do-openssh-do-lado-do-servidor)
-    3. [Ligação entre o cliente e o servidor](#ligação-entre-o-cliente-e-o-servidor)
-    4. [Execução de comandos no servidor](#execução-de-comandos-no-servidor)
-    5. [Criação de um utilizador no servidor](#criação-de-um-utilizador-no-servidor)
-    6. [Acesso ao servidor através do utilizador criado](#acesso-ao-servidor-através-do-utilizador-criado)
-    7. [Acesso de utilizadores guest por parte dos camaradas de curso](#acesso-de-utilizadores-guest-por-parte-dos-camaradas-de-curso)
-    8. [Mudar o porto lógico de acesso do servidor](#mudar-o-porto-lógico-de-acesso-do-servidor)
-    9. [Verificação do acesso ao servidor SSH](#verificação-do-acesso-ao-servidor-ssh)
-    10. [Conclusão](#conclusão)
+<h1> T02 - Acesso Remoto (SSH)</h1>
 
-# T02 - Acesso Remoto (SSH)
+- [1. Instalação do OpenSSH do cliente](#1-instalação-do-openssh-do-cliente)
+- [2. Instalação do OpenSSH do lado do servidor](#2-instalação-do-openssh-do-lado-do-servidor)
+- [3. Ligação entre o cliente e o servidor](#3-ligação-entre-o-cliente-e-o-servidor)
+- [4. Execução de comandos no servidor](#4-execução-de-comandos-no-servidor)
+- [5. Criação de um utilizador no servidor](#5-criação-de-um-utilizador-no-servidor)
+- [6. Acesso ao servidor através do utilizador criado](#6-acesso-ao-servidor-através-do-utilizador-criado)
+- [7. Acesso de utilizadores guest por parte dos camaradas de curso](#7-acesso-de-utilizadores-guest-por-parte-dos-camaradas-de-curso)
+- [8. Mudar o porto lógico de acesso do servidor](#8-mudar-o-porto-lógico-de-acesso-do-servidor)
+- [9. Verificação do acesso ao servidor SSH](#9-verificação-do-acesso-ao-servidor-ssh)
+- [10. Conclusão](#10-conclusão)
 
 ## 1. Instalação do OpenSSH do cliente
 
@@ -39,7 +38,7 @@ systemctl start sshd  # Inicia o serviço do OpenSSH
 systemctl enable sshd # Indica ao sistema para iniciar o serviço do OpenSSH sempre que o sistema iniciar
 ```
 
-## Ligação entre o cliente e o servidor
+## 3. Ligação entre o cliente e o servidor
 
 Por fim, para ligar o cliente ao servidor, basta executar o seguinte comando:
 
@@ -51,14 +50,14 @@ ssh javali@192.168.56.101  # ssh <username>@<ip> (porto lógico 22 por defeito)
 <center>
 <img src="./Assets/Trabalho2ssh1.png" width="70%">
 </center>
-## Execução de comandos no servidor
+## 4. Execução de comandos no servidor
 
 Após a ligação ser estabelecida, é possível executar comandos arbitrários diretamente no servidor. Conforme o exercício pede, executamos o comando **"w"**. Em vez de **"w"**, costumo usar o comando **"who"**, por permitir ver o IP de origem do terminal (quando não aparece o IP, significa que o terminal está local).
 
 <center>
 <img src="./Assets/Trabalho2ssh2.png" width="70%">
 </center>
-## Criação de um utilizador no servidor
+## 5. Criação de um utilizador no servidor
 
 Em Linux, criar um utilizador é bastante simples. Basta executar o seguinte comando em root:
 
@@ -102,7 +101,7 @@ chmod 444 .* -R  # 444 = read-only .* para todos os ficheiros e diretórios ocul
 
 ```
 
-## Acesso ao servidor através do utilizador criado
+## 6. Acesso ao servidor através do utilizador criado
 
 Desta vez, iremos ligar-nos ao servidor através do utilizador que criámos. Irei usar uma ferramenta chamada **sshpass** para dar a password ao comando **ssh**. Esta ferramenta é boa para ganhar tempo, mas não é recomendada para ser usada com utilizadores reais, pois a password fica visível no histórico do terminal.
 
@@ -114,11 +113,11 @@ sshpass -p "guest" ssh guest@192.168.56.101
 <img src="./Assets/Trabalho2ssh3.png" width="70%">
 </center>
 
-## Acesso de utilizadores guest por parte dos camaradas de curso
+## 7. Acesso de utilizadores guest por parte dos camaradas de curso
 
 ![Acesso ao servidor através do utilizador criado pelos camaradas](./Assets/Trabalho2ssh5.png)
 
-## Mudar o porto lógico de acesso do servidor
+## 8. Mudar o porto lógico de acesso do servidor
 
 O OpenSSH usa o porto lógico 22 por defeito para estabelecer ligações, por ser um porto conhecido. Isto significa que, pessoas mal intencionadas podem tentar conectar-se por esse porto através de bots automatizados. É evidente que um escaneamento exaustivo dos 65535 portos lógicos permita descobrir em que porto o servidor SSH está a correr, mas teria de ser feito manualmente e seria claramente um ataque visado.
 
@@ -130,22 +129,22 @@ Para alterar o porto lógico de acesso ao servidor SSH, bast editar o ficheiro d
 # Alterar o porto lógico de acesso do servidor SSH
 sed -i 's/#Port 22/Port 4444/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep Port
-		Port 4444
-		#GatewayPorts no
+        Port 4444
+        #GatewayPorts no
 
 # Reiniciar o serviço do OpenSSH
 systemctl restart sshd
-		Job for sshd.service failed because the control process exited with error code.
-		See "systemctl status sshd.service" and "journalctl -xeu sshd.service" for details.
+        Job for sshd.service failed because the control process exited with error code.
+        See "systemctl status sshd.service" and "journalctl -xeu sshd.service" for details.
 
 # Verificar os logs:
 journalctl -xeu sshd.service
-		...
-		Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on 0.0.0.0 failed: Permission denied.
-		Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on :: failed: Permission denied.
-		Mar 09 20:30:30 RockyBalboa sshd[2425]: fatal: Cannot bind any address.
-		Mar 09 20:30:30 RockyBalboa systemd[1]: sshd.service: Main process exited, code=exited, status=255/EXCEPTION
-		...
+        ...
+        Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on 0.0.0.0 failed: Permission denied.
+        Mar 09 20:30:30 RockyBalboa sshd[2425]: error: Bind to port 4444 on :: failed: Permission denied.
+        Mar 09 20:30:30 RockyBalboa sshd[2425]: fatal: Cannot bind any address.
+        Mar 09 20:30:30 RockyBalboa systemd[1]: sshd.service: Main process exited, code=exited, status=255/EXCEPTION
+        ...
 ```
 
 <center>
@@ -178,7 +177,7 @@ Agora parece estar tudo certo. Mas ao sair e voltar a entrar, não me é possív
 ```bash
 # Verificar o estado do firewall
 firewall-cmd --state
-		running
+        running
 
 # Alterar as regras do firewall
 firewall-cmd --permanent --remove-service=ssh
@@ -190,7 +189,7 @@ firewall-cmd --reload
 
 <div style="page-break-after: always;"></div>
 
-## Verificação do acesso ao servidor SSH
+## 9. Verificação do acesso ao servidor SSH
 
 > Após mudar o porto lógico de acesso pelo /etc/ssh/sshd_config para 4444, ter definido as políticas de segurança que o servidor irá trabalhar pelo porto 4444 e ter alterado as regras do firewall para permitir o acesso ao porto 4444, é possível aceder ao servidor SSH com o respetivo parametro **-p**.
 
@@ -200,7 +199,7 @@ firewall-cmd --reload
 
 <div style="page-break-after: always;"></div>
 
-## Conclusão
+## 10. Conclusão
 
 Neste trabalho, demonstrei como é possível limitar um utilizador a uns meros comandos, como instalar e habilitar um servidor SSH, como alterar o porto lógico de acesso ao mesmo. Deparei-me com um problema de permissões devido a políticas de segurança do sistema operativo Rocky e aprendi a resolve-lo, com a ajuda do **journal**, assim como alterar as regras do firewall também instalado por defeito neste sistema.
 

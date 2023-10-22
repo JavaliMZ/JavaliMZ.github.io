@@ -1,33 +1,34 @@
-1. [Resolução da máquina **Sauna**](#resolução-da-máquina-sauna) 1. [Máquina Easy (hackthebox.com)](#máquina-easy-hacktheboxcom) 2. [by **_JavaliMZ_** - 15/09/2021](#by-javalimz---15092021)
-2. [Enumeração](#enumeração)
-    1. [Nmap](#nmap)
-3. [Web Server](#web-server)
-4. [AS-REP Roasting Attack](#as-rep-roasting-attack)
-    1. [GetNPUsers.py](#getnpuserspy)
-        1. [**_Pwn3d!_**](#pwn3d)
-5. [Primeiro pé na máquina](#primeiro-pé-na-máquina)
-6. [BloodHound](#bloodhound)
-7. [Escalada de Privilégios](#escalada-de-privilégios)
-
 ![](Assets/HTB-Windows-Easy-Sauna/icon.webp)
 
 <img src="https://img.shields.io/badge/Sauna-HackTheBox-green?style=plastic" width="200">
 
-# Resolução da máquina **Sauna**
+<h1> Resolução da máquina <b>Sauna</b></h1>
 
-#### Máquina Easy (hackthebox.com)
+<h4>Máquina Easy (hackthebox.com)</h4>
 
-#### by **_JavaliMZ_** - 15/09/2021
-
----
+<h4>by <b><i>JavaliMZ</i></b> - 15/09/2021</h4>
 
 ---
 
-# Enumeração
+---
+
+- [1. Enumeração](#1-enumeração)
+  - [1.1. Nmap](#11-nmap)
+- [2. Web Server](#2-web-server)
+- [3. AS-REP Roasting Attack](#3-as-rep-roasting-attack)
+  - [3.1. GetNPUsers.py](#31-getnpuserspy)
+    - [3.1.1. **_Pwn3d!_**](#311-pwn3d)
+- [4. Primeiro pé na máquina](#4-primeiro-pé-na-máquina)
+- [5. BloodHound](#5-bloodhound)
+- [6. Escalada de Privilégios](#6-escalada-de-privilégios)
+
+---
+
+# 1. Enumeração
 
 Como sempre, para qualquer PenTest, precisamos saber qual é o alvo. E o primeiro passo para isso é enumerar as portas da máquina! Uma das melhores e mais conhecidas ferramentas para enumerar as portas de uma máquina ou conjunte de máquina é o NMAP.
 
-## Nmap
+## 1.1. Nmap
 
 ![Enumeração nmap allPorts](Assets/HTB-Windows-Easy-Sauna/Enum-nmap-allports.png)
 
@@ -97,7 +98,7 @@ Pela quantidade de portas, sabemos que não estamos perante um "tamagotchi"... I
 
 Neste ponto, há já diversas coisas que quero tentar... primeiro o servidor http claro, ver se podemos entrar no servidor samba, Tentar loggar por RPC, e tentar um AS-REP Roasting attack, Mas vamos com calma!
 
-# Web Server
+# 2. Web Server
 
 ![Web Server potenciais users](Assets/HTB-Windows-Easy-Sauna/web-server-users.png)
 
@@ -148,7 +149,7 @@ cat users-full-name | tr '[A-Z]' '[a-z]' | awk '{print substr ($1,0,1) "." $2}' 
 
 Temos agora uma lista de usuários potenciais para efectuar a próxima tentativa de attack. AS-REP Roasting Attack!.
 
-# AS-REP Roasting Attack
+# 3. AS-REP Roasting Attack
 
 Uma das tecnologias de autenticação da Microsoft Active Directory é o Kerberos. Um artigo excelente sobre o que é o Kerberos e sobre o attack AS-REP Roasting Attack pode encontrar-se em https://thehackernews.com/2021/09/what-is-as-rep-roasting-attack-really.html
 
@@ -158,7 +159,7 @@ Uma vez desativado, quando um atacante solicita dados de autenticação de qualq
 
 Para isso existem diversas ferramentas. Para esta máquina irei utilizar uma que, com ajuda da nossa lista de potenciais usuários, irá solicitar um TGT de cada usuário, e se o usuário existir e tiver a opção "Do not require Kerberos preauthentication", iremos receber diretamente um TGT.
 
-## GetNPUsers.py
+## 3.1. GetNPUsers.py
 
 Ainda antes do attack AS-REP Roasting Attack, poderíamos tentar ver recursos SMB e RPC, que são mais rápidos. Mas adiento já que não se vai ver nada para ambos. No entanto, para futuros ataques, precisamos saber mais informações sobre a máquina... Durante a tentativa de conexão por SMB, é possível recolher informações sobre o nome do domínio, e assim informar o nosso /etc/hosts para que haja menos problemas nos ataques futuros.
 
@@ -209,13 +210,13 @@ crackmapexec winrm 10.10.10.175 -u 'fsmith' -p 'Thestrokes23'
 #>  WINRM       10.10.10.175    5985   SAUNA            [+] EGOTISTICAL-BANK.LOCAL\fsmith:Thestrokes23 (Pwn3d!)
 ```
 
-### **_Pwn3d!_**
+### 3.1.1. **_Pwn3d!_**
 
 O Crackmapexec nos diz que as credenciais estão válidas para ambos os serviços, mas no winrm informa-nos que está **_Pwn3d!_**. Isto significa que podemos entrar a vontade sem ser barrado por nenhum segurança xD
 
 ![In the machine with user fsmith](Assets/HTB-Windows-Easy-Sauna/InTheMachine-user-fsmith.png)
 
-# Primeiro pé na máquina
+# 4. Primeiro pé na máquina
 
 Sabemos que é um Active Directory / Domain Controller. A primeira coisa a fazer num AD/DC é enumerar todos os usuários. Existem 2 tipos de usuários. Usuários Locais, e usuários de domínio. Para enumerar os usuários locais, podemos efectuar um "net users":
 
@@ -274,7 +275,7 @@ BINGO! Encontrámos mais uma credential válida => **svc_loanmgr:Moneymakesthewo
 
 Mesma história... Este novo usuário tem privilégios para aceder à máquina via WinRM provavelmente por ser membro de um groupo chamado **_"BUILTIN\Remote Management Users"_**
 
-# BloodHound
+# 5. BloodHound
 
 Já dentro da máquina, Mesmo tendo um shell verdadeiro e tal, nunca é fácil ver tudo rapidamente, nem é fácil saber por que caminho ir... Para além da mencionada ferramenta winPEAS64.exe, disponível no github, hà uma ferramenta espetacular para visualizar em modo gráfico todos os ramos entre usuários e groupos de todo um domain controller! Esta ferramenta é a **BloodHound**. O programa precisa de uma base de dados, o neo4j, que é uma base de dados graph.
 
@@ -306,7 +307,7 @@ O parte final do video indica um caminho potencial, e indica também o que fazer
 
 Essa vulnerabilidade existe porque o usuário svc_loanmgr tem privilégios de DS-Replication-Get-Changes-All e de DS-Replication-Get-Changes no Domínio. Esse dois privilégios em conjunto permite executar o que é chamado de DCSync attack. É parecido ao que acontece quando se tem privilégios locais de SeImpersonatePrivileges, mas em Domain Controller.
 
-# Escalada de Privilégios
+# 6. Escalada de Privilégios
 
 ```bash
 # Atenção ao link... só posso garantir estar válido AGORA MESMO enquanto escrevo...

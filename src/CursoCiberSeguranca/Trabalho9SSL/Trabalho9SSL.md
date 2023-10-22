@@ -1,14 +1,13 @@
-1. [Trabalho n.º 9 - SSL](#trabalho-nº-9---ssl)
-   1. [O que é SSL (ou TLS)?](#o-que-é-ssl-ou-tls)
-   2. [Criar um site de login simples sem TLS](#criar-um-site-de-login-simples-sem-tls)
-      1. [Configura o NGINX](#configura-o-nginx)
-      2. [Verificar as comunicações com a ferramenta WireShark (HTTP)](#verificar-as-comunicações-com-a-ferramenta-wireshark-http)
-   3. [Adicionar o protocolo de segurança TLS ao servidor](#adicionar-o-protocolo-de-segurança-tls-ao-servidor)
-      1. [Verificar as comunicações com a ferramenta WireShark (HTTPS)](#verificar-as-comunicações-com-a-ferramenta-wireshark-https)
-2. [Conclusão](#conclusão)
-3. [Referências](#referências)
+<h1> Trabalho n.º 9 - SSL</h1>
 
-# Trabalho n.º 9 - SSL
+- [1. O que é SSL (ou TLS)?](#1-o-que-é-ssl-ou-tls)
+- [2. Criar um site de login simples sem TLS](#2-criar-um-site-de-login-simples-sem-tls)
+  - [2.1. Configura o NGINX](#21-configura-o-nginx)
+  - [2.2. Verificar as comunicações com a ferramenta WireShark (HTTP)](#22-verificar-as-comunicações-com-a-ferramenta-wireshark-http)
+- [3. Adicionar o protocolo de segurança TLS ao servidor](#3-adicionar-o-protocolo-de-segurança-tls-ao-servidor)
+  - [3.1. Verificar as comunicações com a ferramenta WireShark (HTTPS)](#31-verificar-as-comunicações-com-a-ferramenta-wireshark-https)
+- [4. Conclusão](#4-conclusão)
+- [5. Referências](#5-referências)
 
 > Nos dias que correm, é importante que todos os dados sensíveis transacionados entre um cliente e um servidor sejam cifrados de modo a que estes não possam ser entendidos por terceiros. Na prática, quando acedemos a um serviço online que nos solicita dados pessoais ou credenciais de acesso (ex. sites de bancos) é importante que a toda a informação passada seja cifrada de modo a tornar-se ilegível. No caso dos > servidores Web (entre outros serviços de uma rede), uma das formas de proceder à cifra dos dados é recorrendo ao protocolo SSL
 >
@@ -24,11 +23,11 @@
 >
 > Pretende-se com este trabalho que o aluno configurar num site um certificado SSL para garantir a segurança do site. Devem publicar no Medium todos os passos necessários para criar e configurar um certificado SSL.
 
-## O que é SSL (ou TLS)?
+## 1. O que é SSL (ou TLS)?
 
 O SSL (secure sockets layer) é um protocolo de segurança que permite a encriptação de dados entre o servidor e o cliente. Este protocolo é usado para proteger a comunicação entre o servidor e o cliente, evitando que os dados sejam lidos por terceiros. No entanto, esta tecnologia já evoluiu para _TLS_ (transport layer security), que é a versão mais recente do SSL. Iremos usar o TLS neste trabalho.
 
-## Criar um site de login simples sem TLS
+## 2. Criar um site de login simples sem TLS
 
 Para este trabalho, iremos recuperar o nosso servidor _NGINX_ previamente criado e alterar o que for necessário para alojar um site de login simples. Iremos usar exatamente a mesma página de login, na mesma localização, mas iremos alterar o ficheiro de configurações do NGINX para que o site seja servido com e sem TLS consoante os portos lógicos a serem usados, a saber, o porto 80 para HTTP (sem TLS) e o porto 443 para HTTPS (com TLS), que são os portos chamados de _"Well-Known Ports"_.
 
@@ -38,7 +37,7 @@ Esta página contém um simples FORM que irá enviar os dados para o servidor po
 
 <div style="page-break-after: always;"></div>
 
-### Configura o NGINX
+### 2.1. Configura o NGINX
 
 Iremos agora configura o servidor, como fizemos no trabalho anterior sobre NGINX e virtual hosting. Iremos mexer apenas no ficheiro de configuração do server block, que se encontra em **/etc/nginx/conf.d/javali.conf**.
 
@@ -89,7 +88,7 @@ Depois, basta abrir o browser e aceder ao site **cenario.pt**. Se tudo estiver b
 <img src="./Assets/loginPage.png" width="80%">
 </center>
 
-### Verificar as comunicações com a ferramenta WireShark (HTTP)
+### 2.2. Verificar as comunicações com a ferramenta WireShark (HTTP)
 
 Para verificar as comunicações, iremos usar a ferramenta WireShark. Esta ferramenta permite-nos ver o tráfego de rede que passa pela nossa placa de rede. Para isso, basta abrir a ferramenta e selecionar a placa de rede que queremos monitorizar. Em Linux, temos a possibilidade de monitorizar todas as placas de rede, mas em Windows, apenas podemos monitorizar uma placa de rede de cada vez.
 
@@ -103,7 +102,7 @@ Iremos adicionar um filtro para que apenas sejam mostrados os pacotes que tenham
 
 Como podemos ver, o tráfego é todo feito em texto plano, pelo que qualquer pessoa que esteja a monitorizar a rede pode ver os dados que estão a ser enviados. Isto é um problema de segurança, pois os dados podem ser roubados por terceiros. Neste caso, capturámos que o utilizador **test** enviou a password **testing** para o servidor.
 
-## Adicionar o protocolo de segurança TLS ao servidor
+## 3. Adicionar o protocolo de segurança TLS ao servidor
 
 A partir de agora importa salientar que qualquer pessoa pode criar os seus certificados. Esse certificados terão de passar por uma entidade que lhe dará credibilidade. Essa entidade é chamada de **CA** (certificate authority). No entanto, para efeitos de teste, iremos criar os nossos próprios certificados sem passar por essas entidade (que são pagas...). Esses certificados sempre irão soar alarmes nos browser, a indicar que os certificados não são de confiança. Mas para um ambiente de testes, é mais do que suficiente. Esses certificados são chamados de **self-signed certificates**.
 
@@ -183,7 +182,7 @@ firewall-cmd --permanent --add-port=443/tcp
 firewall-cmd --reload
 ```
 
-### Verificar as comunicações com a ferramenta WireShark (HTTPS)
+### 3.1. Verificar as comunicações com a ferramenta WireShark (HTTPS)
 
 Desta vez, ao verificar as comunicações pelo WireShark, não podemos filtrar por HTTP, mas sim por TLS. Para isso, basta adicionar o filtro **"tls"**. O filtro completo ficará assim: **"ip.dst == 192.168.1.50 and tls"**.
 
@@ -196,7 +195,7 @@ Desta forma, podemos ver que os dados são encriptados, e que não é possível 
 
 <div style="page-break-after: always;"></div>
 
-# Conclusão
+## 4. Conclusão
 
 Este trabalho foi bastante interessante, foi demoroso pois a preguiça de ler a documentação oficial das ferramentas é sempre grande!!
 
@@ -206,7 +205,7 @@ Este trabalho foi bastante interessante, foi demoroso pois a preguiça de ler a 
 
 Mas foi bastante interessante, pois aprendi a configurar um servidor para usar TLS, e a usar a ferramenta WireShark para verificar as comunicações. Aprendi também a criar certificados e a configurar o NGINX para usar esses certificados.
 
-# Referências
+## 5. Referências
 
 -   [Criação de um certificado auto-firmado](https://devopscube.com/create-self-signed-certificates-openssl/)
 -   [NGINX documentação https](http://nginx.org/en/docs/http/configuring_https_servers.html)

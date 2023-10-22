@@ -1,5 +1,7 @@
 <h1> Anonimato na Internet </h1>
 
+> Data: 22 OCT 2023
+
 - [1. Introdução](#1-introdução)
 - [2. Anonimato na internet](#2-anonimato-na-internet)
   - [2.1. Rede TOR](#21-rede-tor)
@@ -18,13 +20,25 @@
 - [4. Conclusão](#4-conclusão)
 - [5. Bibliografia](#5-bibliografia)
 
-<div style="page-break-after: always;"></div>
+> No contexto do CTESP em cibersegurança que estou a efetuar, foi-me proposto a realização de um trabalho sobre o anonimato na internet. Este trabalho foi realizado no âmbito da unidade curricular de "Técnicas de hacking". O objetivo deste trabalho é aprofundar os conhecimentos sobre o anonimato na internet, e sobre as ferramentas que permitem que os utilizadores possam navegar na internet de forma anónima.
+>
+> Enunciado:
+>
+> Aceder à rede Tor é hoje uma tarefa bastante simples. Para isso basta que usem o Tor Browser, que inclui nativamente todas as configurações necessárias.
+>
+> No entanto, quem pretender usar outros browsers pode sempre configurar um proxy na própria máquina.
+>
+> -- OBJETIVOS DO TRABALHO --
+>
+> Para este trabalho pretende-se que os alunos instalem e configurem o cliente TOR e o proxy Privoxy.
+>
+> Como resultado devem verificar se o tráfego está a ser encaminhado pela rede TOR. Para isso verifiquem a configuração através deste site: https://check.torproject.org/
+>
+> Indiquem também qual o IP atribuído e a área geográfica a qual o mesmo pertence.
 
 # 1. Introdução
 
 Neste trabalho, iremos desenvolver um relatório sobre o anonimato na internet. Iremos tratar de entender o que é a rede TOR, como usar o Privoxy, iremos ainda falar sobre o sistema operativo TAILS e por fim, passando ainda por discutir sobre a importância do anonimato para o black hat hacker, as dificuldades que enfrentam as autoridades contra o anonimato e sobre a importância da coordenação e cooperação internacional para combater o cibercrime.
-
-<div style="page-break-after: always;"></div>
 
 # 2. Anonimato na internet
 
@@ -134,8 +148,6 @@ E no caso de usar TOR? De certeza que não iria ser possível obter tanta inform
 
 Vimos anteriormente várias falhas no anonimato perfeito... Mas vamos tentar otimizar tudo para ficarmos o mais anónimos possível. Vimos que o nosso sistema fala para a internet. Isso é um problema para quem quiser ficar anónimo. Temos então que usar, para além do TOR e de uma VPN-over-TOR, podemos usar uma ferramenta que irá alterar todos esses elementos identificáveis do browser. Essa ferramenta é o privoxy.
 
-<div style="page-break-after: always;"></div>
-
 ## 2.2. Privoxy
 
 O privoxy é uma simples proxy, mas que pode ser configurado para mudar elementos que se enviam para os diferentes servidores WEB. Pode-se controlar que HEADERS se irão enviar, entre muitas outras coisas.
@@ -178,15 +190,13 @@ A seguir, adicionamos as informações ao TOR browser
 <center>
 <img src="./assets/TORproxy2.png" width="80%">
 </center>
-<div style="page-break-after: always;"></div>
+
 <div class='legend'>
     <b>Figura 6:</b> Configurações do TOR Browser
     <b>Fonte:</b> Screenshot do TOR Browser mediante o sistema operacional Linux Arch.
 </div>
 
 Agora que temos tudo configurado, estamos prontos para navegar na internet de forma praticamente anónima. Mas todo esse processo é demorado. Poderiamos criar um script para automatizar todo esse processo. Mas existe ainda melhor. O sistema operacional TAILS.
-
-<div style="page-break-after: always;"></div>
 
 ## 2.3. Sistema operacional TAILS
 
@@ -207,8 +217,6 @@ Para quem quer desaparecer por completo, temos de nos afastar da nossa casa, do 
    <b>Figura 7:</b> Antena WiFi direcional de longo alcance
    <b>Fonte:</b> [https://pt.aliexpress.com/item/1005005309375919.html](https://pt.aliexpress.com/item/1005005309375919.html)
 </div>
-
-<div style="page-break-after: always;"></div>
 
 # 3. Problemas encontrados na busca do anonimato
 

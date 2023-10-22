@@ -1,24 +1,23 @@
-1. [SELinux](#selinux)
-    1. [1. Introdução](#1-introdução)
-        1. [O que é o SELinux?](#o-que-é-o-selinux)
-        2. [DAC (Discretionary Access Control) vs MAC (Mandatory Access Control)](#dac-discretionary-access-control-vs-mac-mandatory-access-control)
-    2. [2. Instalação](#2-instalação)
-    3. [3. Configuração](#3-configuração)
-        1. [Semanage](#semanage)
-            1. [Semanage - fcontext](#semanage---fcontext)
-            2. [Semanage - port](#semanage---port)
-    4. [Troubleshooting](#troubleshooting)
-2. [Referências](#referências)
+<h1> SELinux</h1>
 
-# SELinux
+- [1. Introdução](#1-introdução)
+  - [1.1. O que é o SELinux?](#11-o-que-é-o-selinux)
+  - [1.2. DAC (Discretionary Access Control) vs MAC (Mandatory Access Control)](#12-dac-discretionary-access-control-vs-mac-mandatory-access-control)
+- [2. Instalação](#2-instalação)
+- [3. Configuração](#3-configuração)
+  - [3.1. Semanage](#31-semanage)
+    - [3.1.1. Semanage - fcontext](#311-semanage---fcontext)
+    - [3.1.2. Semanage - port](#312-semanage---port)
+- [4. Troubleshooting](#4-troubleshooting)
+- [5. Referências](#5-referências)
 
 ## 1. Introdução
 
-### O que é o SELinux?
+### 1.1. O que é o SELinux?
 
 O SELinux (Security-Enhanced Linux) é um sistema de segurança desenvolvido pela NSA (Agência de Segurança Nacional dos EUA) que adiciona uma camada adicional de segurança ao sistema operacional Linux. Ele controla o acesso de processos e usuários a recursos do sistema, como arquivos, diretórios e portas de rede, com base em políticas de segurança definidas. O SELinux é projetado para proteger contra ataques de exploração de vulnerabilidades de software e para limitar o impacto de um ataque bem-sucedido. Ele é usado em muitas distribuições Linux, incluindo Red Hat, CentOS e Fedora.
 
-### DAC (Discretionary Access Control) vs MAC (Mandatory Access Control)
+### 1.2. DAC (Discretionary Access Control) vs MAC (Mandatory Access Control)
 
 O DAC é o sistema padrão do LINUX. É o sistema de controle de acesso baseado em permissões de arquivos (leitura, escrita, execução Ex: -rw-r--r--). É o que se vê do lado esquerdo dos arquivos quando executamos o comando ls -l.
 
@@ -76,13 +75,13 @@ Na mesma pasta, existe ainda o ficheiro /etc/selinux/semanage.conf. Este ficheir
 
 <div style="page-break-after: always;"></div>
 
-### Semanage
+### 3.1. Semanage
 
 O "semanage" é uma ferramenta de gestão SELinux que permite gerir as políticas e módulos SELinux no sistema. O "semanage" pode ser usado para gerir as políticas SELinux, módulos SELinux, mapeamentos de usuários e mapeamentos de rótulos. O "semanage" pode ser usado para gerir as políticas SELinux, módulos SELinux, mapeamentos de usuários e mapeamentos de rótulos.
 
 Será talvez a ferramenta mais importante para gerir o SELinux.
 
-#### Semanage - fcontext
+#### 3.1.1. Semanage - fcontext
 
 O "semanage fcontext" é usado para gerir os contextos de arquivos e pastas. Permite informar o SELinux de que um dado ficheiro pertence a um determinado tipo de ficheiro. Por exemplo, se tivermos um ficheiro html para ser lido por um servidor web, poderemos informar o SELinux de que este ficheiro pertence ao tipo de ficheiro httpd_sys_content_t. Para isso, executamos o comando abaixo:
 
@@ -94,7 +93,7 @@ restorecon -v /var/www/html/index.html
 # Verificar se o ficheiro foi adicionado ao tipo de ficheiro httpd_sys_content_t
 semanage fcontext -l | grep index.html # ou
 ls -Z /var/www/html/index.html
-	# -rw-r--r--. root root system_u:object_r:httpd_sys_content_t:s0 /var/www/html/index.html
+    # -rw-r--r--. root root system_u:object_r:httpd_sys_content_t:s0 /var/www/html/index.html
 ```
 
 De referir que o semanage entende regex, pelo que poderá adicionar-se todos os ficheiros de uma dada pasta, por exemplo:
@@ -111,7 +110,7 @@ Para remover um ficheiro de um tipo de ficheiro, execute o comando abaixo:
 semanage fcontext -d -t httpd_sys_content_t /var/www/html/index.html
 restorecon -v /var/www/html/index.html
 ls -Z /var/www/html/index.html
-	# -rw-r--r--. root root system_u:object_r:unlabeled_t:s0 /var/www/html/index.html
+    # -rw-r--r--. root root system_u:object_r:unlabeled_t:s0 /var/www/html/index.html
 ```
 
 <div style="page-break-after: always;"></div>
@@ -122,7 +121,7 @@ Existem dezenas de tipos de ficheiros, e poderá consultar a lista completa das 
 semanage fcontext -l
 ```
 
-#### Semanage - port
+#### 3.1.2. Semanage - port
 
 O **"semanage port"** é usado para gerir os contextos de portas. Permite informar o SELinux de que uma determinada porta pertence a um determinado tipo de porta. Por exemplo, se tivermos um serviço web rodando na porta 80, poderemos informar o SELinux de que esta porta pertence ao tipo de porta http_port_t. Para isso, executamos o comando abaixo:
 
@@ -141,7 +140,7 @@ O semanage port não subtitui uma firewall, mas pode ser usado para limitar muit
 
 <div style="page-break-after: always;"></div>
 
-## Troubleshooting
+## 4. Troubleshooting
 
 Após modificar algo no sistema e não funcionar como deveria, poderá ser necessário verificar o log do SELinux para ver se há alguma mensagem de erro. Para isso, execute o comando abaixo:
 
@@ -151,7 +150,7 @@ sealert -a /var/log/audit/audit.log
 
 Este comando é uma maravilha! Indica os erros e dá sugestões de como corrigir, e tudo isso de forma bem clara e bem detalhada. No entanto, as soluções são quase sempre para alterar os módulos SELinux, e não para alterar as políticas SELinux. Normalmente, as soluções passam pelo comando **semanage**. Mas com a mensagem de erro, poderá pesquisar online e encontrar a solução correspondente via **semanage**.
 
-# Referências
+## 5. Referências
 
 [site:Red Hat - SELinux](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/using_selinux/index)
 

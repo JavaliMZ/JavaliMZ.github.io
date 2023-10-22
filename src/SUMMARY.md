@@ -1,4 +1,4 @@
-# Summary
+# 1. Summary
 
 -   [Introdução](./index.md)
 
@@ -37,6 +37,8 @@
     -   [SELinux](./CursoCiberSeguranca/SELinux/TrabalhoSELinux.md)
 
     -   [HTTPS - SSL com NGINX](./CursoCiberSeguranca/Trabalho9SSL/Trabalho9SSL.md)
+
+    -   [Anonimato na Internet](./CursoCiberSeguranca/Anonimato/04_trabalho.md)
 
 <!-- ---
 

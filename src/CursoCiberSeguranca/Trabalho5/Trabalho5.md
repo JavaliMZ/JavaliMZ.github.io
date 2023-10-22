@@ -1,14 +1,13 @@
-1. [Vários sites num servidor Nginx](#vários-sites-num-servidor-nginx)
-    1. [Criação dos sites](#criação-dos-sites)
-    2. [Configuração do Nginx](#configuração-do-nginx)
-    3. [Configurações do Firewall e do "SELinux Policy Management tool"](#configurações-do-firewall-e-do-selinux-policy-management-tool)
-    4. [Ficheiros de log](#ficheiros-de-log)
-    5. [Testar a configuração](#testar-a-configuração)
-    6. [Configuração do nome de domínio](#configuração-do-nome-de-domínio)
-2. [Verificação do funcionamento](#verificação-do-funcionamento)
-3. [Documentação e ajudas](#documentação-e-ajudas)
+<h1> Vários sites num servidor Nginx</h1>
 
-# Vários sites num servidor Nginx
+- [1. Criação dos sites](#1-criação-dos-sites)
+- [2. Configuração do Nginx](#2-configuração-do-nginx)
+- [3. Configurações do Firewall e do "SELinux Policy Management tool"](#3-configurações-do-firewall-e-do-selinux-policy-management-tool)
+- [4. Ficheiros de log](#4-ficheiros-de-log)
+- [5. Testar a configuração](#5-testar-a-configuração)
+- [6. Configuração do nome de domínio](#6-configuração-do-nome-de-domínio)
+- [7. Verificação do funcionamento](#7-verificação-do-funcionamento)
+- [8. Documentação e ajudas](#8-documentação-e-ajudas)
 
 > O Nginx é um servidor HTTP (Web) gratuito, open-source e com alta performance. O Nginx foi criado em 2005 e tinha como principal objetivo ser um servidor estável, simples de configurar e que necessitasse de poucos recursos ao nível de hardware. Atualmente o Nginx é um dos servidores Web mais usados para publicação de sites na Internet.
 >
@@ -26,7 +25,7 @@
 >
 > A entrega deste trabalho pode ser feita no ClassRoom, mas depois pretende-se que seja feito um pequeno tutorial no Medium.
 
-## Criação dos sites
+## 1. Criação dos sites
 
 Para criar os sites, vamos criar um diretório para cada um deles com um **index.html** muito simples, apenas para ver se funcionam. Irei criar os diretórios em **/var/www**. Para criar os diretórios, irei usar o comando **mkdir**.
 
@@ -69,7 +68,7 @@ chmod 644 /var/www/*/index.html
 # Este "*" refere-se a todos os diretórios dentro de /var/www
 ```
 
-## Configuração do Nginx
+## 2. Configuração do Nginx
 
 Agora que já temos os sites criados, vamos configurar o Nginx para que ele saiba onde estão os ficheiros e como servir os mesmos.
 
@@ -82,33 +81,33 @@ nano javali.conf
 
 ```nginx
 server {
-	listen       80;
-	server_name  a.ipg.pt;
-	# server_name  b.ipg.pt;
-	# server_name  c.ipg.pt;
+    listen       80;
+    server_name  a.ipg.pt;
+    # server_name  b.ipg.pt;
+    # server_name  c.ipg.pt;
 
-	location / {
-		root   /var/www/a.ipg.pt;
-		# root  /var/www/b.ipg.pt;
-		# root   /var/www/c.ipg.pt;
-		index  index.html;
-	}
+    location / {
+        root   /var/www/a.ipg.pt;
+        # root  /var/www/b.ipg.pt;
+        # root   /var/www/c.ipg.pt;
+        index  index.html;
+    }
 
-	error_page   500 502 503 504  /50x.html;
-	location = /50x.html {
-		root   /usr/share/nginx/html;
-	}
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
 
-	access_log /var/log/nginx/a.ipg.pt.access.log;
-	# access_log /var/log/nginx/b.ipg.pt.access.log;
-	# access_log /var/log/nginx/c.ipg.pt.access.log
-	error_log /var/log/nginx/a.ipg.pt.error.log;
-	# error_log /var/log/nginx/b.ipg.pt.error.log;
-	# error_log /var/log/nginx/c.ipg.pt.error.log
+    access_log /var/log/nginx/a.ipg.pt.access.log;
+    # access_log /var/log/nginx/b.ipg.pt.access.log;
+    # access_log /var/log/nginx/c.ipg.pt.access.log
+    error_log /var/log/nginx/a.ipg.pt.error.log;
+    # error_log /var/log/nginx/b.ipg.pt.error.log;
+    # error_log /var/log/nginx/c.ipg.pt.error.log
 }
 ```
 
-## Configurações do Firewall e do "SELinux Policy Management tool"
+## 3. Configurações do Firewall e do "SELinux Policy Management tool"
 
 No nosso caso, o firewall já se encontra aberto para a porta 80. No entanto, caso o firewall não esteja aberto, podemos fazer o seguinte:
 
@@ -126,7 +125,7 @@ semanage fcontext -a -t httpd_sys_content_t '/var/www(/.*)?'
 restorecon -Rv /var/www
 ```
 
-## Ficheiros de log
+## 4. Ficheiros de log
 
 Para cada um dos sites, criamos um ficheiro de log separado, tanto para o access_log como para o error_log. Decidimos arbitrariamente que os ficheiros de log iriam estar na pasta **/var/log/nginx**, conforme o ficheiro de configurações que criamos **/etc/nginx/conf.d/javali.conf**. Apenas temos que criar os diretórios para os ficheiros de log.
 
@@ -134,7 +133,7 @@ Para cada um dos sites, criamos um ficheiro de log separado, tanto para o access
 mkdir -p /var/log/nginx
 ```
 
-## Testar a configuração
+## 5. Testar a configuração
 
 Para testar, o Nginx tem um comando que permite verificar se a configuração está correta. Para isso, basta executar o comando **nginx -t**. Se tudo estiver correcto, iremos reiniciar o serviço do Nginx.
 
@@ -143,7 +142,7 @@ nginx -t
 systemctl restart nginx
 ```
 
-## Configuração do nome de domínio
+## 6. Configuração do nome de domínio
 
 Para configurar o nome de domínio, vamos editar o ficheiro **/etc/hosts** e adicionar as seguintes linhas:
 
@@ -153,7 +152,7 @@ echo -e "127.0.0.1\ta.ipg.pt b.ipg.pt c.ipg.pt" >> /etc/hosts
 echo -e "192.168.16.204\ta.ipg.pt b.ipg.pt c.ipg.pt" >> /etc/hosts
 ```
 
-# Verificação do funcionamento
+## 7. Verificação do funcionamento
 
 Como estamos num servidor sem interface gráfica, vamos usar o comando **curl** para verificar se os sites estão a funcionar.
 
@@ -172,7 +171,7 @@ Por se tratar de uma máquina virtual, para podermos ver o site no nosso browser
 <img src="./Assets/site.png" width="">
 </center>
 
-# Documentação e ajudas
+## 8. Documentação e ajudas
 
 [Site oficial do nginx - server_blocks](https://www.nginx.com/resources/wiki/start/topics/examples/server_blocks/)
 

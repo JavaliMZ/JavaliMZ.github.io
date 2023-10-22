@@ -1,39 +1,40 @@
-1. [Resolução da máquina **APT**](#resolução-da-máquina-apt) 1. [Máquina Insane (hackthebox.com)](#máquina-insane-hacktheboxcom) 2. [by **_JavaliMZ_** - 27/09/2021](#by-javalimz---27092021)
-2. [Introdução](#introdução)
-3. [Enumeração](#enumeração)
-    1. [Nmap](#nmap)
-        1. [Porta 80](#porta-80)
-        2. [Porta 135](#porta-135)
-    2. [Firewall](#firewall)
-        1. [IOXIDResolver](#ioxidresolver)
-    3. [Nmap](#nmap-1)
-    4. [SMB](#smb)
-    5. [getTGT.py](#gettgtpy)
-    6. [reg.py](#regpy)
-4. [Escalada de Privilégios](#escalada-de-privilégios)
-    1. [winPEAS64.exe](#winpeas64exe)
-        1. [Bypass-4MSI](#bypass-4msi)
-            1. [_exemplo com a prórpia máquina alvo:_](#exemplo-com-a-prórpia-máquina-alvo)
-        2. [Invoke-Binary](#invoke-binary)
-    2. [responder](#responder)
-    3. [MsCmdRun.exe](#mscmdrunexe)
-    4. [Secretsdump.py](#secretsdumppy)
-
 ![](Assets/HTB-Windows-Insane-APT/icon.webp)
 
 <img src="https://img.shields.io/badge/APT-HackTheBox-green?style=plastic" width="200">
 
-# Resolução da máquina **APT**
+<h1> Resolução da máquina **APT**</h1>
 
-#### Máquina Insane (hackthebox.com)
+<h4>Máquina Insane (hackthebox.com)</h4>
 
-#### by **_JavaliMZ_** - 27/09/2021
-
----
+<h4>by <i><b>JavaliMZ</b></i> - 27/09/2021</h4>
 
 ---
 
-# Introdução
+---
+
+- [1. Introdução](#1-introdução)
+- [2. Enumeração](#2-enumeração)
+  - [2.1. Nmap](#21-nmap)
+    - [2.1.1. Porta 80](#211-porta-80)
+    - [2.1.2. Porta 135](#212-porta-135)
+  - [2.2. Firewall](#22-firewall)
+    - [2.2.1. IOXIDResolver](#221-ioxidresolver)
+  - [2.3. Nmap](#23-nmap)
+  - [2.4. SMB](#24-smb)
+  - [2.5. getTGT.py](#25-gettgtpy)
+  - [2.6. reg.py](#26-regpy)
+- [3. Escalada de Privilégios](#3-escalada-de-privilégios)
+  - [3.1. winPEAS64.exe](#31-winpeas64exe)
+    - [3.1.1. Bypass-4MSI](#311-bypass-4msi)
+      - [3.1.1.1. _exemplo com a prórpia máquina alvo:_](#3111-exemplo-com-a-prórpia-máquina-alvo)
+    - [3.1.2. Invoke-Binary](#312-invoke-binary)
+  - [3.2. responder](#32-responder)
+  - [3.3. MsCmdRun.exe](#33-mscmdrunexe)
+  - [3.4. Secretsdump.py](#34-secretsdumppy)
+
+---
+
+# 1. Introdução
 
 Bem-vindo para mais um writeup, desta vez uma máquina Insane! É uma máquina Windows, Em que iremos ter bastantes desafios interessantes...
 
@@ -48,9 +49,9 @@ Bem-vindo para mais um writeup, desta vez uma máquina Insane! É uma máquina W
 -   vamos converter o hash NTLMv1 para um hash NTLMv2 via online
 -   Com as novas credenciais de administrador sem capacidade de psexec nem escrita no samba (sem nenhum shell), vamos tratar de extrair todos os hashes do DC através do protocolo DRSUAPI e DCERPC
 
-# Enumeração
+# 2. Enumeração
 
-## Nmap
+## 2.1. Nmap
 
 Como sempre, vamos começar por enumerar as portas abertas da máquina alvo...
 
@@ -58,7 +59,7 @@ Como sempre, vamos começar por enumerar as portas abertas da máquina alvo...
 
 Esta máquina tem apenas 2 portas abertas! E para não engonhar, para não ter um relatório enorme, vou ir mais direto ao assunto...
 
-### Porta 80
+### 2.1.1. Porta 80
 
 O servidor web tem paginas de internet mas não se consegue entrar por ai... Apenas há uma informação de relevo, mas que nem sequer é preciso entrar pelo browser para ver isso
 
@@ -79,7 +80,7 @@ whatweb http://10.10.10.213/ | sed 's/, /\n/g'
 
 O email pode ajudar mais tarde (sales@gigantichosting.com)...
 
-### Porta 135
+### 2.1.2. Porta 135
 
 Já que o servidor Web não nos dá acesso à máquina, só ja temos mais este ponto...
 
@@ -93,7 +94,7 @@ rcpclient 10.10.10.213 -U '%'
 
 Todas as tentativas de conexão falharam... e agora?! Poderíamos tentar analisar portas UDP, visto que o scan que foi feito com o NMAP foi apenas portas TCP. Mas não há portas UDP abertas. O que acontece é que as portas devem estar bloqueadas com regras de firewall.
 
-## Firewall
+## 2.2. Firewall
 
 Um problema comum entre os administradores de redes é que só estão habituados a trabalhar com IPv4. Pode acontecer que não liguem às regras por IPv6! É exatamente esse o ponto desta máquina. Para burlar o firewall, apenas temos de arranjar formas de descobrir o IPv6 da máquina.
 
@@ -104,7 +105,7 @@ Para isso, com a ajuda do serviço RPC que está aberto, podemos chamar uma fun�
 
 > **!!ATENÇÃO!!** Todo o parágrafo acima é para se ler de relance... Porque, eu não percebi tudo do que li, e certamente falta muita informação...
 
-### IOXIDResolver
+### 2.2.1. IOXIDResolver
 
 Para conseguir saber o IPv6, por RPC, basta usar esta ferramenta
 
@@ -126,7 +127,7 @@ ping6 -c 1 dead:beef::b885:d62a:d679:573f
 
 O ping mostra que a máquina responde. A partir de agora, vamos começar novamente do zero a enumerar a máquina.
 
-## Nmap
+## 2.3. Nmap
 
 ```bash
 nmap -p- --open -n -Pn -6 dead:beef::b885:d62a:d679:573f -oG enumeration/allPorts-IPv6 -vvv --min-rate 5000
@@ -172,7 +173,7 @@ Com essas informações, e para termos menos problemas com as diversas ferrament
 echo -e "dead:beef::b885:d62a:d679:573f\tapt apt.htb.local htb.local" >> /etc/hosts
 ```
 
-## SMB
+## 2.4. SMB
 
 Seguindo os passos habituais, que no meu caso é tentar obter credenciais via RPC com **"enumdomusers"**, para depois tentar um AS-REP Roasting Attack, ou até mesmo tentar esse mesmo ataque à bruta com **"kerbrute"**, não obtemos resultados conclusivos. O serviço rpc não está disponível para usuários não autenticados. E o kerbrute às escuras não encontra nada. Passamos para o serviço Samba.
 
@@ -255,7 +256,7 @@ O problema é que a máquina alvo possui algo que impede ataques por força brut
 
 Posto isso, podemos tentar receber um TGT com username e um HASH (ou uma password).
 
-## getTGT.py
+## 2.5. getTGT.py
 
 Existe uma outra utilidade do Impacket que se chama **getTGT.py** e que faz este serviço. O problema é que faz apenas e só uma petição. Não dá para fazer por força bruta com recurso a dicionário. Bem, isto resolve-se com bash, um **for loop** e paralelizar as petições. Depois ainda há outro problema. No output, não temos informações do nome ou do hash que está a ser usado. Para contornar isso, decidi enviar cada output em separado, e cujo o nome do ficheiro é simplesmente o hash... O output correcto informa que foi criado um ficheiro qualquer com o formato "username.ccache". Depois com um find e um grep, é fácil recuperar o hash e o seu username...
 
@@ -280,7 +281,7 @@ vamos validar as credenciais com crackmapexec (atenção que se tem de sair da p
 
 ![crackmapexec henry.vinson](Assets/HTB-Windows-Insane-APT/crackmapexec_henry.png)
 
-## reg.py
+## 2.6. reg.py
 
 Agora vem outra parte tricky! Não me é possível ter uma shell com evil-winrm, não tenho capacidade de escrita em nenhum recurso compartilhado. Mas ainda se pode fazer coisas... o reg.exe do windows é um programa que permite ver/alterar registos do windows pela linha de comando. É quase tão poderoso quando o regedit.exe, que é a aplicação GUI para ver/alterar os registos. Com esta máquina, descobri que o programa reg.exe tem capacidade de ver e alterar registos remotamente, para que os administradores possam trabalhar comodamente de chinelos nos seus lares loool. Fora de brincadeira, isso é bem prático para administradores, e para atacantes também =)
 
@@ -302,13 +303,13 @@ De referir que o crackmapexec por IPv6 (o pequeno apt que se vê, é o IPv6 que 
 
 ![Evil-WinRM henry.vinson_adm](Assets/HTB-Windows-Insane-APT/winrm_henry_adm.png)
 
-# Escalada de Privilégios
+# 3. Escalada de Privilégios
 
 Agora que temos acesso à máquina, podemos enumerar usuários locais. Com o commando **_net localgroup "Remote Management Users"_**, dá para perceber que apenas o nosso usuário actual tem permissões de psexec, ou evil-winrm. Já sabemos então que mesmo o Adminstrator local não tem capacidade de psexec ou evil-winrm.
 
 Vou usar a ferramenta winPEAS64.exe para enumerar a máquina mais rápidamente
 
-## winPEAS64.exe
+## 3.1. winPEAS64.exe
 
 ```bash
 # kali
@@ -324,13 +325,13 @@ Problemas! O antivirus está ativo. É raro ver Domains Controllers com antiviru
 
 Para burlar o antivirus, vou usar 2 funções, que já vêm pré-carregadas no evil-winrm (assim fica fácil...)
 
-### Bypass-4MSI
+### 3.1.1. Bypass-4MSI
 
 Para rodar comando estranhos no powershell, é preciso primeiro burlar uma função que existe no powershell que analisa a string antes de executar o comando. Essa função tem como nome: Interface de verificação antimalware (AMSI)
 
 AMSI é tipo uma API que todos os programas podem usar para analisar sequências de string, e reporta como potencialmente perigoso toda e qualquer string comum em malware, virus, ect...
 
-#### _exemplo com a prórpia máquina alvo:_
+#### 3.1.1.1. _exemplo com a prórpia máquina alvo:_
 
 ![AMSI](Assets/HTB-Windows-Insane-APT/AMSI.png)
 
@@ -349,7 +350,7 @@ Poderíamos também resolver esse problema com one-liners que se podem encontrar
 
 > https://amsi.fail/
 
-### Invoke-Binary
+### 3.1.2. Invoke-Binary
 
 Agora que temos mais liberdade no powershelll, ainda falta bypassear o Windows Defender, pois se tentar executar novamente o winPEASx64.exe, Sou barrado na mesma pelo Windows Defender... O método que iremos utilizar também está diretamente contemplado no evil-winrm e consiste em executar o binário directamente em memória RAM, sem nunca passar pelo disco rígido (terreno protegido pelo Windows Defender!). O programa que queremos executar tem de ser um programa compilado em .Net assembly, para poder ser executado directamente da RAM com essa função... Não encontrei informações de como funciona o Invoke-Binary, mas do material que vi sobre outros scripts e programs em C para fazer a mesma coisa, percebi que o programa é copiado do computador atacante diretamente para a memória RAM e é-lhe ofuscado o código, mudando nomes de funções, mudando o caminho que deveria seguir o programa, saltando em pontos diferentes da memória, ou passando por caminhos só por passar, para enganar o antivírus. Para o antivírus não reconhecer padrões no assembly.
 
@@ -367,7 +368,7 @@ cat winPEAS.out
 
 ![NTLMv1 winPEAS](Assets/HTB-Windows-Insane-APT/NLTMv1.png)
 
-## responder
+## 3.2. responder
 
 Com a última informação recolhida, a saber, a máquina usa NTLMv1 para se autenticar, podemos tentar recuperar o hash NTLMv1.
 
@@ -391,7 +392,7 @@ Depois de forçar o SALT a 1122334455667788 para ser enviado quando nos for soli
 sudo responder -I tun0 --lm -v
 ```
 
-## MsCmdRun.exe
+## 3.3. MsCmdRun.exe
 
 Esperar... e esperar o que? o responder simula montes de serviços de partilha e afins, e captura hashes e informações criticas de quem se conecta a nossa máquina Kali. Mas neste plano, existe um problema... Ninguém vai-nos pedir coisas...
 
@@ -427,7 +428,7 @@ crackmapexec smb apt -u 'APT$' -H 'd167c3238864b12f5f82feae86a7f798'
 
 As credenciais funcionam. Mas não temos capacidade de escrita, nem de psexec, nem de evil-winrm. Sabemos que este usuário é de Domínio, visto que se fizermos um **"net users"** na máquina com o usuário henry.vinson_adm, não o vemos lá. E sabemos também que é este usuário que executou o Windows Defender. Tem que ter muitos privilégios... possivelmente não pertence ao administradores, porque não nos é possível nos connectar com evil-winrm, mas tem que pertencer a algum grupo com muitos privilégios... Sendo assim, podemos tentar extrair todos os hashes de usuários de domínio com o secretsdump.py em "Blind"...
 
-## Secretsdump.py
+## 3.4. Secretsdump.py
 
 ![secretsdump.py](Assets/HTB-Windows-Insane-APT/secrets_dump.png)
 

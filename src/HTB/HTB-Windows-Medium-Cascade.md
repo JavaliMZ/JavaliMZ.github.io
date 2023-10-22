@@ -1,33 +1,34 @@
-1. [Resolução da máquina **Cascade**](#resolução-da-máquina-cascade) 1. [Máquina Medium (hackthebox.com)](#máquina-medium-hacktheboxcom) 2. [by **_JavaliMZ_** - 21/09/2021](#by-javalimz---21092021)
-2. [Enumeração](#enumeração)
-    1. [Nmap](#nmap)
-    2. [RDP](#rdp)
-    3. [GetNPUsers.py](#getnpuserspy)
-    4. [LDAPSearch](#ldapsearch)
-3. [PrivEsc](#privesc)
-    1. [SMBClient](#smbclient)
-    2. [sqlite3](#sqlite3)
-    3. [dotPeek (JetBrains)](#dotpeek-jetbrains)
-        1. [Decrypt Password](#decrypt-password)
-    4. [PrivEsc](#privesc-1)
-
 ![](Assets/HTB-Windows-Medium-Cascade/icon.webp)
 
 <img src="https://img.shields.io/badge/Cascade-HackTheBox-green?style=plastic" width="200">
 
-# Resolução da máquina **Cascade**
+<h1> Resolução da máquina <b>Cascade</b></h1>
 
-#### Máquina Medium (hackthebox.com)
+<h4>Máquina Medium (hackthebox.com)</h4>
 
-#### by **_JavaliMZ_** - 21/09/2021
-
----
+<h4>by <b><i>JavaliMZ</i></b> - 21/09/2021</h4>
 
 ---
 
-# Enumeração
+---
 
-## Nmap
+- [1. Enumeração](#1-enumeração)
+  - [1.1. Nmap](#11-nmap)
+  - [1.2. RDP](#12-rdp)
+  - [1.3. GetNPUsers.py](#13-getnpuserspy)
+  - [1.4. LDAPSearch](#14-ldapsearch)
+- [2. PrivEsc](#2-privesc)
+  - [2.1. SMBClient](#21-smbclient)
+  - [2.2. sqlite3](#22-sqlite3)
+  - [2.3. dotPeek (JetBrains)](#23-dotpeek-jetbrains)
+    - [2.3.1. Decrypt Password](#231-decrypt-password)
+  - [2.4. PrivEsc](#24-privesc)
+
+---
+
+# 1. Enumeração
+
+## 1.1. Nmap
 
 Como em todas as máquinas que fazemos, e como em qualquer trabalho de Pentesting, a primeira fase é a de reconhecimento. Nesta fase, iremos proceder á enumeração das portas, e de outras coisas a seguir. Para enumerar as portas da nossa máquina alvo, irei usar o **nmap**.
 
@@ -79,7 +80,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 O resultado do nmap nos indica que provavelmente estaremos enfrentando um Active Directory / Domain Controller, devido ás suas portas de DNS, Samba, RPC, LDAP, Kerberos e WinRM abertas.
 
-## RDP
+## 1.2. RDP
 
 A primeira coisa a analisar é ver se podemos extrair nomes de usuários de domínio via RPCClient. Nesta máquina temos que especificar que queremos entrar com o usuário vazio (-U '') e sem password (-N).
 
@@ -95,7 +96,7 @@ rpcclient 10.10.10.182 -N -U '' -c 'enumdomusers' | grep -oP '\[.*?\]' | grep -v
 
 ![Enumeração de usuários via RPC](Assets/HTB-Windows-Medium-Cascade/enum-get-users.png)
 
-## GetNPUsers.py
+## 1.3. GetNPUsers.py
 
 Agora que temos usuários de domínio, irei só adicionar usuários admin por defeito e, já que kerberos está aberto, tentar efetuar uma ataque chamado AS-REP Roasting Attack, para tentar recuperar TGT de usuário que foram criados com a opção 'Do not require Kerberos preauthentication' selecionada. Ainda perciso saber o nome do Domain Controller. Então primeiro, vou rodar um crackmapexec, guardar as informações relevantes, e a seguir usar o GetNPUsers.py para tentar recuperar TGTs.
 
@@ -109,7 +110,7 @@ GetNPUsers.py cascade.local/ -no-pass -usersfile contents/users
 
 Nenhum usuário é AS-REP Roastable... Next!
 
-## LDAPSearch
+## 1.4. LDAPSearch
 
 O ldapsearch é uma ferramenta que pode extrair toda a informação de todos os objectos extraíveis por LDAP, que é um protocolo de aplicação para acessar e manter serviços de informações de diretório. É por aí que, por exemplo, uma administrador de domínio cria um novo usuário local de uma máquina onde ele não está... Podemos enumerar os usuários todos, grupos, quem pertence a "x" grupo... É também esse o protocolo pelo qual a ferramenta **_bloodhound-python_**, já usada em outras máquina, extrai toda a informação para gerar o gráfico do bloodhound.
 
@@ -146,9 +147,9 @@ Em primeira instância, a password não funciona... mas o seu formato é típico
 
 > r.thompson:rY4n5eva
 
-# PrivEsc
+# 2. PrivEsc
 
-## SMBClient
+## 2.1. SMBClient
 
 Temos credenciais válidas. Agora com essas novas credenciais podemos aceder ao conteúdo partilhado por Samba
 
@@ -256,7 +257,7 @@ Agora sim! parece uma password
 
 s.smith tem acesso a mais uma pasta. a pasta Audit$. Vamos ver o que há lá e descarregar tudo se for viável devido ao peso.
 
-## sqlite3
+## 2.2. sqlite3
 
 No recurso Audit$ compartilhado a nível de rede, existem binários.exe, dlls e uma base de dados. Podemos ver rapidamente a base de dados com sqlite3
 
@@ -284,7 +285,7 @@ echo BQO5l5Kj9MdErXx6Q6AGOw== | base64 -d
 
 Parece que não está em texto claro!! Mas também não sabemos como foi criptografado... não é como o VNC, que sempre criptografa as suas palavras passes da mesma maneira à anos... Temos que encontrar como foi criptografado. Isto vem de uma base de dados, que está na mesma pasta que um programa desconhecido e o seu dll (aparentemente): CascAudit.exe e CascCrypto.dll. Pelos nomes, isto é promissor...
 
-## dotPeek (JetBrains)
+## 2.3. dotPeek (JetBrains)
 
 O dotPeek é um descompilador de código baseado em .NET. E como sei que esse programa funciona?
 
@@ -304,24 +305,24 @@ Vemos que, na linha 39, o programa connecta-se à base de dados, como prevíamos
 Na linha 39 do Crypto.cs é que está definido a função "**_DecryptString_**". E dái já vemos muitas informações.
 
     -	Crypto.DecryptString(EncryptedString, "c4scadek3y654321");  (MainModule.cs)
-    	-	O trabalho de desencriptação parte daí
+        -	O trabalho de desencriptação parte daí
     -   public static string DecryptString(string EncryptedString, string Key);
-    	-	Isto é o nome da função, e os seus argumentos. a Key usada foi a que está em cima em texto claro ("c4scadek3y654321")
+        -	Isto é o nome da função, e os seus argumentos. a Key usada foi a que está em cima em texto claro ("c4scadek3y654321")
     -   byte[] buffer = Convert.FromBase64String(EncryptedString);
-    	-	Confirma-se que a palavra passe que encontramos na base de dados está em base64, pois o programa está a descodificar antes de tratá-lo
+        -	Confirma-se que a palavra passe que encontramos na base de dados está em base64, pois o programa está a descodificar antes de tratá-lo
     -	Aes aes = Aes.Create();
-    	-	Aes é um tipo de criptografia de dados...
-    	-	Aes é amplamente usado por ser um tipo de criptografia virtualmente inquebrável, que levaria vidas inteiras para decifrá-la por brute force... Mas com o código fonte, a coisa muda...
+        -	Aes é um tipo de criptografia de dados...
+        -	Aes é amplamente usado por ser um tipo de criptografia virtualmente inquebrável, que levaria vidas inteiras para decifrá-la por brute force... Mas com o código fonte, a coisa muda...
     -	aes.IV = Encoding.UTF8.GetBytes("1tdyjCbY1Ix49842");
-    	-
+        -
     -	aes.Mode = CipherMode.CBC;
-    	-	O método de codificação usado é o CBC cipher
+        -	O método de codificação usado é o CBC cipher
     -	aes.Key = Encoding.UTF8.GetBytes(Key);
-    	-	confirma-se da situação da Key ser "c4scadek3y654321"
+        -	confirma-se da situação da Key ser "c4scadek3y654321"
 
 Resumo: - AES - Key == "c4scadek3y654321" - IV == "1tdyjCbY1Ix49842" - Mode == "CBC"
 
-### Decrypt Password
+### 2.3.1. Decrypt Password
 
 Agora é só decifrá-lo. Isto claramente não vou fazer com uma calculadora (de uma não sei como se faz, e não deve ser fácil lol). Para isso existe ferramentas online, e programas diversos no github. Vou usar uma ferramenta online. o **_CyberChef_**. è só procurar as "operations", por o input e guardar o Output
 
@@ -346,7 +347,7 @@ crackmapexec winrm 10.10.10.182 -u 'arksvc' -p 'w3lc0meFr31nd'
 
 Temos capacidade de entrar na máquina via evil-winrm!
 
-## PrivEsc
+## 2.4. PrivEsc
 
 ![Evil-winrm de arksvc](Assets/HTB-Windows-Medium-Cascade/evil-winrm-arksvc.png)
 
