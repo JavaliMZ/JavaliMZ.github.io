@@ -1,0 +1,389 @@
+<!DOCTYPE HTML>
+<html lang="pt" class="sidebar-visible no-js navy">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Anonimato na Internet - WriteUps HackTheBox - by JavaliMZ</title>
+
+
+        <!-- Custom HTML head -->
+        <!-- Content here gets appended to the <html><head> of all the pages -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script
+        	async
+        	src='https://www.googletagmanager.com/gtag/js?id=G-ZCM4NEDCZB'
+        ></script>
+        <script>
+        	window.dataLayer = window.dataLayer || []; function
+        	gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config',
+        	'G-ZCM4NEDCZB');
+        </script>
+        <!-- Custom HTML head: Twitter support -->
+        <script
+        	async
+        	src='https://platform.twitter.com/widgets.js'
+        	charset='utf-8'
+        ></script>
+        
+        <meta
+        	name='google-site-verification'
+        	content='g05a2qliKESUMKBSl7XG8sosQoaFtDugS6F9MlUbe1Y'
+        />
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../theme/css/additional.css">
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../../index.html"><strong aria-hidden="true">1.</strong> Introdução</a></li><li class="chapter-item "><a href="../../Windows.html"><strong aria-hidden="true">2.</strong> Máquinas Windows</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../HTB/HTB-Windows-Easy-Omni.html"><strong aria-hidden="true">2.1.</strong> HTB-Windows-Easy-Omni</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Easy-Sauna.html"><strong aria-hidden="true">2.2.</strong> HTB-Windows-Easy-Sauna</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Medium-Resolute.html"><strong aria-hidden="true">2.3.</strong> HTB-Windows-Medium-Resolute</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Medium-Cascade.html"><strong aria-hidden="true">2.4.</strong> HTB-Windows-Medium-Cascade</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Hard-Blackfield.html"><strong aria-hidden="true">2.5.</strong> HTB-Windows-Hard-Blackfield</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Insane-Bankrobber.html"><strong aria-hidden="true">2.6.</strong> HTB-Windows-Insane-Bankrobber</a></li><li class="chapter-item "><a href="../../HTB/HTB-Windows-Insane-APT.html"><strong aria-hidden="true">2.7.</strong> HTB-Windows-Insane-APT</a></li></ol></li><li class="chapter-item "><a href="../../Linux.html"><strong aria-hidden="true">3.</strong> Máquinas Linux</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../HTB/HTB-Linux-Easy-Pandora.html"><strong aria-hidden="true">3.1.</strong> HTB-Linux-Easy-Pandora</a></li><li class="chapter-item "><a href="../../HTB/HTB-Linux-Easy-Precious.html"><strong aria-hidden="true">3.2.</strong> HTB-Linux-Easy-Precious</a></li><li class="chapter-item "><a href="../../HTB/HTB-Linux-Hard-Falafel.html"><strong aria-hidden="true">3.3.</strong> HTB-Linux-Hard-Falafel</a></li></ol></li><li class="chapter-item expanded "><a href="../../CiberSeguranca.html"><strong aria-hidden="true">4.</strong> Trabalhos do Curso de Ciber Segurança</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../CursoCiberSeguranca/Trabalho2/Trabalho2.html"><strong aria-hidden="true">4.1.</strong> Acesso Remoto (SSH)</a></li><li class="chapter-item "><a href="../../CursoCiberSeguranca/Trabalho3/Trabalho3.html"><strong aria-hidden="true">4.2.</strong> Configuração avançada de um servidor SSH</a></li><li class="chapter-item "><a href="../../CursoCiberSeguranca/Trabalho5/Trabalho5.html"><strong aria-hidden="true">4.3.</strong> Servidor Web com nginx e virtualhost</a></li><li class="chapter-item "><a href="../../CursoCiberSeguranca/SELinux/TrabalhoSELinux.html"><strong aria-hidden="true">4.4.</strong> SELinux</a></li><li class="chapter-item "><a href="../../CursoCiberSeguranca/Trabalho9SSL/Trabalho9SSL.html"><strong aria-hidden="true">4.5.</strong> HTTPS - SSL com NGINX</a></li><li class="chapter-item expanded "><a href="../../CursoCiberSeguranca/Anonimato/04_trabalho.html" class="active"><strong aria-hidden="true">4.6.</strong> Anonimato na Internet</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">WriteUps HackTheBox - by JavaliMZ</h1>
+
+                    <div class="right-buttons">
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="anonimato-na-internet"><a class="header" href="#anonimato-na-internet"> Anonimato na Internet </a></h1>
+<blockquote>
+<p>Data: 22 OCT 2023</p>
+</blockquote>
+<ul>
+<li><a href="#1-introdu%C3%A7%C3%A3o">1. Introdução</a></li>
+<li><a href="#2-anonimato-na-internet">2. Anonimato na internet</a>
+<ul>
+<li><a href="#21-rede-tor">2.1. Rede TOR</a>
+<ul>
+<li><a href="#211-tor-browser">2.1.1. TOR Browser</a></li>
+<li><a href="#212-como-funciona-o-tor">2.1.2. Como funciona o Tor?</a></li>
+<li><a href="#213-o-navegador-tor">2.1.3. O navegador TOR</a></li>
+<li><a href="#214-a-rede-tor-%C3%A9-segura">2.1.4. A rede TOR é segura?</a></li>
+<li><a href="#215-%C3%A9-poss%C3%ADvel-ser-identificado-atrav%C3%A9s-da-rede-tor">2.1.5. É possível ser identificado através da rede TOR?</a></li>
+<li><a href="#216-ent%C3%A3o-porqu%C3%AA-mesmo-assim-podemos-n%C3%A3o-estar-totalmente-ocultos">2.1.6. Então porquê mesmo assim podemos não estar totalmente ocultos?</a></li>
+<li><a href="#217-como-tentar-ficar-an%C3%B3nimo-pela-internet">2.1.7. Como tentar ficar anónimo pela internet?</a></li>
+</ul>
+</li>
+<li><a href="#22-privoxy">2.2. Privoxy</a></li>
+<li><a href="#23-sistema-operacional-tails">2.3. Sistema operacional TAILS</a></li>
+<li><a href="#24-antenas-wifi-direcionais-de-longo-alcance">2.4. Antenas WiFi direcionais de longo alcance</a></li>
+</ul>
+</li>
+<li><a href="#3-problemas-encontrados-na-busca-do-anonimato">3. Problemas encontrados na busca do anonimato</a>
+<ul>
+<li><a href="#31-rede-tor-pode-ser-controlada">3.1. Rede TOR pode ser controlada</a></li>
+</ul>
+</li>
+<li><a href="#4-conclus%C3%A3o">4. Conclusão</a></li>
+<li><a href="#5-bibliografia">5. Bibliografia</a></li>
+</ul>
+<blockquote>
+<p>No contexto do CTESP em cibersegurança que estou a efetuar, foi-me proposto a realização de um trabalho sobre o anonimato na internet. Este trabalho foi realizado no âmbito da unidade curricular de &quot;Técnicas de hacking&quot;. O objetivo deste trabalho é aprofundar os conhecimentos sobre o anonimato na internet, e sobre as ferramentas que permitem que os utilizadores possam navegar na internet de forma anónima.</p>
+<p>Enunciado:</p>
+<p>Aceder à rede Tor é hoje uma tarefa bastante simples. Para isso basta que usem o Tor Browser, que inclui nativamente todas as configurações necessárias.</p>
+<p>No entanto, quem pretender usar outros browsers pode sempre configurar um proxy na própria máquina.</p>
+<p>-- OBJETIVOS DO TRABALHO --</p>
+<p>Para este trabalho pretende-se que os alunos instalem e configurem o cliente TOR e o proxy Privoxy.</p>
+<p>Como resultado devem verificar se o tráfego está a ser encaminhado pela rede TOR. Para isso verifiquem a configuração através deste site: https://check.torproject.org/</p>
+<p>Indiquem também qual o IP atribuído e a área geográfica a qual o mesmo pertence.</p>
+</blockquote>
+<h1 id="1-introdução"><a class="header" href="#1-introdução">1. Introdução</a></h1>
+<p>Neste trabalho, iremos desenvolver um relatório sobre o anonimato na internet. Iremos tratar de entender o que é a rede TOR, como usar o Privoxy, iremos ainda falar sobre o sistema operativo TAILS e por fim, passando ainda por discutir sobre a importância do anonimato para o black hat hacker, as dificuldades que enfrentam as autoridades contra o anonimato e sobre a importância da coordenação e cooperação internacional para combater o cibercrime.</p>
+<h1 id="2-anonimato-na-internet"><a class="header" href="#2-anonimato-na-internet">2. Anonimato na internet</a></h1>
+<p>O anonimato na internet é um assunto muito importante, pois permite que os utilizadores possam navegar na internet sem que sejam identificados. É um assunto muito relevante para quem se preocupa com a sua privacidade e segurança, mas é primordial para pessoas que vivem em países onde a liberdade de expressão é limitada. É ainda crítico para pessoas que trabalham em áreas sensíveis, como jornalistas, ativistas, denunciantes, etc. E claro, para quem pratica atividades ilegais, como o cibercrime.</p>
+<h2 id="21-rede-tor"><a class="header" href="#21-rede-tor">2.1. Rede TOR</a></h2>
+<p>A rede TOR (The Onion Router) é uma rede de computadores que permite que os utilizadores possam navegar na internet de forma anónima. A rede TOR é composta por milhares de servidores, chamados de relays, que são mantidos por voluntários. Estes servidores são responsáveis por encaminhar o tráfego dos utilizadores, de forma a que o seu endereço IP não seja revelado. Como aceder à rede TOR?</p>
+<h3 id="211-tor-browser"><a class="header" href="#211-tor-browser">2.1.1. TOR Browser</a></h3>
+<p>O TOR Browser é o browser mais conhecido e desenvolvido para aceder à rede TOR, de código aberto. É um browser baseado no Firefox, que permite que os utilizadores possam navegar na internet de forma anónima. O Tor Browser oculta o endereço IP e a atividade de navegação redirecionando o tráfego da web por uma série de roteadores diferentes, conhecidos como nós. Além disso, o tráfego da web é criptografado com um tipo de criptografia especial originalmente desenvolvida pela Marinha dos EUA para ajudar a proteger as comunicações de inteligência americanas.</p>
+<p>Além de ser um browser &quot;normal&quot;, o Tor também fornece serviços onion por meio de sua rede onion para permitir o anonimato de sites e servidores. Um endereço web <strong><em>&quot;.onion&quot;</em></strong>, acessível exclusivamente através do navegador Tor, protege a identidade do site e dos visitantes.</p>
+<p>Com uma conexão complexa e criptografada que oferece anonimato para hosts e visitantes, o Tor é frequentemente usado para criar e acessar a dark web. Como tal, o Tor é a própria definição de um navegador da dark web.</p>
+<h3 id="212-como-funciona-o-tor"><a class="header" href="#212-como-funciona-o-tor">2.1.2. Como funciona o Tor?</a></h3>
+<p>O Tor funciona em 3 fases:</p>
+<ol>
+<li>Nó de entrada/guarda: O utilizador liga-se a um servidor aleatório de entrada, também chamado de nó de entrada. Este servidor é responsável por encriptar o tráfego do utilizador e introduzir o tráfego na rede TOR. A informação é encapsulada em várias camadas de criptografia, daí o nome &quot;The Onion Router&quot; que irão ser descascadas à medida que o tráfego é encaminhado para o nó de saída.</li>
+<li>Nós intermediários: O tráfego é então encaminhado de forma totalemnte criptografados por vários servidores, chamados de nós intermediários. Estes servidores são responsáveis descascar uma camada por nó e por encaminhar o tráfego para o nó de saída.</li>
+<li>Nó de saída: O tráfego é então encaminhado para o nó de saída que encaminha o tráfego para o destino.</li>
+</ol>
+<center>
+<img src="./assets/Academy-Tor-browser-01.webp" width="80%">
+</center>
+<div class='legend'>
+    <b>Figura 1:</b> Funcionamento da rede TOR <br>
+    <b>Fonte:</b> <a href='https://www.avast.com/pt-br/c-tor-dark-web-browser'>www.avast.com/pt-br/c-tor-dark-web-browser</a>
+</div>
+<h3 id="213-o-navegador-tor"><a class="header" href="#213-o-navegador-tor">2.1.3. O navegador TOR</a></h3>
+<p>Apesar de todo este processo ser complexo, o utilizador não precisa de saber como funciona a rede TOR para a usar. Ele é um browser baseado no Firefox que permite que os utilizadores possam navegar na internet de forma anónima e já vem configurado e pronto a usar. O TOR Browser é um browser de código aberto, que pode ser descarregado em <a href="https://www.torproject.org/">https://www.torproject.org/</a>.</p>
+<center>
+<img src="./assets/tor_website.png" width="">
+</center>
+<div class='legend'>
+    <b>Figura 2:</b> Home page do website do TOR <br>
+    <b>Fonte:</b> Screenshot da página de internet <a href='https://www.torproject.org/'>www.torproject.org</a>
+</div>
+<p>Pode ainda ser instalado pela linha de comando, em sistemas Linux, como o Ubuntu, com o seguinte comando:</p>
+<pre><code class="language-bash">sudo apt install torbrowser-launcher
+torbrowser-launcher  # Para instalar o TOR Browser pela primeira vez, e para o iniciar depois
+</code></pre>
+<p>Para verificar que estamos devidamente conectados à rede TOR, basta aceder ao site <a href="https://check.torproject.org/">https://check.torproject.org/</a>.</p>
+<center>
+<img src="./assets/tor_connected.png" width="90%">
+</center>
+<div class='legend'>
+    <b>Figura 3:</b> Página de internet para verificar conectividade TOR <br>
+    <b>Fonte:</b> Screenshot da página de internet <a href='https://check.torproject.org/'>check.torproject.org</a>
+</div>
+<h3 id="214-a-rede-tor-é-segura"><a class="header" href="#214-a-rede-tor-é-segura">2.1.4. A rede TOR é segura?</a></h3>
+<p>Bem, a rede em si é criptografada. Mas criptografia não significa segurança. Significa simplesmente que, neste caso, o transporte e as comunicações entre nós são cifradas, ou seja, ilegíveis sem as chaves para as decifrar. De facto, se o utilizador clicar num link malicioso, ou se o site que o utilizador está a visitar tiver código malicioso, o utilizador será comprometido da mesma forma que num browser &quot;normal&quot;. O TOR não é um escudo, mas é uma ferramenta muito útil para quem se preocupa com a sua privacidade.</p>
+<h3 id="215-É-possível-ser-identificado-através-da-rede-tor"><a class="header" href="#215-É-possível-ser-identificado-através-da-rede-tor">2.1.5. É possível ser identificado através da rede TOR?</a></h3>
+<p>Resposta curta: SIM! Existe diversos pontos a ter em conta ao usar a internet em geral. Por exemplo, se usar uma conta pessoal, dados pessoais, etc, não importa usar a rede TOR ou não, porque estarão a identificar-se no ponto de chegada da comunicação. Mesmo que não use nenhum dado pessoal, existem dois pontos fracos neste tipo de rede: O nó de entrada (que contém toda a informação sobre IP e os dados que se quer acessar), e o de saída (onde até poderá ser intercetado). Mas existe ainda mais um recurso que se pode usar para resolver o problema do nó de entrada. Poderá usar uma VPN-over-TOR. A VPN tratará de criptografar a informação inicial antes de chegar ao primeiro nó de entrada da rede TOR.</p>
+<p>No entanto, mesmo assim, podemos afirmar que não estamos 100% anónimos. Isto porque existe ainda uma falha de privacidade na internet que não podemos controlar. Os IPS (provedores de internet) são os primeiros a receber os dados que o nosso router de casa envia, ou de qualquer router por onde estejamos diretamente conectados. E assim para todas as pessoas do mundo que tem internet. Alguma empresa está a fornecer a internet, e será então essa empresa o primeiro ponto de passagem. Posto isso, podemos concluir que, como essas empresas são obrigadas a conhecer um IP de origem e um IP de destino, poderá facilmente reconstruir-se o caminho todo por onde um pacote circula. Teoricamente, sim. Mas ao analisar, vemos que aí reside a força desta rede!</p>
+<p>Como a rede TOR faz questão de enviar o trafego por vários nós, ficamos assim quase totalmente oculos na internet pelo seguinte motivo: O trafego passa por diversos países. Países alguns que nem legislação tem. Isso traz grandes dificuldades em pedir registo de lOGS dos provedores de internet desses países. Além disso, a cooperação entre países é muitas vezes complicada, e torna complicado recolher todos os lOGS necessários á reconstrução do caminho de tráfego. E outro ponto importante também, as autoridades demoram a responder, a burocracia é penosa, e demora-se meses até conseguir talvez o primeiro LOG, para saber o nó seguinte e fazer novos pedidos e assim por diante. A grande maioria das vezes, quando não há falta de lOGS, há falta de tempo, e os crimes prescrevem.</p>
+<h3 id="216-então-porquê-mesmo-assim-podemos-não-estar-totalmente-ocultos"><a class="header" href="#216-então-porquê-mesmo-assim-podemos-não-estar-totalmente-ocultos">2.1.6. Então porquê mesmo assim podemos não estar totalmente ocultos?</a></h3>
+<p>Existe outras formas de saber quem somos pela internet sem metermos os nosso dados. Existem dados nosso sobre tudo o que possamos imaginar e o que não imaginamos gravados na internet Um expert em OSINT consegue fazer ligações inimagináveis para determinar com um grau de certezas muito elevado que foi tal ou tal pessoa a fazer algo pela internet. Exemplos:</p>
+<p>Exitem diversos dados que enviamos através do nosso browser que nos identificam, e outros que são acessíveis por código javascript que o nosso browser executa. Dados como:</p>
+<pre><code>- tamanho do ecrã
+- tamanho usável do browser
+- user-agent
+- Do Not Track header
+- Timezone
+- Content language
+- layout de teclado
+- Lista de fontes instaladas
+- Lista de plugins instalados
+- WebGL Renderer
+- permissões do browser
+- e muitos outros
+</code></pre>
+<center>
+<img src="./assets/amiunique.png" width="">
+</center>
+<div class='legend'>
+   <b>Figura 4:</b> Página de internet [https://amiunique.org/fingerprint](https://amiunique.org/fingerprint)
+   <b>Fonte:</b> Screenshot da página de internet [https://amiunique.org/fingerprint](https://amiunique.org/fingerprint)
+</div>
+<p>No meu caso em particular, sou único. totalmente identificável pela internet... Também posso dizer que talvés me ponho a geito. Teclado e linguagem em Portugues, computador Linux, fontes (tipos de letras) como &quot;<em>firacode</em>&quot; entre outras coisas fazem que não haja outra configuração igual.</p>
+<p>E no caso de usar TOR? De certeza que não iria ser possível obter tanta informação, mas mesmo assim, seriam perfeitamente suficientes para me identificarem.</p>
+<h3 id="217-como-tentar-ficar-anónimo-pela-internet"><a class="header" href="#217-como-tentar-ficar-anónimo-pela-internet">2.1.7. Como tentar ficar anónimo pela internet?</a></h3>
+<p>Vimos anteriormente várias falhas no anonimato perfeito... Mas vamos tentar otimizar tudo para ficarmos o mais anónimos possível. Vimos que o nosso sistema fala para a internet. Isso é um problema para quem quiser ficar anónimo. Temos então que usar, para além do TOR e de uma VPN-over-TOR, podemos usar uma ferramenta que irá alterar todos esses elementos identificáveis do browser. Essa ferramenta é o privoxy.</p>
+<h2 id="22-privoxy"><a class="header" href="#22-privoxy">2.2. Privoxy</a></h2>
+<p>O privoxy é uma simples proxy, mas que pode ser configurado para mudar elementos que se enviam para os diferentes servidores WEB. Pode-se controlar que HEADERS se irão enviar, entre muitas outras coisas.</p>
+<p>A sua instalação é básica:</p>
+<pre><code class="language-bash">sudo apt install privoxy
+</code></pre>
+<p>O seu ficheiro de configurações tem mais de duas mil linhas, com explicações de cada função. É por si só um manual e o ficheiro de configurações. Está localizado em <strong>/etc/privoxy/config</strong></p>
+<p>Para emparelhar o TOR e o privoxy, teremos de iniciar o serviço privoxy:</p>
+<pre><code class="language-bash">sudo systemctl start privoxy.service
+</code></pre>
+<p>Termos ainda que informar ao TOR Browser (ou outro browser) que queremos primeiro passar por um proxy, e só depois continuar a circular a informação normalmente pela rede TOR. Para isso, temos de saber onde está o nosso servidor proxy:</p>
+<pre><code class="language-bash">cat config | grep -v &quot;^#&quot; | grep listen-address
+    listen-address  127.0.0.1:8118
+    listen-address  [::1]:8118
+</code></pre>
+<p>A seguir, adicionamos as informações ao TOR browser</p>
+<center>
+<img src="./assets/TORproxy.png" width="">
+</center>
+<div class='legend'>
+    <b>Figura 5:</b> Configurações do TOR Browser
+    <b>Fonte:</b> Screenshot do TOR Browser mediante o sistema operacional Linux Arch.
+</div>
+<br>
+<br>
+<center>
+<img src="./assets/TORproxy2.png" width="80%">
+</center>
+<div class='legend'>
+    <b>Figura 6:</b> Configurações do TOR Browser
+    <b>Fonte:</b> Screenshot do TOR Browser mediante o sistema operacional Linux Arch.
+</div>
+<p>Agora que temos tudo configurado, estamos prontos para navegar na internet de forma praticamente anónima. Mas todo esse processo é demorado. Poderiamos criar um script para automatizar todo esse processo. Mas existe ainda melhor. O sistema operacional TAILS.</p>
+<h2 id="23-sistema-operacional-tails"><a class="header" href="#23-sistema-operacional-tails">2.3. Sistema operacional TAILS</a></h2>
+<p>O TAILS é um sistema operacional baseado em Debian - Linux. Ele é um sistema operacional que pode ser executado a partir de um pendrive, sem necessidade de instalação. É um sistema que já vem configurado com tudo o que for melhor para permitir que os utilizadores possam navegar na internet de forma anónima. O TAILS é um sistema operacional de código aberto, que pode ser descarregado em <a href="https://tails.boum.org/">https://tails.boum.org/</a>.</p>
+<p>O TAILS é um sistema amnésico, pois tudo roda na memória RAM, e não guarda nada na pendrive, nem no disco do computador onde rodar o TAILS. Permite criar persistência criptografada, mas aí ja demos assas ao erro, pelo que se recomenda usar e desligar. Toda a informação da sessão será perdida.</p>
+<p>Esse sistema é o melhor do mercado, mas ainda assim, não resolvemos o problema do nosso IPS. Para isso, para quem seja vital o seu anonimato na internet, temos ainda soluções! No próximo capítulo iremos falar sobre como desaparecer por completo.</p>
+<h2 id="24-antenas-wifi-direcionais-de-longo-alcance"><a class="header" href="#24-antenas-wifi-direcionais-de-longo-alcance">2.4. Antenas WiFi direcionais de longo alcance</a></h2>
+<p>Para quem quer desaparecer por completo, temos de nos afastar da nossa casa, do nosso IPS, e de tudo o que nos possa identificar. Para isso, podemos usar uma antena WiFi direcional de longo alcance. Essas antenas são capazes de se ligar a redes WiFi a quilómetros de distância. Podemos então ligar-nos a uma rede WiFi pública, e usar o TAILS para navegar na internet. Assim, não só estamos a usar o TAILS e todas as suas ferramentas de anonimato, como estamos a usar uma rede WiFi pública, que não tem nada a ver connosco, e uma distância que permite nos afastar o máximo possível desta rede. Assim, podemos dizer que estamos o mais anónimos possível. Mas mesmo assim, se continuarmos a publicar no facebook que compramos uma antena nova para hackear a NASA, não há anonimato que nos salve.</p>
+<center>
+<img src="./assets/antena.webp" width="70%">
+</center>
+<div class='legend'>
+   <b>Figura 7:</b> Antena WiFi direcional de longo alcance
+   <b>Fonte:</b> [https://pt.aliexpress.com/item/1005005309375919.html](https://pt.aliexpress.com/item/1005005309375919.html)
+</div>
+<h1 id="3-problemas-encontrados-na-busca-do-anonimato"><a class="header" href="#3-problemas-encontrados-na-busca-do-anonimato">3. Problemas encontrados na busca do anonimato</a></h1>
+<p>Todo estes procedimentos são complexos, mas necessários para estar o mais anónimo possível. E certas organizações entenderam o perigo que isso representa. Por exemplo, o FBI, a NSA, a CIA, etc. Essas organizações têm como objetivo proteger os cidadãos, mas também têm como objetivo proteger o país. E estar totalmente anónimo para cibercriminoso ou um ciberterrorista é perigoso para as populações. Já houve, então, tentativas de contornar algumas dessas ferramentas.</p>
+<h2 id="31-rede-tor-pode-ser-controlada"><a class="header" href="#31-rede-tor-pode-ser-controlada">3.1. Rede TOR pode ser controlada</a></h2>
+<p>Já não é a primeira vez que a rede TOR se encontra nas mãos da Agência de Segurança Nacional (NSA) dos Estados Unidos. A notícia mais falada sobre este assunto foi em 2013. Mas o rasto deste artigos são complexas de encontrar na internet. O que é certo é que já não é a primeira vez que a rede TOR é comprometida, e não será certamente a última. Num desses controlos consistia em comprar os nós TOR para ter o controlo e efetuar um monitoramento Man-In-The-Middle.</p>
+<blockquote>
+<p><a href="https://www.wired.co.uk/article/nsa-targeting-tor-users">Notícia: NSA targeting Tor users</a></p>
+</blockquote>
+<p>Além do controlo dos nós, o próprio browser já sofreu ataques. Para além de que sempre houve e haverá novos zero-days no firefox. O TOR Browser é um projeto open source, pelo que o código é revisto por milhares de pessoas que dependem do anonimato que o TOR oferece. Mas nunca se sabe. Já não é a primeira vez que se ataca os desenvolvedores de uma dada ferramenta para esconder backdoors no código-fonte sem que ninguém se aperceba</p>
+<h1 id="4-conclusão"><a class="header" href="#4-conclusão">4. Conclusão</a></h1>
+<p>O anonimato na internet é um assunto muito importante, pois permite que os utilizadores possam navegar na internet sem que sejam identificados. É um assunto muito relevante para quem se preocupa com a sua privacidade e segurança, mas é primordial para pessoas que vivem em países onde a liberdade de expressão é limitada. É ainda crítico para pessoas que trabalham em áreas sensíveis, como jornalistas, ativistas, denunciantes, etc. E claro, para quem pratica atividades ilegais, como o cibercrime.</p>
+<p>A forma mais fácil de ficar anónimo é usando o sistema operacional TAILS. Mas para quem quer estar minimamente anónimo, basta usar o TOR e o privoxy. As sua ferramentas juntas já trazem um nível de anonimato excecional.</p>
+<p>Todas as técnicas aqui referidas foram para tratar a anonimidade na internet. Não confundir estar anónimo com estar livre de malwares, vírus, etc. Além disso, essas técnicas são inúteis se o utilizador não tiver cuidado com o que faz na internet. Se o utilizador usar a sua conta pessoal do facebook, e publicar X ou Y coisa, não importa ter tido o cuidado de usar a rede TOR ou o TAILS, pois toda a gente sabe que ele publicou X ou Y coisa.</p>
+<h1 id="5-bibliografia"><a class="header" href="#5-bibliografia">5. Bibliografia</a></h1>
+<ul>
+<li><a href="https://www.torproject.org/">https://www.torproject.org/</a></li>
+<li><a href="https://www.avast.com/pt-br/c-tor-dark-web-browser">https://www.avast.com/pt-br/c-tor-dark-web-browser</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../CursoCiberSeguranca/Trabalho9SSL/Trabalho9SSL.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../CursoCiberSeguranca/Trabalho9SSL/Trabalho9SSL.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>
