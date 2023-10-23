@@ -203,10 +203,10 @@ firewall-cmd --reload
 
 Neste trabalho, demonstrei como é possível limitar um utilizador a uns meros comandos, como instalar e habilitar um servidor SSH, como alterar o porto lógico de acesso ao mesmo. Deparei-me com um problema de permissões devido a políticas de segurança do sistema operativo Rocky e aprendi a resolve-lo, com a ajuda do **journal**, assim como alterar as regras do firewall também instalado por defeito neste sistema.
 
-    - Fontes úteis:
-      - https://serverfault.com/questions/998399/how-to-create-a-very-limited-linux-user
-      - https://docs.rackspace.com/support/how-to/change-the-ssh-port-in-centos-and-redhat/
-      - https://www.digitalocean.com/community/tutorials/additional-recommended-steps-for-new-centos-7-servers
+-   Fontes úteis:
+    -   https://serverfault.com/questions/998399/how-to-create-a-very-limited-linux-user
+    -   https://docs.rackspace.com/support/how-to/change-the-ssh-port-in-centos-and-redhat/
+    -   https://www.digitalocean.com/community/tutorials/additional-recommended-steps-for-new-centos-7-servers
 
 <center >
 <image src='./Assets/Coding-bro.svg' width=50%>

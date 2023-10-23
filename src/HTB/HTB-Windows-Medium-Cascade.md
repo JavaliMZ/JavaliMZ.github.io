@@ -304,21 +304,20 @@ Vemos que, na linha 39, o programa connecta-se à base de dados, como prevíamos
 
 Na linha 39 do Crypto.cs é que está definido a função "**_DecryptString_**". E dái já vemos muitas informações.
 
-    -	Crypto.DecryptString(EncryptedString, "c4scadek3y654321");  (MainModule.cs)
-        -	O trabalho de desencriptação parte daí
-    -   public static string DecryptString(string EncryptedString, string Key);
-        -	Isto é o nome da função, e os seus argumentos. a Key usada foi a que está em cima em texto claro ("c4scadek3y654321")
-    -   byte[] buffer = Convert.FromBase64String(EncryptedString);
-        -	Confirma-se que a palavra passe que encontramos na base de dados está em base64, pois o programa está a descodificar antes de tratá-lo
-    -	Aes aes = Aes.Create();
-        -	Aes é um tipo de criptografia de dados...
-        -	Aes é amplamente usado por ser um tipo de criptografia virtualmente inquebrável, que levaria vidas inteiras para decifrá-la por brute force... Mas com o código fonte, a coisa muda...
-    -	aes.IV = Encoding.UTF8.GetBytes("1tdyjCbY1Ix49842");
-        -
-    -	aes.Mode = CipherMode.CBC;
-        -	O método de codificação usado é o CBC cipher
-    -	aes.Key = Encoding.UTF8.GetBytes(Key);
-        -	confirma-se da situação da Key ser "c4scadek3y654321"
+-   Crypto.DecryptString(EncryptedString, "c4scadek3y654321"); (MainModule.cs)
+    -   O trabalho de desencriptação parte daí
+-   public static string DecryptString(string EncryptedString, string Key);
+    -   Isto é o nome da função, e os seus argumentos. a Key usada foi a que está em cima em texto claro ("c4scadek3y654321")
+-   byte[] buffer = Convert.FromBase64String(EncryptedString);
+    -   Confirma-se que a palavra passe que encontramos na base de dados está em base64, pois o programa está a descodificar antes de tratá-lo
+-   Aes aes = Aes.Create();
+    -   Aes é um tipo de criptografia de dados...
+    -   Aes é amplamente usado por ser um tipo de criptografia virtualmente inquebrável, que levaria vidas inteiras para decifrá-la por brute force... Mas com o código fonte, a coisa muda...
+-   ## aes.IV = Encoding.UTF8.GetBytes("1tdyjCbY1Ix49842");
+-   aes.Mode = CipherMode.CBC;
+    -   O método de codificação usado é o CBC cipher
+-   aes.Key = Encoding.UTF8.GetBytes(Key);
+    -   confirma-se da situação da Key ser "c4scadek3y654321"
 
 Resumo: - AES - Key == "c4scadek3y654321" - IV == "1tdyjCbY1Ix49842" - Mode == "CBC"
 

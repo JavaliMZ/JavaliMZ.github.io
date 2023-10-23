@@ -401,22 +401,42 @@ sqlite&gt; select * from Ldap;
 <p>Vemos que, na linha 39, o programa connecta-se à base de dados, como prevíamos. E na linha 46, percebemos que a string EncryptedString é a tal palavra que encontramos com o sqlite3. A seguir na linha 49, o programa tenta decryptar a palavra passe. Essa função &quot;<strong><em>Crypto.DecryptString(EncryptedString, &quot;c4scadek3y654321&quot;)</em></strong>&quot; está a ser importada do CascCrypto.dll</p>
 <p><img src="Assets/HTB-Windows-Medium-Cascade/dotpeek-casccrypto.png" alt="DotPeek CascCrypto.dll" /></p>
 <p>Na linha 39 do Crypto.cs é que está definido a função &quot;<strong><em>DecryptString</em></strong>&quot;. E dái já vemos muitas informações.</p>
-<pre><code>-	Crypto.DecryptString(EncryptedString, &quot;c4scadek3y654321&quot;);  (MainModule.cs)
-    -	O trabalho de desencriptação parte daí
--   public static string DecryptString(string EncryptedString, string Key);
-    -	Isto é o nome da função, e os seus argumentos. a Key usada foi a que está em cima em texto claro (&quot;c4scadek3y654321&quot;)
--   byte[] buffer = Convert.FromBase64String(EncryptedString);
-    -	Confirma-se que a palavra passe que encontramos na base de dados está em base64, pois o programa está a descodificar antes de tratá-lo
--	Aes aes = Aes.Create();
-    -	Aes é um tipo de criptografia de dados...
-    -	Aes é amplamente usado por ser um tipo de criptografia virtualmente inquebrável, que levaria vidas inteiras para decifrá-la por brute force... Mas com o código fonte, a coisa muda...
--	aes.IV = Encoding.UTF8.GetBytes(&quot;1tdyjCbY1Ix49842&quot;);
-    -
--	aes.Mode = CipherMode.CBC;
-    -	O método de codificação usado é o CBC cipher
--	aes.Key = Encoding.UTF8.GetBytes(Key);
-    -	confirma-se da situação da Key ser &quot;c4scadek3y654321&quot;
-</code></pre>
+<ul>
+<li>Crypto.DecryptString(EncryptedString, &quot;c4scadek3y654321&quot;); (MainModule.cs)
+<ul>
+<li>O trabalho de desencriptação parte daí</li>
+</ul>
+</li>
+<li>public static string DecryptString(string EncryptedString, string Key);
+<ul>
+<li>Isto é o nome da função, e os seus argumentos. a Key usada foi a que está em cima em texto claro (&quot;c4scadek3y654321&quot;)</li>
+</ul>
+</li>
+<li>byte[] buffer = Convert.FromBase64String(EncryptedString);
+<ul>
+<li>Confirma-se que a palavra passe que encontramos na base de dados está em base64, pois o programa está a descodificar antes de tratá-lo</li>
+</ul>
+</li>
+<li>Aes aes = Aes.Create();
+<ul>
+<li>Aes é um tipo de criptografia de dados...</li>
+<li>Aes é amplamente usado por ser um tipo de criptografia virtualmente inquebrável, que levaria vidas inteiras para decifrá-la por brute force... Mas com o código fonte, a coisa muda...</li>
+</ul>
+</li>
+<li>
+<h2 id="aesiv--encodingutf8getbytes1tdyjcby1ix49842"><a class="header" href="#aesiv--encodingutf8getbytes1tdyjcby1ix49842">aes.IV = Encoding.UTF8.GetBytes(&quot;1tdyjCbY1Ix49842&quot;);</a></h2>
+</li>
+<li>aes.Mode = CipherMode.CBC;
+<ul>
+<li>O método de codificação usado é o CBC cipher</li>
+</ul>
+</li>
+<li>aes.Key = Encoding.UTF8.GetBytes(Key);
+<ul>
+<li>confirma-se da situação da Key ser &quot;c4scadek3y654321&quot;</li>
+</ul>
+</li>
+</ul>
 <p>Resumo: - AES - Key == &quot;c4scadek3y654321&quot; - IV == &quot;1tdyjCbY1Ix49842&quot; - Mode == &quot;CBC&quot;</p>
 <h3 id="231-decrypt-password"><a class="header" href="#231-decrypt-password">2.3.1. Decrypt Password</a></h3>
 <p>Agora é só decifrá-lo. Isto claramente não vou fazer com uma calculadora (de uma não sei como se faz, e não deve ser fácil lol). Para isso existe ferramentas online, e programas diversos no github. Vou usar uma ferramenta online. o <strong><em>CyberChef</em></strong>. è só procurar as &quot;operations&quot;, por o input e guardar o Output</p>

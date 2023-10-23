@@ -20,6 +20,10 @@
 - [4. Conclusão](#4-conclusão)
 - [5. Bibliografia](#5-bibliografia)
 
+---
+
+---
+
 > No contexto do CTESP em cibersegurança que estou a efetuar, foi-me proposto a realização de um trabalho sobre o anonimato na internet. Este trabalho foi realizado no âmbito da unidade curricular de "Técnicas de hacking". O objetivo deste trabalho é aprofundar os conhecimentos sobre o anonimato na internet, e sobre as ferramentas que permitem que os utilizadores possam navegar na internet de forma anónima.
 >
 > Enunciado:
@@ -35,6 +39,8 @@
 > Como resultado devem verificar se o tráfego está a ser encaminhado pela rede TOR. Para isso verifiquem a configuração através deste site: https://check.torproject.org/
 >
 > Indiquem também qual o IP atribuído e a área geográfica a qual o mesmo pertence.
+
+---
 
 # 1. Introdução
 
@@ -117,30 +123,30 @@ Como a rede TOR faz questão de enviar o trafego por vários nós, ficamos assim
 
 Existe outras formas de saber quem somos pela internet sem metermos os nosso dados. Existem dados nosso sobre tudo o que possamos imaginar e o que não imaginamos gravados na internet Um expert em OSINT consegue fazer ligações inimagináveis para determinar com um grau de certezas muito elevado que foi tal ou tal pessoa a fazer algo pela internet. Exemplos:
 
-Exitem diversos dados que enviamos através do nosso browser que nos identificam, e outros que são acessíveis por código javascript que o nosso browser executa. Dados como:
+Existem diversos dados que enviamos através do nosso browser que nos identificam, e outros que são acessíveis por código javascript que o nosso browser executa. Dados como:
 
-    - tamanho do ecrã
-    - tamanho usável do browser
-    - user-agent
-    - Do Not Track header
-    - Timezone
-    - Content language
-    - layout de teclado
-    - Lista de fontes instaladas
-    - Lista de plugins instalados
-    - WebGL Renderer
-    - permissões do browser
-    - e muitos outros
+-   tamanho do ecrã
+-   tamanho usável do browser
+-   user-agent
+-   Do Not Track header
+-   Timezone
+-   Content language
+-   layout de teclado
+-   Lista de fontes instaladas
+-   Lista de plugins instalados
+-   WebGL Renderer
+-   permissões do browser
+-   e muitos outros
 
 <center>
 <img src="./assets/amiunique.png" width="">
 </center>
 <div class='legend'>
-   <b>Figura 4:</b> Página de internet [https://amiunique.org/fingerprint](https://amiunique.org/fingerprint)
-   <b>Fonte:</b> Screenshot da página de internet [https://amiunique.org/fingerprint](https://amiunique.org/fingerprint)
+   <b>Figura 4:</b> Página de internet <a href='https://amiunique.org/fingerprint'> amiunique.org/fingerprint</a><br>
+   <b>Fonte:</b> Screenshot da página de internet <a href='https://amiunique.org/fingerprint'> amiunique.org/fingerprint</a>
 </div>
 
-No meu caso em particular, sou único. totalmente identificável pela internet... Também posso dizer que talvés me ponho a geito. Teclado e linguagem em Portugues, computador Linux, fontes (tipos de letras) como "_firacode_" entre outras coisas fazem que não haja outra configuração igual.
+No meu caso em particular, sou único. totalmente identificável pela internet... Também posso dizer que talvez me ponho a jeito. Teclado e linguagem em Portugues, computador Linux, fontes (tipos de letras) como "_firacode_" entre outras coisas fazem que não haja outra configuração igual.
 
 E no caso de usar TOR? De certeza que não iria ser possível obter tanta informação, mas mesmo assim, seriam perfeitamente suficientes para me identificarem.
 
@@ -180,7 +186,7 @@ A seguir, adicionamos as informações ao TOR browser
 <img src="./assets/TORproxy.png" width="">
 </center>
 <div class='legend'>
-    <b>Figura 5:</b> Configurações do TOR Browser
+    <b>Figura 5:</b> Configurações do TOR Browser<br>
     <b>Fonte:</b> Screenshot do TOR Browser mediante o sistema operacional Linux Arch.
 </div>
 
@@ -192,7 +198,7 @@ A seguir, adicionamos as informações ao TOR browser
 </center>
 
 <div class='legend'>
-    <b>Figura 6:</b> Configurações do TOR Browser
+    <b>Figura 6:</b> Configurações do TOR Browser<br>
     <b>Fonte:</b> Screenshot do TOR Browser mediante o sistema operacional Linux Arch.
 </div>
 
@@ -214,8 +220,8 @@ Para quem quer desaparecer por completo, temos de nos afastar da nossa casa, do 
 <img src="./assets/antena.webp" width="70%">
 </center>
 <div class='legend'>
-   <b>Figura 7:</b> Antena WiFi direcional de longo alcance
-   <b>Fonte:</b> [https://pt.aliexpress.com/item/1005005309375919.html](https://pt.aliexpress.com/item/1005005309375919.html)
+   <b>Figura 7:</b> Antena WiFi direcional de longo alcance<br>
+   <b>Fonte:</b> <a href='https://pt.aliexpress.com/item/1005005309375919.html'>aliexpress</a>
 </div>
 
 # 3. Problemas encontrados na busca do anonimato
@@ -236,9 +242,11 @@ O anonimato na internet é um assunto muito importante, pois permite que os util
 
 A forma mais fácil de ficar anónimo é usando o sistema operacional TAILS. Mas para quem quer estar minimamente anónimo, basta usar o TOR e o privoxy. As sua ferramentas juntas já trazem um nível de anonimato excecional.
 
-Todas as técnicas aqui referidas foram para tratar a anonimidade na internet. Não confundir estar anónimo com estar livre de malwares, vírus, etc. Além disso, essas técnicas são inúteis se o utilizador não tiver cuidado com o que faz na internet. Se o utilizador usar a sua conta pessoal do facebook, e publicar X ou Y coisa, não importa ter tido o cuidado de usar a rede TOR ou o TAILS, pois toda a gente sabe que ele publicou X ou Y coisa.
+Todas as técnicas aqui referidas foram para tratar a anonimidade na internet. Não confundir estar anónimo com estar livre de malwares, vírus, etc. Além disso, essas técnicas são inúteis se o utilizador não tiver cuidado com o que faz na internet. Se o utilizador usar a sua conta pessoal do facebook, e publicar X ou Y coisa, sim a comunicação até aos servidores do facebook são anónimas, sim é muito dificil (praticamente impossível) reconstruir o caminho que cada pacote usou, mas não importa ter tido o cuidado de usar a rede TOR ou o TAILS, pois toda a gente sabe que ele publicou X ou Y coisa.
 
 # 5. Bibliografia
 
 -   [https://www.torproject.org/](https://www.torproject.org/)
 -   [https://www.avast.com/pt-br/c-tor-dark-web-browser](https://www.avast.com/pt-br/c-tor-dark-web-browser)
+-   [Notícia: NSA targeting Tor users](https://www.wired.co.uk/article/nsa-targeting-tor-users)
+

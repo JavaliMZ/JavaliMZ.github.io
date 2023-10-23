@@ -192,6 +192,8 @@
 <li><a href="#4-conclus%C3%A3o">4. Conclusão</a></li>
 <li><a href="#5-bibliografia">5. Bibliografia</a></li>
 </ul>
+<hr />
+<hr />
 <blockquote>
 <p>No contexto do CTESP em cibersegurança que estou a efetuar, foi-me proposto a realização de um trabalho sobre o anonimato na internet. Este trabalho foi realizado no âmbito da unidade curricular de &quot;Técnicas de hacking&quot;. O objetivo deste trabalho é aprofundar os conhecimentos sobre o anonimato na internet, e sobre as ferramentas que permitem que os utilizadores possam navegar na internet de forma anónima.</p>
 <p>Enunciado:</p>
@@ -202,6 +204,7 @@
 <p>Como resultado devem verificar se o tráfego está a ser encaminhado pela rede TOR. Para isso verifiquem a configuração através deste site: https://check.torproject.org/</p>
 <p>Indiquem também qual o IP atribuído e a área geográfica a qual o mesmo pertence.</p>
 </blockquote>
+<hr />
 <h1 id="1-introdução"><a class="header" href="#1-introdução">1. Introdução</a></h1>
 <p>Neste trabalho, iremos desenvolver um relatório sobre o anonimato na internet. Iremos tratar de entender o que é a rede TOR, como usar o Privoxy, iremos ainda falar sobre o sistema operativo TAILS e por fim, passando ainda por discutir sobre a importância do anonimato para o black hat hacker, as dificuldades que enfrentam as autoridades contra o anonimato e sobre a importância da coordenação e cooperação internacional para combater o cibercrime.</p>
 <h1 id="2-anonimato-na-internet"><a class="header" href="#2-anonimato-na-internet">2. Anonimato na internet</a></h1>
@@ -255,28 +258,29 @@ torbrowser-launcher  # Para instalar o TOR Browser pela primeira vez, e para o i
 <p>Como a rede TOR faz questão de enviar o trafego por vários nós, ficamos assim quase totalmente oculos na internet pelo seguinte motivo: O trafego passa por diversos países. Países alguns que nem legislação tem. Isso traz grandes dificuldades em pedir registo de lOGS dos provedores de internet desses países. Além disso, a cooperação entre países é muitas vezes complicada, e torna complicado recolher todos os lOGS necessários á reconstrução do caminho de tráfego. E outro ponto importante também, as autoridades demoram a responder, a burocracia é penosa, e demora-se meses até conseguir talvez o primeiro LOG, para saber o nó seguinte e fazer novos pedidos e assim por diante. A grande maioria das vezes, quando não há falta de lOGS, há falta de tempo, e os crimes prescrevem.</p>
 <h3 id="216-então-porquê-mesmo-assim-podemos-não-estar-totalmente-ocultos"><a class="header" href="#216-então-porquê-mesmo-assim-podemos-não-estar-totalmente-ocultos">2.1.6. Então porquê mesmo assim podemos não estar totalmente ocultos?</a></h3>
 <p>Existe outras formas de saber quem somos pela internet sem metermos os nosso dados. Existem dados nosso sobre tudo o que possamos imaginar e o que não imaginamos gravados na internet Um expert em OSINT consegue fazer ligações inimagináveis para determinar com um grau de certezas muito elevado que foi tal ou tal pessoa a fazer algo pela internet. Exemplos:</p>
-<p>Exitem diversos dados que enviamos através do nosso browser que nos identificam, e outros que são acessíveis por código javascript que o nosso browser executa. Dados como:</p>
-<pre><code>- tamanho do ecrã
-- tamanho usável do browser
-- user-agent
-- Do Not Track header
-- Timezone
-- Content language
-- layout de teclado
-- Lista de fontes instaladas
-- Lista de plugins instalados
-- WebGL Renderer
-- permissões do browser
-- e muitos outros
-</code></pre>
+<p>Existem diversos dados que enviamos através do nosso browser que nos identificam, e outros que são acessíveis por código javascript que o nosso browser executa. Dados como:</p>
+<ul>
+<li>tamanho do ecrã</li>
+<li>tamanho usável do browser</li>
+<li>user-agent</li>
+<li>Do Not Track header</li>
+<li>Timezone</li>
+<li>Content language</li>
+<li>layout de teclado</li>
+<li>Lista de fontes instaladas</li>
+<li>Lista de plugins instalados</li>
+<li>WebGL Renderer</li>
+<li>permissões do browser</li>
+<li>e muitos outros</li>
+</ul>
 <center>
 <img src="./assets/amiunique.png" width="">
 </center>
 <div class='legend'>
-   <b>Figura 4:</b> Página de internet [https://amiunique.org/fingerprint](https://amiunique.org/fingerprint)
-   <b>Fonte:</b> Screenshot da página de internet [https://amiunique.org/fingerprint](https://amiunique.org/fingerprint)
+   <b>Figura 4:</b> Página de internet <a href='https://amiunique.org/fingerprint'> amiunique.org/fingerprint</a><br>
+   <b>Fonte:</b> Screenshot da página de internet <a href='https://amiunique.org/fingerprint'> amiunique.org/fingerprint</a>
 </div>
-<p>No meu caso em particular, sou único. totalmente identificável pela internet... Também posso dizer que talvés me ponho a geito. Teclado e linguagem em Portugues, computador Linux, fontes (tipos de letras) como &quot;<em>firacode</em>&quot; entre outras coisas fazem que não haja outra configuração igual.</p>
+<p>No meu caso em particular, sou único. totalmente identificável pela internet... Também posso dizer que talvez me ponho a jeito. Teclado e linguagem em Portugues, computador Linux, fontes (tipos de letras) como &quot;<em>firacode</em>&quot; entre outras coisas fazem que não haja outra configuração igual.</p>
 <p>E no caso de usar TOR? De certeza que não iria ser possível obter tanta informação, mas mesmo assim, seriam perfeitamente suficientes para me identificarem.</p>
 <h3 id="217-como-tentar-ficar-anónimo-pela-internet"><a class="header" href="#217-como-tentar-ficar-anónimo-pela-internet">2.1.7. Como tentar ficar anónimo pela internet?</a></h3>
 <p>Vimos anteriormente várias falhas no anonimato perfeito... Mas vamos tentar otimizar tudo para ficarmos o mais anónimos possível. Vimos que o nosso sistema fala para a internet. Isso é um problema para quem quiser ficar anónimo. Temos então que usar, para além do TOR e de uma VPN-over-TOR, podemos usar uma ferramenta que irá alterar todos esses elementos identificáveis do browser. Essa ferramenta é o privoxy.</p>
@@ -299,7 +303,7 @@ torbrowser-launcher  # Para instalar o TOR Browser pela primeira vez, e para o i
 <img src="./assets/TORproxy.png" width="">
 </center>
 <div class='legend'>
-    <b>Figura 5:</b> Configurações do TOR Browser
+    <b>Figura 5:</b> Configurações do TOR Browser<br>
     <b>Fonte:</b> Screenshot do TOR Browser mediante o sistema operacional Linux Arch.
 </div>
 <br>
@@ -308,7 +312,7 @@ torbrowser-launcher  # Para instalar o TOR Browser pela primeira vez, e para o i
 <img src="./assets/TORproxy2.png" width="80%">
 </center>
 <div class='legend'>
-    <b>Figura 6:</b> Configurações do TOR Browser
+    <b>Figura 6:</b> Configurações do TOR Browser<br>
     <b>Fonte:</b> Screenshot do TOR Browser mediante o sistema operacional Linux Arch.
 </div>
 <p>Agora que temos tudo configurado, estamos prontos para navegar na internet de forma praticamente anónima. Mas todo esse processo é demorado. Poderiamos criar um script para automatizar todo esse processo. Mas existe ainda melhor. O sistema operacional TAILS.</p>
@@ -322,8 +326,8 @@ torbrowser-launcher  # Para instalar o TOR Browser pela primeira vez, e para o i
 <img src="./assets/antena.webp" width="70%">
 </center>
 <div class='legend'>
-   <b>Figura 7:</b> Antena WiFi direcional de longo alcance
-   <b>Fonte:</b> [https://pt.aliexpress.com/item/1005005309375919.html](https://pt.aliexpress.com/item/1005005309375919.html)
+   <b>Figura 7:</b> Antena WiFi direcional de longo alcance<br>
+   <b>Fonte:</b> <a href='https://pt.aliexpress.com/item/1005005309375919.html'>aliexpress</a>
 </div>
 <h1 id="3-problemas-encontrados-na-busca-do-anonimato"><a class="header" href="#3-problemas-encontrados-na-busca-do-anonimato">3. Problemas encontrados na busca do anonimato</a></h1>
 <p>Todo estes procedimentos são complexos, mas necessários para estar o mais anónimo possível. E certas organizações entenderam o perigo que isso representa. Por exemplo, o FBI, a NSA, a CIA, etc. Essas organizações têm como objetivo proteger os cidadãos, mas também têm como objetivo proteger o país. E estar totalmente anónimo para cibercriminoso ou um ciberterrorista é perigoso para as populações. Já houve, então, tentativas de contornar algumas dessas ferramentas.</p>
@@ -336,11 +340,12 @@ torbrowser-launcher  # Para instalar o TOR Browser pela primeira vez, e para o i
 <h1 id="4-conclusão"><a class="header" href="#4-conclusão">4. Conclusão</a></h1>
 <p>O anonimato na internet é um assunto muito importante, pois permite que os utilizadores possam navegar na internet sem que sejam identificados. É um assunto muito relevante para quem se preocupa com a sua privacidade e segurança, mas é primordial para pessoas que vivem em países onde a liberdade de expressão é limitada. É ainda crítico para pessoas que trabalham em áreas sensíveis, como jornalistas, ativistas, denunciantes, etc. E claro, para quem pratica atividades ilegais, como o cibercrime.</p>
 <p>A forma mais fácil de ficar anónimo é usando o sistema operacional TAILS. Mas para quem quer estar minimamente anónimo, basta usar o TOR e o privoxy. As sua ferramentas juntas já trazem um nível de anonimato excecional.</p>
-<p>Todas as técnicas aqui referidas foram para tratar a anonimidade na internet. Não confundir estar anónimo com estar livre de malwares, vírus, etc. Além disso, essas técnicas são inúteis se o utilizador não tiver cuidado com o que faz na internet. Se o utilizador usar a sua conta pessoal do facebook, e publicar X ou Y coisa, não importa ter tido o cuidado de usar a rede TOR ou o TAILS, pois toda a gente sabe que ele publicou X ou Y coisa.</p>
+<p>Todas as técnicas aqui referidas foram para tratar a anonimidade na internet. Não confundir estar anónimo com estar livre de malwares, vírus, etc. Além disso, essas técnicas são inúteis se o utilizador não tiver cuidado com o que faz na internet. Se o utilizador usar a sua conta pessoal do facebook, e publicar X ou Y coisa, sim a comunicação até aos servidores do facebook são anónimas, sim é muito dificil (praticamente impossível) reconstruir o caminho que cada pacote usou, mas não importa ter tido o cuidado de usar a rede TOR ou o TAILS, pois toda a gente sabe que ele publicou X ou Y coisa.</p>
 <h1 id="5-bibliografia"><a class="header" href="#5-bibliografia">5. Bibliografia</a></h1>
 <ul>
 <li><a href="https://www.torproject.org/">https://www.torproject.org/</a></li>
 <li><a href="https://www.avast.com/pt-br/c-tor-dark-web-browser">https://www.avast.com/pt-br/c-tor-dark-web-browser</a></li>
+<li><a href="https://www.wired.co.uk/article/nsa-targeting-tor-users">Notícia: NSA targeting Tor users</a></li>
 </ul>
 
                     </main>

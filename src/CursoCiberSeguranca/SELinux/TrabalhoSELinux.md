@@ -55,21 +55,21 @@ yum install policycoreutils-python
 
 Existem ainda outros pacotes que poderão ser instalados dependendo das necessidades. Na documentação oficial do Red Hat, encontramos a seguinte lista de pacotes:
 
-    - policies: selinux-policy-targeted, selinux-policy-mls
-    - tools: policycoreutils, policycoreutils-gui, libselinux-utils, policycoreutils-python-utils, setools-console, checkpolicy
+-   policies: selinux-policy-targeted, selinux-policy-mls
+-   tools: policycoreutils, policycoreutils-gui, libselinux-utils, policycoreutils-python-utils, setools-console, checkpolicy
 
 ## 3. Configuração
 
 O ficheiro principal de configuração do SELinux é o /etc/selinux/config. Este ficheiro contém as seguintes opções:
 
-    - SELINUX: define o modo de execução do SELinux
-      - SELINUX=disabled: desativa o SELinux durante o arranque
-      - SELINUX=permissive: coloca o SELinux em modo permissivo, imprimindo apenas mensagens de aviso
-      - SELINUX=enforcing: coloca o SELinux em modo de execução
-    - SELINUXTYPE: define o tipo de política SELinux a ser usada
-      - SELINUXTYPE=targeted: define a política SELinux como targeted
-      - SELINUXTYPE=minimum: define a política SELinux como minimum, apenas processos selecionados são protegidos
-      - SELINUXTYPE=mls: define a política SELinux como multi level security (MLS)
+-   SELINUX: define o modo de execução do SELinux
+    -   SELINUX=disabled: desativa o SELinux durante o arranque
+    -   SELINUX=permissive: coloca o SELinux em modo permissivo, imprimindo apenas mensagens de aviso
+    -   SELINUX=enforcing: coloca o SELinux em modo de execução
+-   SELINUXTYPE: define o tipo de política SELinux a ser usada
+    -   SELINUXTYPE=targeted: define a política SELinux como targeted
+    -   SELINUXTYPE=minimum: define a política SELinux como minimum, apenas processos selecionados são protegidos
+    -   SELINUXTYPE=mls: define a política SELinux como multi level security (MLS)
 
 Na mesma pasta, existe ainda o ficheiro /etc/selinux/semanage.conf. Este ficheiro **"/etc/selinux/semanage.conf"**, é um ficheiro de configuração para a ferramenta de gestão SELinux "semanage". Ele contém definições para a localização padrão do armazenamento de políticas, a localização padrão do armazenamento de módulos de políticas e o caminho padrão dos módulos de políticas. Estas definições são usadas pelo "semanage" para gerir as políticas e módulos SELinux no sistema. O ficheiro pode ser editado para alterar as definições padrão do "semanage".
 
