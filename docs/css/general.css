@@ -216,3 +216,10 @@ blockquote {
 .result-no-output {
     font-style: italic;
 }
+
+
+.legend {
+    font-size: 0.8em;
+    line-height: 110%;
+    text-align: center;
+}
